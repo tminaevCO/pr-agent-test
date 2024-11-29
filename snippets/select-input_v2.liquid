@@ -1,0 +1,152 @@
+{% comment %}
+  - options - ex. option1,option2,option3....
+  - placeholder - fisrst empty option in select, ex. 'Select your option'
+  - label - input label + using for input naming if select_name not found
+  - select_name - ex. contact[topic]
+  - id - section or block id
+  - required
+  - border_radius
+  - border_color
+  - text_color
+  - background_color
+  - higlight_color
+{% endcomment %}
+
+{% liquid
+  assign id = id | default: ''
+  assign select_id =  label | handelize | append: id
+  assign select_name = select_name | default: select_id
+  assign options = options | split: ','
+  assign required = required | default: false
+
+  comment  
+  Styles
+  endcomment
+
+  assign border_color = border_color | default: '#000000'
+  assign text_color = text_color | default: '#000000'
+  assign background_color = background_color | default: '#ffffff'
+  assign higlight_color = higlight_color | default: '#00000020'
+  assign border_radius = border_radius | default: 0
+%}
+
+{% style %}
+  custom-select {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+  }
+
+  custom-select select {
+    position: absolute;
+    z-index: 0;
+    opacity: 0;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .custom-select {
+    position: relative;
+    width: 300px;
+  }
+
+  .custom-select.opened .custom-select__list {
+    display: flex;
+  }
+
+  .custom-select.opened .custom-select__label svg {
+    transform: rotate(180deg) translateY(50%);
+  }
+
+  .custom-select__label {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    padding: 11px 44px 11px 16px;
+    border: 1px solid {{ border_color }};
+    border-radius: {{ border_radius }}px;
+    cursor: pointer;
+    box-sizing: border-box;
+    color: {{ text_color }};
+    background-color: {{ background_color }};
+  }
+
+  .custom-select__label span{
+    width: 100%;
+  }
+
+  .custom-select__label svg {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+  }
+
+  .custom-select__list {
+    margin: 0;
+    list-style: none;
+    padding: 8px;
+    background-color: {{ background_color }};
+    color: {{ text_color }};
+    flex-direction: column;
+    display: none;
+    width: 100%;
+    user-select: none;
+    box-sizing: border-box;
+    border-radius: {{ border_radius }}px;
+
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 1;
+    box-shadow: 0px 8px 20px -4px #1718181f;
+  }
+
+  .custom-select__list-option {
+    padding: 12px 8px;
+    cursor: pointer;
+    border-radius: {{ border_radius }}px;
+  }
+
+  .custom-select__list-option:hover {
+    background-color: {{ higlight_color }};
+  }
+{% endstyle %}
+
+<custom-select>
+  <label for="{{ select_id }}">{{ label }}</label>
+  <select id="{{ select_id }}" name="{{ select_name }}" required="{{ required }}">
+    {% if placeholder != blank %}
+      <option value="">{{ placeholder }}</option>
+    {% endif %}
+    {% for option in options %}
+      <option value="{{ option }}">{{ option }}</option>
+    {% endfor %}
+  </select>
+
+  <div class="custom-select">
+    <div class="custom-select__label">
+      <span>
+        {% if placeholder != blank %}
+          {{ placeholder }}
+        {% else %}
+          {{ options | first }}
+        {% endif %}
+      </span>
+      {% render 'icon_v2', icon: 'chevron', color: border_color %}
+    </div>
+    <ul class="custom-select__list">
+      {% if placeholder != blank %}
+        <li class="custom-select__list-option" data-value="">{{ placeholder }}</li>
+      {% endif %}
+      {% for option in options %}
+        <li class="custom-select__list-option" data-value="{{ option }}">{{ option }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</custom-select>

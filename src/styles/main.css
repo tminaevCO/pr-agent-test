@@ -1,0 +1,521 @@
+/* src/styles/main.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "./fonts.css";
+@config "../../tailwind.config.js";
+
+* {
+  @apply p-0 m-0 box-border;
+}
+
+html {
+  @apply font-regular text-[16px] antialiased;
+}
+
+body.locked {
+  overflow: hidden;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
+  white-space: nowrap;
+  clip-path: inset(100%);
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+[data-aria-hidden="true"] {
+  @apply hidden;
+}
+
+h1,
+.h1,
+.heading-1 {
+  @apply font-heading text-60 leading-60 lg:text-88 lg:leading-88;
+}
+
+h2,
+.h2,
+.heading-2 {
+  @apply font-heading text-56 leading-56 -tracking-1 lg:text-72 lg:leading-72 lg:-tracking-0.5;
+}
+
+h3,
+.h3,
+.heading-3 {
+  @apply font-heading text-40 leading-40 lg:text-56 lg:leading-40 lg:-tracking-0.5;
+}
+
+h4,
+.h4,
+.heading-4 {
+  @apply font-heading text-32 leading-32 tracking-0.5 lg:text-40 lg:leading-40 lg:tracking-1;
+}
+
+h5,
+.h5,
+.heading-5 {
+  @apply font-heading text-24 leading-24 -tracking-0.5 lg:text-32 lg:leading-32 lg:tracking-1;
+}
+
+h6,
+.h6
+.heading-6 {
+  @apply font-heading text-18 leading-20 lg:text-20 lg:leading-24;
+}
+
+.body-1 {
+  @apply text-18 leading-28;
+}
+
+.body-2 {
+  @apply text-16 leading-24;
+}
+
+.body-3 {
+  @apply text-14 leading-22;
+}
+
+.button-text-1 {
+  @apply font-heading text-16 leading-24 tracking-0.5 lg:text-18;
+}
+
+.button-text-2 {
+  @apply font-heading text-16 leading-24 tracking-0.5 lg:text-14;
+}
+
+.label-text {
+  @apply text-12 leading-20;
+}
+
+.subtitle-text {
+  @apply text-20 leading-24 -tracking-0.5 lg:text-24 lg:leading-32;
+}
+
+.button {
+  @apply appearance-none border-none w-fit flex items-center justify-center button-text-1 rounded-8 px-40 py-16 text-white uppercase transition-colors cursor-pointer;
+}
+
+.button[disabled] {
+  @apply bg-grey-200;
+}
+
+.button--w-full {
+  @apply w-full;
+}
+
+.button--centered {
+  @apply mx-auto;
+}
+
+.button--primary {
+  @apply bg-orange-100 border-orange-100 hover:bg-orange;
+}
+
+.button--secondary {
+  @apply bg-black-200 border-black-200 hover:bg-black-100;
+}
+
+.button--link {
+  @apply bg-transparent button-text-2 text-black-200 hover:underline px-16 py-12;
+}
+
+.button--link[disabled] {
+  @apply text-grey-300;
+}
+
+.button--icon {
+  @apply p-12 rounded-6 border-white border-1;
+}
+
+.button--social {
+  @apply p-9 rounded-6 border-1 border-solid border-white-0.2 hover:bg-orange hover:border-orange active:bg-orange-100 active:border-orange;
+}
+
+.button--social[disabled] {
+  @apply opacity-50;
+}
+
+.button svg {
+  @apply mx-8;
+}
+
+.button svg:nth-of-type(1) {
+  @apply ml-0;
+}
+
+.button svg:nth-of-type(2) {
+  @apply mr-0;
+}
+
+.button--icon svg {
+  @apply m-0;
+}
+
+.input-wrapper {
+  @apply relative;
+}
+
+.input-wrapper .input-label {
+  @apply text-white label-text absolute top-0 left-0 opacity-0 transition-opacity;
+}
+
+.input-wrapper .input {
+  @apply w-full appearance-none bg-transparent border-t-0 border-l-0 border-r-0 border-b-2 font-heading text-20 leading-24 text-white border-white transition-colors pt-22 pb-12 px-0 focus:ring-0 focus:border-orange-100 placeholder:text-white placeholder:font-heading placeholder:text-20 placeholder:leading-24 placeholder:uppercase;
+}
+
+.input-wrapper .input:not(:placeholder-shown) ~ .input-label {
+  @apply opacity-100;
+}
+
+.input-wrapper.dark .input {
+  @apply text-black-200 border-black-200 placeholder:text-black-200 focus:border-orange-100;
+}
+
+.input-wrapper.dark .input-label {
+  @apply text-black-200;
+}
+
+.input-wrapper.error .input {
+  @apply border-error;
+}
+
+.checkbox-wrapper {
+  @apply flex cursor-pointer relative;
+}
+
+.checkbox-wrapper .checkbox {
+  @apply appearance-none bg-none bg-transparent relative w-20 h-20 border-1 border-grey-300 rounded-2 transition-all focus:ring-0 focus:bg-transparent focus:ring-offset-0 focus:shadow-none focus:shadow-transparent checked:bg-transparent;
+}
+
+.checkbox-wrapper .checkbox-label {
+  @apply ml-8 label-text text-left text-grey-300 transition-colors;
+}
+
+.checkbox-wrapper .checkbox-icon {
+  @apply -ml-20 w-20 h-20 flex items-center justify-center opacity-0 transition-opacity pointer-events-none;
+}
+
+.checkbox-wrapper .checkbox:checked {
+  @apply border-white;
+}
+
+.checkbox-wrapper .checkbox:checked + .checkbox-icon {
+  @apply opacity-100;
+}
+
+.checkbox-wrapper .checkbox:checked ~ .checkbox-label {
+  @apply text-grey-200;
+}
+
+.checkbox-wrapper:hover .checkbox {
+  @apply border-white;
+}
+
+.checkbox-wrapper:hover .checkbox-label {
+  @apply text-grey-200;
+}
+
+.checkbox-wrapper:hover {
+  @apply text-black-200;
+}
+
+.checkbox-wrapper.dark .checkbox {
+  @apply border-grey-300;
+}
+
+.checkbox-wrapper.dark .checkbox-label {
+  @apply text-grey-300;
+}
+
+.checkbox-wrapper.dark .checkbox-icon svg path {
+  @apply fill-black-200;
+}
+
+.checkbox-wrapper.dark .checkbox:checked {
+  @apply border-black-200;
+}
+
+.checkbox-wrapper.dark .checkbox:checked ~ .checkbox-label {
+  @apply text-black-200;
+}
+
+.checkbox-wrapper.dark:hover .checkbox {
+  @apply border-black-200;
+}
+
+.checkbox-wrapper.dark:hover .checkbox-label {
+  @apply text-black-200;
+}
+
+.tab-item {
+  @apply w-fit px-16 py-12 body-3 border-1 border-transparent bg-black-200 text-white rounded-8 hover:bg-grey-100 hover:text-black-200 transition-colors cursor-pointer;
+}
+
+.tab-item.active {
+  @apply bg-white text-black-200 border-black-200;
+}
+
+.tab-item--reverse {
+  @apply bg-white text-black-200 border-black-200 transition-all;
+}
+
+.tab-item--reverse.grey-bg{
+  @apply bg-grey border-white;
+}
+
+.tab-item--reverse.grey-bg:not(.active):hover{
+  @apply bg-white border-black-200;
+}
+
+.tab-item--reverse.active {
+  @apply bg-black-200 text-white border-transparent;
+}
+
+.container {
+  @apply mx-auto max-w-container px-16 lg:px-32;
+}
+
+@media (max-width:767px) {
+  .mobile-container {
+    @apply mx-auto max-w-container px-16;
+  }
+}
+
+@media (min-width:768px) {
+  .desktop-container {
+    @apply mx-auto max-w-container px-16;
+  }
+}
+
+.container--full {
+  @apply max-w-none;
+}
+
+@media (min-width:1300px) and (max-width: 1440px) {
+  .container {
+    @apply px-0;
+  }
+}
+
+.w-without-container {
+  width: calc(100% + 32px);
+}
+
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.global-spacing {
+  padding-top: var(--padding-top-mobile);
+  padding-bottom: var(--padding-bottom-mobile);
+  margin-top: var(--margin-top-mobile);
+  margin-bottom: var(--margin-bottom-mobile);
+}
+
+@media only screen and (min-width: 1024px) {
+  .global-spacing {
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+    margin-top: var(--margin-top);
+    margin-bottom: var(--margin-bottom);
+  }
+}
+
+/* buttons with arrow svg */
+.button-arrow {
+  cursor: pointer;
+}
+
+.button-arrow[disabled] svg path {
+  fill: #C2C1C0;
+}
+
+.button-arrow, .button-arrow * {
+  transition: .2s all;
+}
+
+.button-arrow[disabled] svg rect {
+  fill: transparent;
+}
+
+.button-arrow {
+  border: 1px solid transparent;
+  transition: .2s all;
+  border-radius: 10px;
+}
+
+.button-arrow[disabled] {
+  border-color: #0A03001A;
+  border-radius: 10px;
+}
+
+.button-arrow:hover {
+  border-color: #FF6929;
+}
+
+.button-arrow:hover rect {
+  fill: #FF6929;
+}
+
+.button-arrow:hover path {
+  fill: #FFFFFF;
+}
+
+.button-arrow:active {
+  border-color: #FF4C01;
+}
+
+.button-arrow:active rect {
+  fill: #FF4C01;
+}
+
+.button-arrow:active path {
+  fill: white;
+}
+
+.button-arrow[disabled]:hover {
+  border-color: #0A03001A;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+product-card .loox-rating-label {
+  @apply text-14 leading-14 text-grey-300;
+}
+
+product-card svg.loox-icon {
+  @apply w-16 h-16 text-orange-100;
+}
+
+.custom-text-color {
+  color: var(--text-color);
+}
+
+.custom-title-color {
+  color: var(--title-color);
+}
+
+.custom-text-align {
+  text-align: var(--text-align);
+}
+
+
+/* search button styles */
+
+.search-button:hover svg rect {
+  transition: .2s all;
+  fill: #FF6929;
+}
+
+.search-button * {
+  transition: .2s all;
+}
+
+.search-button {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: .2s all;
+}
+
+.search-button[disabled] {
+  transform: scale(.95);
+  border: 1px solid #0A03001A;
+}
+
+.search-button[disabled] svg rect {
+  fill: transparent;
+}
+
+.search-button[disabled] svg path {
+  stroke: #C2C1C0;
+}
+
+.search-button:focus {
+  border-color: #4A25FF;
+  transform: scale(.95);
+}
+
+.bg-image-variable{
+  background-image: var(--bg-image-mobile);
+}
+
+@media (min-width:768px){
+  .bg-image-variable{
+    background-image: var(--bg-image-desktop);
+  }
+}
+
+/* Swiper styles */
+.swiper .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: #C2C1C0;
+  opacity: 1;
+  border-radius: 0;
+  cursor: pointer;
+  transition: .2s all;
+}
+
+.swiper .swiper-pagination-bullet-active {
+  width: 10px;
+  height: 10px;
+  background: #2B2B2B;
+  transform: translateY(1px);
+}
+
+.original-scrollbar {
+  /* Track styles */
+  scrollbar-width: thin;
+  scrollbar-color: #0A0300 #0A03001A;
+}
+
+/* For Webkit browsers (Chrome, Safari, etc.) */
+.original-scrollbar::-webkit-scrollbar {
+  height: 2px;
+  width: 2px;
+  display: block; /* Make sure it's always visible */
+}
+
+.original-scrollbar::-webkit-scrollbar-track {
+  background: #0A03001A;
+  display: block; /* Make sure it's always visible */
+}
+
+.original-scrollbar::-webkit-scrollbar-thumb {
+  background: #0A0300;
+  display: block; /* Make sure it's always visible */
+}
+
+/* Keep the same color on hover */
+.original-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #0A0300;
+}
+
+/* Added bg image here since it was breadking liquid */
+.breadcrumbs li:not(:first-child):before{
+  background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='5.33325' y='5.33398' width='5.33333' height='5.33333' fill='%23848180'/%3E%3C/svg%3E%0A");
+}
+[name="country_code"] {
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%230A0300' stroke-width='2' stroke-linecap='square' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 20px;
+}

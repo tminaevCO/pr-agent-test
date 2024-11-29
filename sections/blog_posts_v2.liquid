@@ -1,0 +1,556 @@
+{% liquid
+  assign articles_per_page = section.settings.articles_per_page
+  assign columns = section.settings.columns
+  assign grid_gap = section.settings.grid_gap
+  assign text_alignment = section.settings.text_alignment
+  assign enlarge_first_article = section.settings.enlarge_first_article
+  assign first_article_layout = section.settings.first_article_layout
+  assign first_article_text_alignment = section.settings.first_article_text_alignment
+  assign title_tag = section.settings.title_tag
+  assign title_color = section.settings.title_color
+  assign title_font_size_scale = section.settings.title_font_size_scale
+  assign show_excerpt = section.settings.show_excerpt
+  assign excerpt_color = section.settings.excerpt_color
+  assign excerpt_font_size_scale = section.settings.excerpt_font_size_scale
+  assign display_date = section.settings.display_date
+  assign display_author = section.settings.display_author
+  assign date_author_text_color = section.settings.date_author_text_color
+  assign divider_color = section.settings.divider_color
+  assign date_and_author_font_size_scale = section.settings.date_and_author_font_size_scale
+  assign date_and_author_order = section.settings.date_and_author_order
+  assign top_margin = section.settings.top_margin
+  assign bottom_margin = section.settings.bottom_margin
+
+  assign background_color = section.settings.background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign top_padding = section.settings.top_padding
+  assign bottom_padding = section.settings.bottom_padding
+  assign side_padding = section.settings.side_padding
+%}
+
+{% style %}
+  #shopify-section-{{section.id}} {
+    margin-top: {{ top_margin | divided_by: 2 }}px;
+    margin-bottom: {{ bottom_margin | divided_by: 2 }}px;
+  }
+  {% if background_color.alpha != null and background_color.alpha != 0.0 %}
+    {% if fullwidth_background %}
+      #shopify-section-{{section.id}} {
+        background-color: {{background_color}};
+        max-width: 100%;
+        padding-top: {{top_padding}}px;
+        padding-bottom: {{bottom_padding}}px;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      #shopify-section-{{ section.id }} .blog-posts--inner {
+        max-width: {{ settings.page_width }}px;
+        margin: 0 auto;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+    {% else %}
+      #shopify-section-{{ section.id }} {
+        background-color: {{background_color}};
+        padding-top: {{top_padding}}px;
+        padding-bottom: {{bottom_padding}}px;
+        padding-left: {{side_padding}}px;
+        padding-right: {{side_padding}}px;
+      }
+    {% endif %}
+  {% endif %}
+
+
+  #shopify-section-{{section.id}} .blog-posts__artilces-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    grid-gap: {{grid_gap}}px;
+  }
+
+  @media only screen and (min-width: 769px) {
+
+    #shopify-section-{{section.id}} {
+      margin-top: {{ top_margin }}px;
+      margin-bottom: {{ bottom_margin }}px;
+    }
+
+    #shopify-section-{{section.id}} .blog-posts__artilces-grid {
+      grid-template-columns: repeat({{columns}}, minmax(0, 1fr));
+    }
+
+    {% if enlarge_first_article %}
+      #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type {
+        grid-column: 1 / {{columns | plus: 1}};
+        grid-row: 1;
+      }
+
+      #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type .blog-article-card__media {
+        padding-bottom: 54%;
+      }
+
+      {%- case first_article_layout -%}
+        {%- when "image_left_text_right" -%}
+          #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type {
+            grid-template-columns: 1.04fr 1fr;
+            column-gap: 48px;
+          }
+
+          #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type .blog-article-card__media {
+            padding-bottom: 72.59%;
+          }
+
+          #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type .blog-article-card__content {
+            order: 1;
+            justify-content: center;
+          }
+
+        {%- when "image_right_text_left" -%}
+          #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type {
+            grid-template-columns: 1fr 1.04fr;
+            column-gap: 48px;
+          }
+
+          #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type .blog-article-card__media {
+            padding-bottom: 72.59%;
+          }
+
+          #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type .blog-article-card__content {
+            order: -1;
+            justify-content: center;
+          }
+      {%- endcase -%}
+
+      {%- case first_article_text_alignment -%}
+        {%- when 'left' -%}
+          #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type .blog-article-card__content .block__title,
+          #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type .blog-article-card__content .block__paragraph {
+            margin-left: 0;
+            margin-right: 0;
+            text-align: left;
+          }
+
+          #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type .blog-article-card__content .blog-article-card__author-date {
+            margin-left: 0;
+            margin-right: 0;
+            text-align: left;
+          }
+        {%- when 'center' -%}
+          #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type .blog-article-card__content .block__title,
+          #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type .blog-article-card__content .block__paragraph {
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+          }
+
+          #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type .blog-article-card__content .blog-article-card__author-date {
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+          }
+
+        {%- when 'right' -%}
+          #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type .blog-article-card__content .block__title,
+          #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type .blog-article-card__content .block__paragraph {
+            margin-left: auto;
+            margin-right: 0;
+            text-align: right;
+          }
+
+          #shopify-section-{{section.id}} .blog-posts__artilces-grid a:first-of-type .blog-article-card__content .blog-article-card__author-date {
+            margin-left: auto;
+            margin-right: 0;
+            text-align: right;
+          }
+      {%- endcase -%}
+    {% endif %}
+  }
+{% endstyle %}
+
+<div class="blog-posts--inner">
+  <div class="blog-posts__content">
+    {% paginate blog.articles by articles_per_page %}
+      <div class="blog-posts__artilces-grid">
+        {% for article in blog.articles %}
+          {%- assign block_id = section.id | append: '-' | append: forloop.index -%}
+          {%- assign mobile_size = 100 | divided_by: 1 | append: 'vw' -%}
+          {%- assign desktop_size = 100 | divided_by: columns | append: 'vw' -%}
+          {% if forloop.index == 1 and enlarge_first_article %}
+            {%- assign desktop_size = 100 | append: 'vw' -%}
+          {% endif %}
+
+          {%- assign image_sizes = '(max-width: 769px) MOBILE, (max-width: CONTAINERpx) calc(DESKTOP - 32px), CONTAINERpx'
+            | replace: 'MOBILE', mobile_size
+            | replace: 'DESKTOP', desktop_size
+            | replace: 'CONTAINER', settings.page_width
+          -%}
+
+          {% if forloop.index < 3 %}
+            {%- assign fetchpriority = 'high' -%}
+          {% endif %}
+
+          {% render 'blog-article-card_v2',
+            article: article,
+            columns: columns,
+            display_title: true,
+            display_author: display_author,
+            display_date: display_date,
+            display_excerpt: show_excerpt,
+            text_alignment: text_alignment,
+            title_tag: title_tag,
+            title_color: title_color,
+            divider_color: divider_color,
+            title_font_size_scale: title_font_size_scale,
+            date_color: date_author_text_color,
+            date_font_size_scale: date_and_author_font_size_scale,
+            author_color: date_author_text_color,
+            author_font_size_scale: date_and_author_font_size_scale,
+            date_and_author_order: date_and_author_order,
+            excerpt_color: excerpt_color,
+            excerpt_font_size_scale: excerpt_font_size_scale,
+            block_id: block_id,
+            image_sizes: image_sizes,
+            fetchpriority: fetchpriority
+          %}
+        {% endfor %}
+      </div>
+
+      {% render 'pagination_v2',
+        paginate: paginate,
+        target_selector: '.blog-posts__artilces-grid',
+        default_page_behavior: true
+      %}
+    {% endpaginate %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Blog posts",
+  "class": "blog-posts container",
+  "tag": "section",
+  "enabled_on": {"templates": ["blog"]},
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "This section displays all of the articles on a blog page within a customizable grid. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+    },
+    {
+      "type": "range",
+      "id": "articles_per_page",
+      "min": 2,
+      "max": 60,
+      "step": 1,
+      "label": "Articles per page",
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Change the layout of your article grid by amending the columns and spacing"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columns",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Grid gap",
+      "default": 10
+    },
+    {
+       "type": "text_alignment",
+       "id": "text_alignment",
+       "label": "Text alignment",
+       "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "First article",
+      "info": "Amend how the first article of your blog displays."
+    },
+    {
+      "type": "checkbox",
+      "id": "enlarge_first_article",
+      "label": "Enlarge first article",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "first_article_layout",
+      "label": "First article layout",
+      "options": [
+        {
+          "value": "fullwidth",
+          "label": "Image fullwidth"
+        },
+        {
+          "value": "image_left_text_right",
+          "label": "Image left"
+        },
+        {
+          "value": "image_right_text_left",
+          "label": "Image right"
+        }
+      ],
+      "default": "image_right_text_left"
+    },
+    {
+       "type": "text_alignment",
+       "id": "first_article_text_alignment",
+       "label": "Text alignment",
+       "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Titles",
+      "info": "Amend your article's titles to your liking."
+    },
+    {
+      "type": "select",
+      "id": "title_tag",
+      "label": "Tag",
+      "options": [
+        {
+          "value": "h1",
+          "label": "H1"
+        },
+        {
+          "value": "h2",
+          "label": "H2"
+        },
+        {
+          "value": "h3",
+          "label": "H3"
+        },
+        {
+          "value": "h4",
+          "label": "H4"
+        },
+        {
+          "value": "h5",
+          "label": "H5"
+        },
+        {
+          "value": "h6",
+          "label": "H6"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Excerpt",
+      "info": "Amend your article's excerpt to your liking."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt",
+      "label": "Show excerpt",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "excerpt_color",
+      "label": "Color"
+    },
+    {
+      "type": "range",
+      "id": "excerpt_font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Dates and authors",
+      "info": "Amend your article's date and author text to your liking."
+    },
+    {
+      "type": "checkbox",
+      "id": "display_date",
+      "label": "Display date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "display_author",
+      "label": "Display author",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "date_author_text_color",
+      "label": "Text color"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider color"
+    },
+    {
+      "type": "range",
+      "id": "date_and_author_font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "date_and_author_order",
+      "label": "Order",
+      "options": [
+        {
+          "value": "author_first",
+          "label": "Author first"
+        },
+        {
+          "value": "date_first",
+          "label": "Date first"
+        }
+      ],
+      "default": "author_first"
+    },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Personalize the background of your section to match your brand. "
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth_background",
+      "label": "Fullwidth background",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Section padding",
+      "info": "Add spacing above and below inside your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "bottom_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Section margin",
+      "info": "Add spacing above and below your section."
+    },
+    {
+      "type": "range",
+      "id": "top_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top margin",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "bottom_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom margin",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Blog posts",
+         "settings": {
+        "background_color": "rgba(0,0,0,0)",
+        "fullwidth_background": false,
+        "articles_per_page": 24,
+        "columns": 4,
+        "grid_gap": 25,
+        "text_alignment": "left",
+        "enlarge_first_article": true,
+        "first_article_layout": "image_right_text_left",
+        "first_article_text_alignment": "left",
+        "title_tag": "h3",
+        "title_color": "rgba(0,0,0,0)",
+        "title_font_size_scale": 100,
+        "show_excerpt": true,
+        "excerpt_color": "rgba(0,0,0,0)",
+        "excerpt_font_size_scale": 100,
+        "display_date": true,
+        "display_author": true,
+        "date_author_text_color": "rgba(0,0,0,0)",
+        "divider_color": "rgba(0,0,0,0)",
+        "date_and_author_font_size_scale": 100,
+        "date_and_author_order": "author_first",
+        "top_padding": 0,
+        "bottom_padding": 0,
+        "side_padding": 24,
+        "top_margin": 0,
+        "bottom_margin": 25
+      }
+    }
+  ]
+}
+{% endschema %}

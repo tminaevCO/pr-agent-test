@@ -1,0 +1,91 @@
+{% liquid
+  assign input_type = input_type | default: 'text'
+  assign max_width = max_width
+  assign placeholder = placeholder
+  assign placeholder_text_color = placeholder_text_color
+  assign input_text_color = input_text_color
+  assign input_background_color = input_background_color
+  assign input_border_color = input_border_color
+  assign input_border_width = input_border_width
+  assign input_border_radius = input_border_radius
+  assign aria_label = aria_label
+  assign input_id = input_id
+  assign input_name = input_name
+  assign pattern = pattern | default: ''
+  assign required = required
+
+  assign default_font_size_mobile = default_font_size_mobile | default: 16
+  assign default_font_size_desktop = default_font_size_desktop | default: 16
+  assign global_setting_font_size_scale = settings.paragraph_font_size_scale | default: 100
+  assign global_setting_line_height_scale = settings.paragraph_line_spacing_scale | default: 100
+
+  assign font_size = default_font_size_mobile | times: global_setting_font_size_scale | divided_by: 100.0 | round
+  assign font_size_desktop = default_font_size_desktop | times: global_setting_font_size_scale | divided_by: 100.0 | round
+
+  assign line_height = font_size | times: 160 | divided_by: 100.0 | round | times: global_setting_line_height_scale | divided_by: 100.0 | round
+  assign line_height_desktop = font_size_desktop | times: 160 | divided_by: 100.0 | round | times: global_setting_line_height_scale | divided_by: 100.0 | round
+%}
+
+{% style %}
+  .element-{{input_id}} {
+      flex: 1 1 auto;
+  }
+
+  .input-{{input_id}} {
+      font-family: {{ settings.paragraph_font.family }}, {{ settings.paragraph_font.fallback_families }};
+      font-weight: {{ settings.paragraph_font.weight }};
+      font-size: {{font_size}}px;
+      line-height: {{line_height}}px;
+      color: {% if input_text_color.alpha and input_text_color.alpha != 0.0 %}{{input_text_color}}{% else %}{{settings.input_text_color}}{% endif %};
+      background-color: {% if input_background_color.alpha and input_background_color.alpha != 0.0 %}{{input_background_color}}{% else %}{{settings.input_background_color}}{% endif %};
+      border: {{input_border_width}}px solid {% if input_border_color.alpha and input_border_color.alpha != 0.0 %}{{input_border_color}}{% else %}{{settings.input_border_color}}{% endif %};
+      border-radius: {{input_border_radius}}px;
+      padding: 8px 16px;
+      min-height: 50px;
+      box-sizing: border-box;
+      width: 100%;
+      flex: 1 0 auto;
+  }
+
+  .input-{{input_id}}::placeholder {
+      color: {% if placeholder_text_color.alpha and placeholder_text_color.alpha != 0.0 %}{{placeholder_text_color}}{% else %}{{settings.input_placeholder_color}}{% endif %}
+  }
+
+  @media only screen and (min-width: 768px) {
+      .element-{{input_id}} {
+          flex: 1 1 auto;
+      }
+
+      .input-{{input_id}} {
+          width: 100%;
+          font-size: {{font_size_desktop}}px;
+          line-height: {{line_height_desktop}}px;
+      }
+  }
+{% endstyle %}
+
+<div class="input-element element-{{input_id}}">
+  <input
+    class="input-{{input_id}} {{ classes }}"
+    id="{{input_id}}"
+    name="{{input_name}}"
+    {% if pattern != blank %}
+      pattern="{{pattern}}"
+    {% endif %}
+    type="{{input_type}}"
+    placeholder="{{placeholder}}"
+    value="{{value}}"
+    aria-label="{{aria_label}}"
+    {% if required %}
+      required
+    {% endif %}
+  >
+  <div class="validation-messages">
+    {% if success_message -%}
+      <span class="validation-messages__success">{{ success_message }}</span>
+    {%- endif %}
+    {% if error_message -%}
+      <span class="validation-messages__error">{{ error_message }}</span>
+    {%- endif %}
+  </div>
+</div>

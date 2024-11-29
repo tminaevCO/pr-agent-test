@@ -1,0 +1,241 @@
+{% liquid
+  assign default_color = default_color | default: settings.secondary_text_color
+  assign text = text | default: block.settings.text
+  assign font_size_scale = font_size_scale | default: block.settings.font_size_scale | default: 100
+  assign color = color | default: block.settings.color
+  assign max_width = max_width | default: block.settings.max_width
+  assign visible_on_desktop = visible_on_desktop | default: block.settings.visible_on_desktop
+  assign visible_on_mobile = visible_on_mobile | default: block.settings.visible_on_mobile
+  assign block_id = block_id | default: block.id
+  assign margin_top = margin_top | default: block.settings.margin_top | default: 0
+  assign margin_bottom = margin_bottom | default: block.settings.margin_bottom | default: 0
+  assign max_rows = max_rows | times: 1
+
+  assign top_padding = top_padding | default: block.settings.top_padding | default: 0
+  assign bottom_padding = bottom_padding | default: block.settings.bottom_padding | default: 0
+
+  assign content_alignment = content_alignment | default: block.settings.content_alignment | default: 'inherit'
+  assign content_alignment_mobile = content_alignment_mobile | default: block.settings.content_alignment_mobile | default: 'inherit'
+
+  assign default_font_size_mobile = default_font_size_mobile | default: 16
+  assign default_font_size_desktop = default_font_size_desktop | default: 16
+  assign global_setting_font_size_scale = settings.font_size_scale | default: 100
+  assign global_setting_line_height_scale = settings.paragraph_line_spacing_scale | default: 100
+
+  assign font_size = default_font_size_mobile | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round
+  assign font_size_desktop = default_font_size_desktop | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round
+
+  assign line_height = font_size | times: 160 | divided_by: 100.0 | round | times: global_setting_line_height_scale | divided_by: 100.0 | round
+  assign line_height_desktop = font_size_desktop | times: 160 | divided_by: 100.0 | round | times: global_setting_line_height_scale | divided_by: 100.0 | round
+%}
+
+{%- if text != blank -%}
+  {% style %}
+        .block__richtext.block-{{block_id}} {
+            font-family: {{ settings.paragraph_font.family }}, {{ settings.paragraph_font.fallback_families }};
+            color: {% if color.alpha and color.alpha != 0.0 %}{{color}}{% else %}{{settings.paragraph_color}}{% endif %};
+            font-size: {{font_size}}px;
+            line-height: {{line_height}}px;
+            font-weight: {{ settings.paragraph_font.weight }};
+            margin: {{margin_top}}px 0 {{margin_bottom}}px;
+            padding: {{top_padding}}px 0 {{bottom_padding}}px;
+            text-align: {{content_alignment_mobile}};
+            {%- case content_alignment_mobile -%}
+                {%- when "center" -%}
+                    margin-left: auto;
+                    margin-right: auto;
+                {%- when "left" -%}
+                    margin-left: 0;
+                    margin-right: 0;
+                {%- when "right" -%}
+                    margin-left: auto;
+                    margin-right: 0;
+            {%- endcase -%}
+            word-break: break-word;
+            {% if max_rows != 0 %}
+                height: {{line_height_desktop |  times: max_rows }}px;
+                text-overflow: -o-ellipsis-lastline;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: {{ max_rows }};
+                overflow: hidden;
+            {% endif %}
+        }
+
+        {% if visible_on_mobile %}
+            .block__richtext.block-{{block_id}} {
+                display: block;
+                {% if max_rows != 0 %}
+                display: -webkit-box;
+                {% endif %}
+            }
+        {% else %}
+        .block__richtext.block-{{block_id}} {
+                display: none;
+            }
+        {% endif %}
+
+        .block__richtext.block-{{block_id}} span,
+        .block__richtext.block-{{block_id}} p,
+        .block__richtext.block-{{block_id}} p span,
+        .block__richtext.block-{{block_id}} li,
+        .block__richtext.block-{{block_id}} li span,
+        .block__richtext.block-{{block_id}} ul,
+        .block__richtext.block-{{block_id}} ol,
+        .block__richtext.block-{{block_id}} em,
+        .block__richtext.block-{{block_id}} em span {
+            color: {{ color }};
+            font-family: {{ settings.paragraph_font.family }}, {{ settings.paragraph_font.fallback_families }};
+            font-size: {{ font_size }}px;
+            line-height: {{ line_height }}px;
+            font-weight: {{ settings.paragraph_font.weight }};
+        }
+
+        .block__richtext.block-{{block_id}} ul,
+        .block__richtext.block-{{block_id}} ol{
+            list-style-position: inside;
+            padding: 0;
+        }
+
+        .block__richtext.block-{{block_id}} a,
+        .block__richtext.block-{{block_id}} a span {
+            color: {{ color }};
+            text-decoration: underline;
+        }
+
+        .block__richtext.block-{{block_id}} a:hover{
+            text-decoration: none;
+        }
+
+        .block__richtext.block-{{block_id}} h1,
+        .block__richtext.block-{{block_id}} h1 *,
+        .block__richtext.block-{{block_id}} h2,
+        .block__richtext.block-{{block_id}} h2 *,
+        .block__richtext.block-{{block_id}} h3,
+        .block__richtext.block-{{block_id}} h3 *,
+        .block__richtext.block-{{block_id}} h4,
+        .block__richtext.block-{{block_id}} h4 *,
+        .block__richtext.block-{{block_id}} h5,
+        .block__richtext.block-{{block_id}} h5 *,
+        .block__richtext.block-{{block_id}} h6,
+        .block__richtext.block-{{block_id}} h6 * {
+            font-family: {{ settings.heading_font.family }}, {{ settings.heading_font.fallback_families }};
+            color: {{ color }};
+            font-weight: {{ settings.heading_font.weight }};
+        }
+
+        .block__richtext.block-{{block_id}} h1  + *,
+        .block__richtext.block-{{block_id}} h2  + *,
+        .block__richtext.block-{{block_id}} h3  + *,
+        .block__richtext.block-{{block_id}} h4  + *,
+        .block__richtext.block-{{block_id}} h5  + *,
+        .block__richtext.block-{{block_id}} h6  + * {
+            margin-top: 16px;
+        }
+
+        .block__richtext.block-{{block_id}} * + h1,
+        .block__richtext.block-{{block_id}} * + h2,
+        .block__richtext.block-{{block_id}} * + h3,
+        .block__richtext.block-{{block_id}} * + h4,
+        .block__richtext.block-{{block_id}} * + h5,
+        .block__richtext.block-{{block_id}} * + h6 {
+            margin-top: 48px;
+        }
+
+        .block__richtext.block-{{block_id}} h1,
+        .block__richtext.block-{{block_id}} h1 * {
+            font-size: {{ 36 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round }}px;
+            line-height: {{ 36 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round | times: 130 | divided_by: 100.0 | round | times: settings.heading_line_spacing_scale | divided_by: 100.0 | round }}px;
+        }
+
+        .block__richtext.block-{{block_id}} h2,
+        .block__richtext.block-{{block_id}} h2 * {
+            font-size: {{ 32 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round }}px;
+            line-height: {{ 32 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round | times: 130 | divided_by: 100.0 | round | times: settings.heading_line_spacing_scale | divided_by: 100.0 | round }}px;
+        }
+
+        .block__richtext.block-{{block_id}} h3,
+        .block__richtext.block-{{block_id}} h3 * {
+            font-size: {{ 24 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round }}px;
+            line-height: {{ 24 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round | times: 130 | divided_by: 100.0 | round | times: settings.heading_line_spacing_scale | divided_by: 100.0 | round }}px;
+        }
+
+        .block__richtext.block-{{block_id}} h4,
+        .block__richtext.block-{{block_id}} h4 * {
+            font-size: {{ 20 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round }}px;
+            line-height: {{ 20 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round | times: 130 | divided_by: 100.0 | round | times: settings.heading_line_spacing_scale | divided_by: 100.0 | round }}px;
+        }
+
+        .block__richtext.block-{{block_id}} h5,
+        .block__richtext.block-{{block_id}} h5 * {
+            font-size: {{ 18 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round }}px;
+            line-height: {{ 18 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round | times: 130 | divided_by: 100.0 | round | times: settings.heading_line_spacing_scale | divided_by: 100.0 | round }}px;
+        }
+
+        .block__richtext.block-{{block_id}} h6,
+        .block__richtext.block-{{block_id}} h6 * {
+            font-size: {{ 16 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round }}px;
+            line-height: {{ 16 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round | times: 130 | divided_by: 100.0 | round | times: settings.heading_line_spacing_scale | divided_by: 100.0 | round }}px;
+        }
+
+        .block__richtext.block-{{block_id}} blockquote {
+            font-style: italic;
+            color: rgba(18,18,18, .75);
+            border-left: .2rem solid rgba(18,18,18, .2);
+            padding-left: 1rem;
+        }
+
+        @media only screen and (min-width: 769px) {
+            .block__richtext.block-{{block_id}} {
+                font-size: {{font_size_desktop}}px;
+                line-height: {{line_height_desktop}}px;
+                text-align: {{content_alignment}};
+                {%- case content_alignment -%}
+                    {%- when "center " -%}
+                        margin-left: auto;
+                        margin-right: auto;
+                    {%- when "left" -%}
+                        margin-left: 0;
+                        margin-right: 0;
+                    {%- when "right" -%}
+                        margin-left: auto;
+                        margin-right: 0;
+                {%- endcase -%}
+                {% if max_rows != 0 %}
+                    height: {{line_height_desktop |  times: max_rows }}px;
+                    text-overflow: -o-ellipsis-lastline;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: {{ max_rows }};
+                    overflow: hidden;
+                {% endif %}
+            }
+
+            {% if max_width != blank and max_width > 0 %}
+                .block__richtext.block-{{block_id}} {
+                    max-width: {{max_width}}px;
+                }
+            {% endif %}
+
+            {% if visible_on_desktop %}
+                .block__richtext.block-{{block_id}} {
+                    display: block;
+                    {% if max_rows != 0 %}
+                    display: -webkit-box;
+                    {% endif %}
+                }
+            {% else %}
+                .block__richtext.block-{{block_id}} {
+                    display: none;
+                }
+            {% endif %}
+        }
+  {% endstyle %}
+
+  <div
+    class="block__richtext inherit-inner-content block-{{block_id}}"
+    aria-label="{{'accessibility.general.description' | t}}"
+  >
+    {{ text }}
+  </div>
+{%- endif -%}

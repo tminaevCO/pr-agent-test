@@ -1,0 +1,101 @@
+{% liquid
+    assign primary_text = block.settings.primary_text
+    assign primary_link = block.settings.primary_link
+    assign primary_type = block.settings.primary_type
+    assign primary_text_color = block.settings.primary_text_color
+    assign primary_background_color = block.settings.primary_background_color
+    assign primary_border_color = block.settings.primary_border_color
+    assign primary_border_width = block.settings.primary_border_width
+    assign primary_button_border_radius = block.settings.primary_button_border_radius
+    assign primary_button_animation = block.settings.primary_button_animation
+
+    assign secondary_text = block.settings.secondary_text
+    assign secondary_link = block.settings.secondary_link
+    assign secondary_type = block.settings.secondary_type
+    assign secondary_text_color = block.settings.secondary_text_color
+    assign secondary_background_color = block.settings.secondary_background_color
+    assign secondary_border_color = block.settings.secondary_border_color
+    assign secondary_border_width = block.settings.secondary_border_width
+    assign secondary_button_border_radius = block.settings.secondary_button_border_radius
+    assign secondary_buttons_animation = block.settings.secondary_buttons_animation
+
+    assign top_padding = top_padding | default: block.settings.top_padding | default: 0
+    assign bottom_padding = bottom_padding | default: block.settings.bottom_padding | default: 0
+
+    assign visible_on_desktop = visible_on_desktop | default: block.settings.visible_on_desktop
+    assign visible_on_mobile = visible_on_mobile | default: block.settings.visible_on_mobile
+
+    assign block_id = block.id
+%}
+
+{%- if primary_text != blank or secondary_text != blank -%}
+    
+
+    <div class="block__buttons" id="block-{{block_id}}">
+        {% style %}
+            #block-{{block_id}} {
+                margin: {{top_padding}}px 0 {{bottom_padding}}px;
+            }
+    
+            {% if visible_on_mobile %}
+                #block-{{block_id}} {
+                    display: flex;
+                    gap: 16px;
+                    flex-wrap: wrap;
+                }
+            {% else %}
+                #block-{{block_id}} {
+                    display: none;
+                }
+            {% endif %}
+        
+            @media only screen and (min-width: 768px) {
+                {% if visible_on_desktop %}
+                    #block-{{block_id}} {
+                        display: flex;
+                        gap: 16px;
+                        flex-wrap: wrap;
+                    }
+                {% else %}
+                    #block-{{block_id}} {
+                        display: none;
+                    }
+                {% endif %}
+            }
+        {% endstyle %}
+        {%- if primary_text != blank -%}
+            {%- assign block_id = 'primary' |  append: block_id | append: '-' | append: tag -%}
+            {% render 'button-with-animation_v2'
+                text: primary_text,
+                link: primary_link,
+                type: primary_type,
+                animation: primary_button_animation,
+                text_color: primary_text_color,
+                background_color: primary_background_color,
+                border_color: primary_border_color,
+                border_width: primary_border_width,
+                border_radius: primary_button_border_radius,
+                button_id: block_id
+            %}
+        {%- endif -%}
+        
+        {%- if secondary_text != blank -%}
+            {%- assign block_id = 'secondary' |  append: block_id | append: '-' | append: tag -%}
+            {% render 'button-with-animation_v2'
+                text: secondary_text,
+                link: secondary_link,
+                type: secondary_type,
+                animation: secondary_buttons_animation,
+                text_color: secondary_text_color,
+                background_color: secondary_background_color,
+                border_color: secondary_border_color,
+                border_width: secondary_border_width,
+                border_radius: secondary_button_border_radius,
+                button_id: block_id
+            %}
+        {%- endif -%}
+
+    </div>
+{%- endif -%}
+
+

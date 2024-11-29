@@ -1,0 +1,36 @@
+{% liquid
+  assign layout_content = layout_content
+%}
+
+{{ 'fonts.min.css' | asset_url | stylesheet_tag }}
+{{ 'tailwind.min.css' | asset_url | stylesheet_tag }}
+
+{% comment %} Swiper styles {% endcomment %}
+{%- if layout_content contains 'swiper' -%}
+  {{ 'swiper-bundle.min.css' | asset_url | stylesheet_tag }}
+  <noscript>{{ 'swiper-bundle.min.css' | asset_url | stylesheet_tag }}</noscript>
+{%- endif -%}
+
+{% comment %} video-reviews-carousel.liquid {% endcomment %}
+{%- if layout_content contains 'video-reviews-carousel' -%}
+  {{ 'video-reviews-carousel.min.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
+
+{% comment %} section-products-slider.liquid {% endcomment %}
+{%- if layout_content contains 'products-slider' -%}
+  {{ 'products-slider.min.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
+
+{% comment %} drawer-mega-menu.liquid {% endcomment %}
+{%- if layout_content contains 'mega-menu' -%}
+  {{ 'drawer-mega-menu.min.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
+
+{% comment %} currency-selector.liquid {% endcomment %}
+{% comment %} Works only when using link stylesheet tag {% endcomment %}
+{%- if layout_content contains 'localization-form' -%}
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"
+  >
+{%- endif -%}

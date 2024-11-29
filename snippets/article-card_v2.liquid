@@ -1,0 +1,208 @@
+{% liquid
+  assign article = article | default: block.settings.article
+
+  assign image_with_text_image = block.settings.image_with_text_image | default: article.image
+
+  assign desktop_focal_x_point = image_with_text_image.presentation.focal_point.x
+  assign desktop_focal_y_point = image_with_text_image.presentation.focal_point.y
+
+  assign enable_title_override = block.settings.enable_title_override
+  assign enable_date_override = block.settings.enable_date_override
+  assign enable_author_override = block.settings.enable_author_override
+  assign title_override = block.settings.title_override
+  assign date_override = block.settings.date_override
+  assign author_override = block.settings.author_override
+
+  assign width = width | default: block.settings.width
+  assign height = height | default: block.settings.height
+
+  assign columns = columns
+
+  assign block_id = block_id | default: block.id
+
+  assign display_title = display_title
+  assign title_tag = title_tag
+  assign title_color = title_color
+  assign title_font_size_scale = title_font_size_scale
+
+  assign display_date = display_date
+  assign date_color = date_color
+  assign date_font_size_scale = date_font_size_scale
+  assign date_block_id = block_id | prepend: 'date--'
+
+  assign display_author = display_author
+  assign author_color = author_color
+  assign author_font_size_scale = author_font_size_scale
+  assign author_block_id = block_id | prepend: 'author--'
+
+  assign title = article.title | default: 'Article name'
+  assign date = article.created_at | date: '%b %d, %Y' | default: 'Jun 07, 2022'
+  assign author = article.author | default: 'Author'
+
+  if enable_title_override and title_override != blank
+    assign title = title_override
+  endif
+
+  if enable_date_override and date_override != blank
+    assign date = date_override
+  endif
+
+  if enable_author_override and author_override != blank
+    assign author = author_override
+  endif
+
+  if date != blank and display_date and author != blank and display_author
+    assign author = author | prepend: '| '
+  endif
+%}
+
+<a href="{{ article.url }}" class="article-card block--{{ block_id }}">
+  {% style %}
+    {% if width == 1 and height == 1 %}
+      .block--{{ block_id }} .article-card__media{
+        {% case columns %}
+          {% when 2 %}
+            padding-top: 85%;
+          {% when 3 %}
+            padding-top: 77.5%;
+          {% when 4 %}
+            padding-top: 62.5%;
+        {% endcase %}
+        height: 0;
+      }
+
+      .block--{{ block_id }} .article-card__media img,
+      .block--{{ block_id }} .article-card__media svg {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+      }
+
+    {% else %}
+      @media only screen and (max-width: 1050px) {
+        .block--{{ block_id }} .article-card__media{
+          {% case columns %}
+            {% when 2 %}
+              padding-top: 85%;
+            {% when 3 %}
+              padding-top: 77.5%;
+            {% when 4 %}
+              padding-top: 62.5%;
+          {% endcase %}
+          height: 0;
+        }
+
+        .block--{{ block_id }} .article-card__media img,
+        .block--{{ block_id }} .article-card__media svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+      }
+    {% endif %}
+
+    .block--{{ block_id }} .svg-placeholder {
+      background-color: {{settings.image_background_color}};
+      stroke: {{settings.icon_color}};
+      fill: {{settings.icon_color}};
+    }
+
+    @media only screen and (min-width: 1050px) {
+      {% if width != 0 and height != 0 %}
+        .block--{{ block_id }}{
+            grid-column: span {{ width | at_most: columns }};
+            grid-row: span {{ height }};
+        }
+      {% endif %}
+    }
+  {% endstyle %}
+
+  <div class="article-card__media">
+    {% if image_with_text_image != null or image_with_text_image != blank %}
+      {% if section_index == 1 %}
+        {%- assign fetchpriority = 'high' -%}
+      {% else %}
+        {%- assign fetchpriority = 'auto' -%}
+      {% endif %}
+
+      {% if columns > 1 %}
+        {%- assign tablet_size = '50' -%}
+      {%- else -%}
+        {%- assign tablet_size = '100' -%}
+      {% endif %}
+      {%- assign width = width | times: 1 -%}
+
+      {% render 'responsive-image-dynamic_v2', image: image_with_text_image, fetchpriority: fetchpriority %}
+    {% else %}
+      {% if card_index == 1 %}
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'svg-placeholder' }}
+      {% else %}
+        {% assign remainder = card_index | modulo: 7 %}
+
+        {% case remainder %}
+          {% when 0 %}
+            {{ 'collection-1' | placeholder_svg_tag: 'svg-placeholder' }}
+          {% when 1 %}
+            {{ 'collection-2' | placeholder_svg_tag: 'svg-placeholder' }}
+          {% when 2 %}
+            {{ 'collection-3' | placeholder_svg_tag: 'svg-placeholder' }}
+          {% when 3 %}
+            {{ 'collection-4' | placeholder_svg_tag: 'svg-placeholder' }}
+          {% when 4 %}
+            {{ 'collection-5' | placeholder_svg_tag: 'svg-placeholder' }}
+          {% when 5 %}
+            {{ 'collection-6' | placeholder_svg_tag: 'svg-placeholder' }}
+          {% when 6 %}
+            {{ 'product-6' | placeholder_svg_tag: 'svg-placeholder' }}
+        {% endcase %}
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <div class="article-card__content">
+    {% render 'title_v2',
+      block: block,
+      text: title,
+      font_size_scale: title_font_size_scale,
+      color: title_color,
+      tag: title_tag,
+      visible_on_desktop: display_title,
+      visible_on_mobile: display_title,
+      margin_top: 14,
+      block_id: block_id,
+      default_font_size_desktop: 18,
+      default_font_size_mobile: 18,
+      default_color: settings.heading_color
+    %}
+
+    <div class="article-card__author-date">
+      {% render 'plane-text_v2',
+        block: block,
+        text: date,
+        font_size_scale: date_font_size_scale,
+        color: date_color,
+        visible_on_desktop: display_date,
+        visible_on_mobile: display_date,
+        block_id: date_block_id,
+        default_font_size_desktop: 15,
+        default_color: settings.inactive_color
+      %}
+      {% render 'plane-text_v2',
+        block: block,
+        text: author,
+        font_size_scale: author_font_size_scale,
+        color: author_color,
+        visible_on_desktop: display_author,
+        visible_on_mobile: display_author,
+        block_id: author_block_id,
+        default_font_size_desktop: 15,
+        block_id: block_id,
+        default_color: settings.inactive_color
+      %}
+    </div>
+  </div>
+</a>

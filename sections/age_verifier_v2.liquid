@@ -1,0 +1,780 @@
+{% liquid
+  assign show_testing_view = section.settings.show_testing_view
+  assign card_background_color = section.settings.card_background_color
+  assign background_color = section.settings.background_color
+  if background_color.alpha == null
+    assign background_color = settings.image_background_color
+  endif
+
+  assign background_opacity = section.settings.background_opacity
+
+  if background_opacity < 100
+    assign background_opacity = background_opacity | divided_by: 100.0 | round: 2
+  else
+    assign background_opacity = 1
+  endif
+
+  assign background_color = background_color | color_to_rgb | color_modify: 'alpha', background_opacity
+
+  assign image_with_text_image = section.settings.image_with_text_image
+  assign image_position = section.settings.image_position
+  assign content_alignment = section.settings.content_alignment
+  assign text = section.settings.text
+  assign color = section.settings.color
+  assign tag = section.settings.tag
+  assign font_size_scale = section.settings.font_size_scale
+  assign paragraph_text = section.settings.paragraph_text
+  assign paragraph_color = section.settings.paragraph_color
+  assign paragraph_font_size_scale = section.settings.paragraph_font_size_scale
+  assign confirm_text = section.settings.confirm_text
+  assign confirm_type = section.settings.confirm_type
+  assign confirm_text_color = section.settings.confirm_text_color
+  assign confirm_background_color = section.settings.confirm_background_color
+  assign confirm_border_color = section.settings.confirm_border_color
+  assign confirm_border_width = section.settings.confirm_border_width
+  assign confirm_button_border_radius = section.settings.confirm_button_border_radius
+  assign confirm_button_animation = section.settings.confirm_button_animation
+  assign reject_text = section.settings.reject_text
+  assign reject_type = section.settings.reject_type
+  assign reject_text_color = section.settings.reject_text_color
+  assign reject_background_color = section.settings.reject_background_color
+  assign reject_border_color = section.settings.reject_border_color
+  assign reject_border_width = section.settings.reject_border_width
+  assign reject_button_border_radius = section.settings.reject_button_border_radius
+  assign reject_button_animation = section.settings.reject_button_animation
+%}
+
+{% stylesheet %}
+  .age-verifier--inner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    z-index: -3;
+    transition: opacity 0.4s ease;
+  }
+
+  .age-verifier--inner[show='true'] {
+    opacity: 1;
+    visibility: visible;
+    z-index: 5;
+    transition: opacity 0.4s ease;
+  }
+
+  .age-verifier__content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 5;
+  }
+
+  .age-verifier__popup {
+    max-width: 574px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+  }
+
+  .age-verifier__popup__image {
+    position: relative;
+    padding-bottom: 59.4%;
+    flex: 1 0;
+    width: 100%;
+  }
+
+  .age-verifier__popup__image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .age-verifier__popup__content--wrapper {
+    padding: 32px;
+  }
+
+  .age-verifier__popup__content-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+
+  .age-verifier__popup__content-buttons div + div {
+    margin-top: 0px;
+    margin-left: 8px;
+  }
+
+  @media screen and (max-width: 769px) {
+    .age-verifier__popup__content-buttons div + div {
+      margin-top: 8px;
+      margin-left: 0;
+    }
+
+    .age-verifier__popup__image {
+      padding-bottom: 76.8%;
+    }
+
+    .age-verifier__popup__content-buttons {
+      flex-direction: column;
+    }
+
+    .age-verifier__popup__content .block__button {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .age-verifier__popup__content .age-verifier__popup__content-buttons > div,
+    .age-verifier__popup__content .age-verifier__popup__content-buttons a[type='button'],
+    .age-verifier__popup__content .age-verifier__popup__content-buttons button {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .age-verifier__popup {
+      max-width: 100%;
+      width: 100%;
+      height: 100%;
+      justify-content: flex-start;
+    }
+  }
+{% endstylesheet %}
+
+{%- if image_with_text_image != blank or text != blank or paragraph_text != blank -%}
+  {% style %}
+    #shopify-section-{{section.id}} .age-verifier--inner {
+      background-color: {{background_color}};
+    }
+
+    #shopify-section-{{section.id}} .age-verifier__popup {
+      border-radius: {{settings.border_radius}}px;
+      background-color: {% if card_background_color.alpha != null and card_background_color.alpha != 0.0 %}{{card_background_color}}{% else %}{{settings.card_background_color}}{% endif %}
+    }
+
+    #shopify-section-{{section.id}} .age-verifier__popup__content-buttons {
+      {%- case content_alignment -%}
+        {%- when "left" -%}
+          justify-content: flex-start;
+        {%- when "center" -%}
+          justify-content: center;
+        {%- when "right" -%}
+          justify-content: flex-end;
+    {%- endcase -%}
+    }
+
+    @media screen and (min-width: 992px) {
+      {% if image_with_text_image != blank %}
+        {%- case image_position -%}
+          {%- when "left" -%}
+            #shopify-section-{{section.id}} .age-verifier__popup {
+              flex-direction: row;
+              max-width: 844px;
+            }
+
+            #shopify-section-{{section.id}} .age-verifier__popup__image {
+              min-width: 422px;
+              padding-bottom: 45.2%;
+            }
+
+            #shopify-section-{{section.id}} .age-verifier__popup__content-buttons {
+              flex-direction: column;
+            }
+
+            #shopify-section-{{section.id}} .age-verifier__popup__content-buttons div + div {
+              margin-top: 8px;
+              margin-left: 0;
+            }
+
+            #shopify-section-{{section.id}} .age-verifier__popup__content-buttons > div,
+            #shopify-section-{{section.id}} .age-verifier__popup__content-buttons a[type="button"],
+            #shopify-section-{{section.id}} .age-verifier__popup__content-buttons button,
+            #shopify-section-{{section.id}} .age-verifier__popup__content-buttons .block__button {
+              width: 100%;
+              max-width: none;
+            }
+
+          {%- when "top" -%}
+            #shopify-section-{{section.id}} .age-verifier__popup {
+              flex-direction: column;
+            }
+          {%- when "right" -%}
+            #shopify-section-{{section.id}} .age-verifier__popup {
+              flex-direction: row-reverse;
+              max-width: 844px;
+            }
+
+            #shopify-section-{{section.id}} .age-verifier__popup__image {
+              min-width: 422px;
+              padding-bottom: 45.2%;
+            }
+
+            #shopify-section-{{section.id}} .age-verifier__popup__content-buttons {
+              flex-direction: column;
+            }
+
+            #shopify-section-{{section.id}} .age-verifier__popup__content-buttons div + div {
+              margin-top: 8px;
+              margin-left: 0;
+            }
+
+            #shopify-section-{{section.id}} .age-verifier__popup__content-buttons > div,
+            #shopify-section-{{section.id}} .age-verifier__popup__content-buttons a[type="button"],
+            #shopify-section-{{section.id}} .age-verifier__popup__content-buttons button,
+            #shopify-section-{{section.id}} .age-verifier__popup__content-buttons .block__button {
+              width: 100%;
+              max-width: none;
+            }
+        {%- endcase -%}
+      {% endif %}
+    }
+
+    @media screen and (max-width: 991px) {
+      {% if image_with_text_image != blank %}
+        #shopify-section-{{section.id}} .age-verifier__popup  {
+          border-radius: 0;
+        }
+
+        #shopify-section-{{section.id}} .age-verifier__popup__content--wrapper {
+          display: flex;
+          flex-direction: column;
+          flex: 1 0 auto;
+        }
+
+        #shopify-section-{{section.id}} .age-verifier__popup__content {
+          flex: 1 0 auto;
+          display: flex;
+          justify-content: flex-start;
+          flex-direction: column;
+        }
+
+        #shopify-section-{{section.id}} .age-verifier__popup__content-buttons {
+          margin-top: 20px;
+        }
+
+      {% else %}
+        #shopify-section-{{section.id}} .age-verifier__popup__content--wrapper {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          flex: 1 0 auto;
+        }
+
+        #shopify-section-{{section.id}} .age-verifier__popup__content-buttons {
+          margin-top: 40px;
+        }
+      {% endif %}
+
+      #shopify-section-{{section.id}} .age-verifier__popup__content-buttons > div,
+      #shopify-section-{{section.id}} .age-verifier__popup__content-buttons a[type="button"],
+      #shopify-section-{{section.id}} .age-verifier__popup__content-buttons button,
+      #shopify-section-{{section.id}} .age-verifier__popup__content-buttons .block__button {
+        width: 100%;
+        max-width: none;
+      }
+    }
+  {% endstyle %}
+  <age-verifier class="age-verifier--inner" show="false" testing-view="{% if show_testing_view %}true{% else %}false{% endif %}">
+    <div class="age-verifier__content">
+      <div class="age-verifier__popup">
+        {%- if image_with_text_image != blank -%}
+          <div class="age-verifier__popup__image">
+            {%- assign image_sizes = '(max-width: 574px), 100vw - 32px, (min-width: 575px) 574px, 574px' -%}
+            {% render 'responsive-image-dynamic_v2', image: image_with_text_image, sizes: image_sizes %}
+          </div>
+        {%- endif -%}
+
+        <div class="age-verifier__popup__content--wrapper">
+          <div class="age-verifier__popup__content">
+            {%- if text != blank -%}
+              <div class="age-verifier__popup__content-title">
+                {%
+                  render 'title_v2',
+                  text: text, color: color,
+                  default_color: settings.heading_color,
+                  tag: tag,
+                  font_size_scale: font_size_scale,
+                  block_id: section.id,
+                  max_width: 510,
+                  visible_on_desktop: true,
+                  visible_on_mobile: true,
+                  default_font_size_desktop: 32,
+                  default_font_size_mobile: 32,
+                  content_alignment: {{content_alignment}},
+                  content_alignment_mobile: {{content_alignment}}
+                %}
+              </div>
+            {%- endif -%}
+
+            {%- if paragraph_text != blank -%}
+              <div class="age-verifier__popup__content-paragraph">
+                {%
+                  render 'paragraph_v2',
+                  text: paragraph_text,
+                  color: paragraph_color,
+                  default_color: settings.paragraph_color,
+                  font_size_scale: paragraph_font_size_scale,
+                  block_id: section.id,
+                  margin_top: 12,
+                  visible_on_desktop: true,
+                  visible_on_mobile: true,
+                  content_alignment: {{content_alignment}},
+                  content_alignment_mobile: {{content_alignment}}
+                %}
+              </div>
+            {%- endif -%}
+          </div>
+
+          <div class="age-verifier__popup__footer">
+            {%- if confirm_text != blank or reject_text != blank -%}
+              <div class="age-verifier__popup__content-buttons">
+                {% if confirm_text != blank %}
+                  <div class="age-verifier__popup__content-buttons__accept">
+                    {%- assign confirm_button_id = 'confirm-button' -%}
+                    {% render 'button_v2',
+                      text: confirm_text,
+                      type: confirm_type,
+                      text_color: confirm_text_color,
+                      background_color: confirm_background_color,
+                      border_color: confirm_border_color,
+                      border_width: confirm_border_width,
+                      border_radius: confirm_button_border_radius,
+                      animation: confirm_button_animation,
+                      visible_on_desktop: true,
+                      visible_on_mobile: true,
+                      block_id: confirm_button_id
+                    %}
+                  </div>
+                {% endif %}
+
+                {% if reject_text != blank %}
+                  <div class="age-verifier__popup__content-buttons__reject">
+                    {%- assign reject_button_id = 'reject-button' -%}
+                    {% render 'button_v2',
+                      text: reject_text,
+                      type: reject_type,
+                      text_color: reject_text_color,
+                      background_color: reject_background_color,
+                      border_color: reject_border_color,
+                      border_width: reject_border_width,
+                      border_radius: reject_button_border_radius,
+                      animation: reject_button_animation,
+                      visible_on_desktop: true,
+                      visible_on_mobile: true,
+                      block_id: reject_button_id
+                    %}
+                  </div>
+                {% endif %}
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </age-verifier>
+{%- endif -%}
+
+{% schema %}
+  {
+    "name": "Age verifier",
+    "tag": "section",
+    "class": "age-verifier",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Enable the age verifier to have your customers verify their age before being provided access to your website’s content. [Learn more](https://help.shopify.com/manual/customers/manage-customers)"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_testing_view",
+        "label": "Show popup (testing purposes)",
+        "default": true,
+        "info": "Force the popup to become visible on the customizer. This checkbox has no effect on the live view of your store."
+      },
+      {
+        "type": "header",
+        "content": "Backgrounds",
+        "info": "Edit the color and opacity of the core backgrounds within this section."
+      },
+      {
+        "type": "color",
+        "id": "card_background_color",
+        "label": "Card background color"
+      },
+      {
+        "type": "color",
+        "id": "background_color",
+        "label": "Overlay color"
+      },
+      {
+        "type": "range",
+        "id": "background_opacity",
+        "min": 1,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Overlay opacity",
+        "default": 100
+      },
+      {
+        "type": "header",
+        "content": "Image",
+        "info": "Add an image to the age verification popup and position it to your liking."
+      },
+      {
+        "type": "image_picker",
+        "id": "image_with_text_image",
+        "label": "Image"
+      },
+      {
+        "type": "header",
+        "content": "Layout",
+        "info": "Ammend the layout of the age verification popup."
+      },
+      {
+        "type": "select",
+        "id": "image_position",
+        "label": "Image position",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "top",
+            "label": "Top"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "left"
+      },
+      {
+        "type": "text_alignment",
+        "id": "content_alignment",
+        "label": "Content alignment",
+        "default": "left"
+     },
+      {
+        "type": "header",
+        "content": "Title",
+        "info": "Amend the title on your popup."
+      },
+      {
+      "type": "inline_richtext",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "color",
+      "id": "color",
+      "label": "Color"
+    },
+    {
+      "type": "select",
+      "id": "tag",
+      "label": "Tag",
+      "options": [
+        {
+          "value": "h1",
+          "label": "H1"
+        },
+        {
+          "value": "h2",
+          "label": "H2"
+        },
+        {
+          "value": "h3",
+          "label": "H3"
+        },
+        {
+          "value": "h4",
+          "label": "H4"
+        },
+        {
+          "value": "h5",
+          "label": "H5"
+        },
+        {
+          "value": "h6",
+          "label": "H6"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "range",
+      "id": "font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Paragraph",
+      "info": "Amend the paragraph text on your popup."
+    },
+    {
+      "type": "richtext",
+      "id": "paragraph_text",
+      "label": "Text"
+    },
+    {
+      "type": "color",
+      "id": "paragraph_color",
+      "label": "Color"
+    },
+    {
+      "type": "range",
+      "id": "paragraph_font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Confirm button",
+      "info": "Customize the text and look of the confirmation button."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "confirm_text",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "confirm_type",
+      "label": "Type",
+      "options": [
+        {
+          "value": "primary",
+          "label": "Primary"
+        },
+        {
+          "value": "secondary",
+          "label": "Secondary"
+        },
+        {
+          "value": "override",
+          "label": "Override"
+        }
+      ],
+      "default": "primary"
+    },
+    {
+      "type": "header",
+      "content": "Confirm button override"
+    },
+    {
+      "type": "color",
+      "id": "confirm_text_color",
+      "label": "Text color"
+    },
+    {
+      "type": "color",
+      "id": "confirm_background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "color",
+      "id": "confirm_border_color",
+      "label": "Border color"
+    },
+    {
+      "type": "range",
+      "id": "confirm_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Border width",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "confirm_button_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 6
+    },
+    {
+      "type": "select",
+      "id": "confirm_button_animation",
+      "label": "Animation",
+      "options": [
+        {
+          "value": "grow",
+          "label": "Grow"
+        },
+        {
+          "value": "shrink",
+          "label": "Shrink"
+        },
+        {
+          "value": "lighten",
+          "label": "Lighten"
+        },
+        {
+          "value": "darken",
+          "label": "Darken"
+        }
+      ],
+      "default": "shrink"
+    },
+    {
+      "type": "header",
+      "content": "Reject button",
+      "info": "Customize the text and look of the rejection button."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "reject_text",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "reject_type",
+      "label": "Type",
+      "options": [
+        {
+          "value": "primary",
+          "label": "Primary"
+        },
+        {
+          "value": "secondary",
+          "label": "Secondary"
+        },
+        {
+          "value": "override",
+          "label": "Override"
+        }
+      ],
+      "default": "primary"
+    },
+    {
+      "type": "header",
+      "content": "Reject button override"
+    },
+    {
+      "type": "color",
+      "id": "reject_text_color",
+      "label": "Text color"
+    },
+    {
+      "type": "color",
+      "id": "reject_background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "color",
+      "id": "reject_border_color",
+      "label": "Border color"
+    },
+    {
+      "type": "range",
+      "id": "reject_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Border width",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "reject_button_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 6
+    },
+    {
+      "type": "select",
+      "id": "reject_button_animation",
+      "label": "Animation",
+      "options": [
+        {
+          "value": "grow",
+          "label": "Grow"
+        },
+        {
+          "value": "shrink",
+          "label": "Shrink"
+        },
+        {
+          "value": "lighten",
+          "label": "Lighten"
+        },
+        {
+          "value": "darken",
+          "label": "Darken"
+        }
+      ],
+      "default": "shrink"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Age verifier",
+      "settings": {
+        "show_testing_view": true,
+        "card_background_color": "rgba(0,0,0,0)",
+        "background_color": "rgba(0,0,0,0)",
+        "background_opacity": 85,
+        "image_position": "left",
+        "content_alignment": "center",
+        "text": "You must be over 18 years old to access this website",
+        "color": "rgba(0,0,0,0)",
+        "tag": "h2",
+        "font_size_scale": 100,
+        "paragraph_text": "<p>Please verify your age below<\/p>",
+        "paragraph_color": "rgba(0,0,0,0)",
+        "paragraph_font_size_scale": 100,
+        "confirm_text": "Continue",
+        "confirm_type": "primary",
+        "confirm_text_color": "",
+        "confirm_background_color": "",
+        "confirm_border_color": "",
+        "confirm_border_width": 0,
+        "confirm_button_border_radius": 6,
+        "confirm_button_animation": "shrink",
+        "reject_text": "Leave",
+        "reject_type": "secondary",
+        "reject_text_color": "",
+        "reject_background_color": "",
+        "reject_border_color": "",
+        "reject_border_width": 0,
+        "reject_button_border_radius": 6,
+        "reject_button_animation": "shrink"
+      }
+    }
+  ],
+  "enabled_on": {
+    "templates": ["*"],
+    "groups": ["custom.overlay"]
+  }
+}
+{% endschema %}

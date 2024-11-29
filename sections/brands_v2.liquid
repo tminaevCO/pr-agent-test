@@ -1,0 +1,308 @@
+{% liquid
+  assign brand_height = section.settings.brand_height
+  assign column_gap = section.settings.column_gap
+  assign row_gap = section.settings.row_gap
+  assign background_color = section.settings.background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign top_padding = section.settings.top_padding
+  assign bottom_padding = section.settings.bottom_padding
+  assign side_padding = section.settings.side_padding
+  assign top_margin = section.settings.top_margin
+  assign bottom_margin = section.settings.bottom_margin
+%}
+
+{% stylesheet %}
+  .brands__content {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+  }
+
+  .brand__item {
+    display: flex;
+  }
+
+  .brand__item img,
+  .brand__item svg {
+    width: auto;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .block__title.brands__title p {
+    margin: 0;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  .brand__background-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .brand__background-pattern img,
+  .brand__background-pattern svg {
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media only screen and (min-width: 769px) {
+    .block__title.brands__title {
+      margin-bottom: 64px;
+    }
+  }
+{% endstylesheet %}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    position: relative;
+
+    margin-top: {{ top_margin }}px;
+    margin-bottom: {{ bottom_margin }}px;
+  }
+
+  #shopify-section-{{ section.id }} .brands__content {
+    column-gap: {{column_gap}}px;
+    row-gap: {{row_gap}}px;
+  }
+
+  {% if background_color.alpha != null and background_color.alpha != 0.0 %}
+    {% if fullwidth_background %}
+      #shopify-section-{{ section.id }} {
+        background-color: {{background_color}};
+        max-width: 100%;
+        padding-top: {{top_padding}}px;
+        padding-bottom: {{bottom_padding}}px;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      #shopify-section-{{ section.id }} .brands--inner {
+        max-width: {{ settings.page_width }}px;
+        margin: 0 auto;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+    {% else %}
+      #shopify-section-{{ section.id }}{
+        background-color: {{background_color}};
+        padding-top: {{top_padding}}px;
+        padding-bottom: {{bottom_padding}}px;
+        padding-left: {{side_padding}}px;
+        padding-right: {{side_padding}}px;
+        box-sizing: border-box;
+      }
+    {% endif %}
+  {% endif %}
+
+  #shopify-section-{{section.id}} .brand__item {
+    height: {{brand_height}}px;
+  }
+
+  #shopify-section-{{section.id}} .svg-placeholder {
+    background-color: {{settings.image_background_color}};
+    stroke: {{settings.icon_color}};
+    fill: {{settings.icon_color}};
+    aspect-ratio: 1.5;
+  }
+
+  #shopify-section-{{ section.id }} .block__title {
+    position: relative;
+    z-index: 2;
+  }
+{% endstyle %}
+
+{%- if section.blocks.size > 0 -%}
+  <div class="brands--inner {% if fullwidth_background %}container{% endif %}">
+    <div class="brands__content">
+      {% for block in section.blocks %}
+        {% liquid
+          assign image = block.settings.image
+        %}
+
+        <div class="brand__item">
+          {%- if image != blank -%}
+            {%- assign image_size = image.width | append: 'px' -%}
+            {% render 'responsive-image-dynamic_v2', image: image, sizes: image_size %}
+          {%- else -%}
+            {{ 'image' | placeholder_svg_tag: 'svg-placeholder' }}
+          {%- endif -%}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Brands",
+  "tag": "section",
+  "class": "brands container",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "All of your collections are listed by default. To customize your list, choose 'Selected' and add collections."
+    },
+    {
+      "type": "range",
+      "id": "brand_height",
+      "min": 35,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Brand height",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 10,
+      "max": 110,
+      "step": 1,
+      "unit": "px",
+      "label": "Column gap",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "row_gap",
+      "min": 10,
+      "max": 110,
+      "step": 1,
+      "unit": "px",
+      "label": "Row gap",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Customize the background of your section."
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth_background",
+      "label": "Fullwidth background",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Section padding",
+      "info": "Add spacing inside your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "bottom_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Section margin",
+      "info": "Add spacing above and below your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top margin",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "bottom_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom margin",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Brand",
+      "type": "brand",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "All of your collections are listed by default. To customize your list, choose 'Selected' and add collections."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brands",
+      "settings": {
+        "brand_height": 50,
+        "column_gap": 40,
+        "row_gap": 30,
+        "background_color": "rgba(0,0,0,0)",
+        "fullwidth_background": false,
+        "top_padding": 15,
+        "bottom_padding": 15,
+        "side_padding": 24,
+        "top_margin": 40,
+        "bottom_margin": 40
+      },
+      "blocks": [
+        {
+          "type": "brand"
+        },
+        {
+          "type": "brand"
+        },
+        {
+          "type": "brand"
+        },
+        {
+          "type": "brand"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

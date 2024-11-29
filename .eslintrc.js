@@ -1,0 +1,52 @@
+module.exports = {
+  extends: ['airbnb-base', 'prettier'],
+  plugins: ['prettier', 'import'],
+  parser: '@babel/eslint-parser',
+  parserOptions: {
+    sourceType: 'module',
+    allowImportExportEverywhere: true,
+    requireConfigFile: false,
+  },
+  rules: {
+    'max-len': [
+      'error',
+      {
+        code: 120,
+        tabWidth: 2,
+        ignoreComments: true,
+        ignoreStrings: true,
+      },
+    ],
+    'no-console': 'off',
+    'no-use-before-define': 'off',
+    'no-underscore-dangle': 'off',
+    'function-paren-newline': 'off',
+    'implicit-arrow-linebreak': 'off',
+    'class-methods-use-this': 'off', // https://eslint.org/docs/rules/class-methods-use-this
+    'no-nested-ternary': 'off',
+    'no-restricted-syntax': [
+      'error',
+      'ForInStatement',
+      'LabeledStatement',
+      'WithStatement',
+    ], // https://eslint.org/docs/rules/no-restricted-syntax
+  },
+  env: {
+    browser: true,
+    node: true,
+    commonjs: true,
+    es2021: true,
+  },
+  root: true,
+  globals: {
+    Shopify: 'readonly',
+  },
+  settings: {
+    'import/resolver': {
+      alias: {
+        map: [['utils', './components/utils']],
+        extensions: ['.js'],
+      },
+    },
+  },
+};

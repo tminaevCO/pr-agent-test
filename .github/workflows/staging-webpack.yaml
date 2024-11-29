@@ -1,0 +1,73 @@
+name: Automatic build and marge webpack files to staging branch
+
+on:
+  # workflow_dispatch:
+  push:
+    branches:
+      - staging
+
+jobs:
+  check_author:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout staging Branch
+        uses: actions/checkout@v4
+        with:
+          ref: staging
+      - name: Check commit author
+        id: check_author
+        run: |
+          COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')  
+          echo "Commit author is $COMMIT_AUTHOR"
+          echo "commit_author=$COMMIT_AUTHOR" >> $GITHUB_OUTPUT
+
+      - name: Trigger if author is allowed
+        if: steps.check_author.outputs.commit_author != 'shopify[bot]'  # Condition to check author
+        run: |
+          echo "Running job because the commit author is allowed."      
+
+
+      - name: Trigger if author is not allowed
+        if: steps.check_author.outputs.commit_author == 'shopify[bot]'  # Condition to check author
+        run: |
+          echo "Running job because the commit author is not allowed."
+          exit 1
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout staging Branch
+        uses: actions/checkout@v4
+        with:
+          ref: staging
+
+      - name: Setup Node.js (if using Node.js, adapt for your environment)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build specific files
+        # if: ${{ steps.file-check.outputs.contains_specific_files == 'true' }}
+        run: |
+          echo "Building specific files..."
+          npm install -g yarn
+          yarn install
+          ls -la assets/ | grep js
+          yarn build
+          ls -la assets/ | grep js
+
+      - name: Commit and push built files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add -f assets/*
+          
+          git commit -m "[Action] Add built files from CI"
+
+
+          git push -u origin staging
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+

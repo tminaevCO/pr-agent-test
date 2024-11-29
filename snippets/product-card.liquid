@@ -1,0 +1,86 @@
+{% comment %}
+  Usage:
+  {% render 'product-card',
+  product: product, - required, product object
+  group: group - optional, will add data-group attribute to the swiper slide wrapper
+  index - required, will add fetchpriority attribute to the product card depending on the index
+  is_slider - optional, will add swiper-slide class and wrapper to the product card
+  %}
+{% endcomment %}
+{%- if is_slider -%}
+  <div
+    class="swiper-slide p-8 lg:p-16 border-t border-black [&:not(:last-child)]:border-r !h-auto "
+    {% if group != blank %}
+      data-group="{{ group }}"
+    {% endif %}
+  >
+{%- endif -%}
+<product-card class="group relative flex flex-col gap-2 md:gap-24">
+  <div class="product-card__top relative">
+    {%- liquid
+      render 'product-badges', product: product, classes: 'absolute z-10 left-0 top-0'
+      render 'wishlist-btn', product: product
+      render 'quick-view-btn', product: product
+    -%}
+    <a
+      class="block w-full h-full relative"
+      href="{{ product.url }}"
+    >
+      {%- liquid
+        if product.images.size > 1
+          assign alt_text = product.title | append: ' - ' | append: page_title
+          assign alt_text_hover = product.title | append: ' - Hover ' | append: page_title
+          assign loading = 'lazy'
+          assign fetchpriority = 'auto'
+          if index != blank and index < 5
+            assign fetchpriority = 'high'
+            assign loading = 'eager'
+          endif
+          render 'responsive-image-dynamic_v2', image: product.images[0], alt_text: alt_text, loading: loading, fetchpriority: fetchpriority, class: 'product-card__image group-hover:opacity-0 transition-all object-cover aspect-square'
+          render 'responsive-image-dynamic_v2', image: product.images[1], alt_text: alt_text_hover, loading: 'lazy', class: 'product-card__image opacity-0 absolute left-0 top-0 group-hover:opacity-100 transition-all object-cover aspect-square'
+        elsif product.featured_image != blank
+          assign alt_text = product.title | append: ' - ' | append: page_title
+          assign loading = 'lazy'
+          assign fetchpriority = 'auto'
+          if index != blank and index < 4
+            assign fetchpriority = 'high'
+            assign loading = 'eager'
+          endif
+          render 'responsive-image-dynamic_v2', image: product.featured_image, alt_text: alt_text, loading: loading, fetchpriority: fetchpriority, class: 'product-card__image object-cover aspect-square'
+        else
+          echo 'product-1' | placeholder_svg_tag
+        endif
+      -%}
+    </a>
+  </div>
+  <a
+    href="{{ product.url }}"
+    class="product-card__bottom"
+  >
+    {% comment %} Added height for CLS score since the rating is loaded asynchronously {% endcomment %}
+    <div
+      class="loox-rating mb-8 h-26"
+      data-id="{{ product.id }}"
+      data-rating="{{ product.metafields.loox.avg_rating }}"
+      data-raters="{{ product.metafields.loox.num_reviews }}"
+    ></div>
+    <div class="product-card__bottom__meta grid grid-cols-[4fr_0.66fr] gap-[24px] h-[100%]">
+      <h6 class="h6">
+        {{ product.title }}
+      </h6>
+      <div class="product-card__bottom__meta-price flex flex-col">
+        <p class="product-card__bottom__meta-price-main body-1">
+          {{ product.price | money_without_currency | prepend: cart.currency.symbol }}
+        </p>
+        {%- if product.compare_at_price != blank and product.compare_at_price > product.price -%}
+          <p class="product-card__bottom__meta-price-compare body-2 text-grey-300 line-through">
+            {{ product.compare_at_price | money_without_currency | prepend: cart.currency.symbol }}
+          </p>
+        {%- endif -%}
+      </div>
+    </div>
+  </a>
+</product-card>
+{%- if is_slider -%}
+  </div>
+{%- endif -%}

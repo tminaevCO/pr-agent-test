@@ -1,0 +1,816 @@
+{% liquid
+  assign text = section.settings.text
+  assign tag = section.settings.tag
+  assign grid_gap = section.settings.grid_gap
+  assign font_size_scale = section.settings.font_size_scale
+  assign max_width = section.settings.max_width
+
+  assign color = section.settings.color
+  assign content_alignment = section.settings.content_alignment
+  assign content_alignment_mobile = section.settings.content_alignment_mobile
+  assign top_margin = section.settings.top_margin
+  assign bottom_margin = section.settings.bottom_margin
+  assign top_margin_mobile = section.settings.top_margin | divided_by: 2
+  assign bottom_margin_mobile = section.settings.bottom_margin | divided_by: 2
+  assign active_block = section.blocks | first
+
+  assign background_color = section.settings.background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign top_padding = section.settings.top_padding
+  assign bottom_padding = section.settings.bottom_padding
+  assign side_padding = section.settings.side_padding
+%}
+
+{% if max_width > settings.page_width %}
+  {% assign max_width = settings.page_width %}
+{% endif %}
+
+{%- if text != blank -%}
+  {% style %}
+    #shopify-section-{{section.id}} {
+      margin-top: {{top_margin_mobile}}px;
+      margin-bottom: {{bottom_margin_mobile}}px;
+    }
+
+    {% if background_color.alpha != null and background_color.alpha != 0.0 %}
+      {% if fullwidth_background %}
+        #shopify-section-{{ section.id }} {
+          background-color: {{background_color}};
+          max-width: 100%;
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: 0;
+          padding-right: 0;
+        }
+
+        #shopify-section-{{ section.id }} .section-title--inner {
+          margin: 0 auto;
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+      {% else %}
+        #shopify-section-{{ section.id }}{
+          background-color: {{background_color}};
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: {{side_padding}}px;
+          padding-right: {{side_padding}}px;
+          box-sizing: border-box;
+        }
+      {% endif %}
+    {% endif %}
+
+    #shopify-section-{{ section.id }} .section-title--inner {
+      max-width: {{ max_width }}px;
+      {% case section.settings.content_position %}
+          {% when 'left' %}
+            margin-left: 0;
+            margin-right: auto;
+          {% when 'center' %}
+            margin-left: auto;
+            margin-right: auto;
+          {% when 'right' %}
+            margin-left: auto;
+            margin-right: 0;
+        {% endcase %}
+    }
+
+    {% case active_block.type %}
+      {% when "button" %}
+        #shopify-section-{{section.id}} .block__button {
+          max-width: 154px;
+        }
+      {% when "link" %}
+        #shopify-section-{{section.id}} .section-title__link {
+          {% if active_block.settings.underline %}
+            text-decoration: underline;
+          {% endif %}
+          color: {% if active_block.settings.color.alpha != null and active_block.settings.color.alpha != 0.0 %}{{active_block.settings.color}}{% else %}{{settings.link_color}}{% endif %};
+          font-family: {{ settings.paragraph_font.family }}, {{ settings.paragraph_font.fallback_families }};
+          font-size: {{16 | times: settings.paragraph_font_size_scale | divided_by: 100.0 | round | times: active_block.settings.font_size_scale | divided_by: 100.0 | round }}px;
+          line-height: {{16 | times: settings.paragraph_font_size_scale | divided_by: 100.0 | round | times: active_block.settings.font_size_scale | divided_by: 100.0 | round | times: 140 | divided_by: 100.0 | round | times: settings.paragraph_line_spacing_scale | divided_by: 100.0 | round}}px;
+          font-weight: {{ settings.paragraph_font.weight }};
+        }
+
+        @media only screen and (max-width: 768px) {
+          #shopify-section-{{section.id}} .section-title__link {
+            {% if active_block.settings.show_on_mobile == false %}
+              display: none;
+            {% endif %}
+          }
+        }
+
+      {% when "search" %}
+        #shopify-section-{{section.id}} .search-form {
+          position: relative;
+        }
+
+        #shopify-section-{{section.id}} .search-form input {
+          padding: 18px 30px 18px 16px;
+          min-height: 50px;
+          min-width: 350px;
+          box-sizing: border-box;
+          width: 100%;
+          color: {% if active_block.settings.search_input_text_color.alpha != null and active_block.settings.search_input_text_color.alpha != 0.0 %}{{active_block.settings.search_input_text_color}}{% else %}{{settings.input_text_color}}{% endif %};
+          background-color: {% if active_block.settings.search_input_background_color.alpha != null and active_block.settings.search_input_background_color.alpha != 0.0 %}{{active_block.settings.search_input_background_color}}{% else %}{{settings.input_background_color}}{% endif %};
+          border: {{active_block.settings.search_input_border_width}}px solid {% if active_block.settings.search_input_border_color.alpha != null and active_block.settings.search_input_border_color.alpha != 0.0 %}{{active_block.settings.search_input_border_color}}{% else %}{{settings.input_border_color}}{% endif %};
+          border-radius: {{settings.border_radius}}px;
+        }
+
+        #shopify-section-{{section.id}} .search-form input::placeholder {
+          color: {% if active_block.settings.search_placeholder_text_color.alpha != null and active_block.settings.search_placeholder_text_color.alpha != 0.0 %}{{active_block.settings.search_placeholder_text_color}}{% else %}{{settings.input_placeholder_color}}{% endif %};
+        }
+
+        #shopify-section-{{section.id}} .search-form input:focus {
+          outline: 1px ridge {% if active_block.settings.search_input_active_highlight_color.alpha != null and active_block.settings.search_input_active_highlight_color.alpha != 0.0 %}{{active_block.settings.search_input_active_highlight_color}}{% else %}{{settings.input_active_highlight_color}}{% endif %};
+        }
+
+        #shopify-section-{{section.id}} .search-form button[type="submit"] {
+          position: absolute;
+          top: 50%;
+          right: 5px;
+          width: 20px;
+          height: 20px;
+          padding: 0;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          padding: 10px;
+          box-sizing: content-box;
+          cursor: pointer;
+        }
+
+        #shopify-section-{{section.id}} .search-form button[type="submit"] svg {
+          width: 100%;
+          height: 100%;
+        }
+
+        @media only screen and (max-width: 768px) {
+          #shopify-section-{{section.id}} .search-form {
+            {% if active_block.settings.show_on_mobile == false %}
+              display: none;
+            {% endif %}
+          }
+        }
+    {% endcase %}
+
+    #shopify-section-{{section.id}} .section-title__content{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    #shopify-section-{{section.id}} .block__title {
+      flex: 1 0 min-content;
+    }
+
+    {%- case content_alignment_mobile -%}
+      {%- when "left" -%}
+        #shopify-section-{{section.id}} .section-title__content{
+          justify-content: {% if section.blocks.size > 0 %}space-between{% else %}flex-start{% endif %};
+          align-items: flex-start;
+        }
+
+        #shopify-section-{{section.id}} .block__title {
+          text-align: left;
+          order: 0;
+        }
+
+      {%- when "center" -%}
+        #shopify-section-{{section.id}} .section-title__content{
+          justify-content: {% if section.blocks.size > 0 %}space-between{% else %}center{% endif %};
+          flex-direction: column;
+          gap: 8px;
+          align-items: center;
+        }
+
+        #shopify-section-{{section.id}} .block__title {
+          text-align: center;
+          order: 0;
+        }
+      {%- when "right" -%}
+        #shopify-section-{{section.id}} .section-title__content{
+          justify-content: {% if section.blocks.size > 0 %}space-between{% else %}flex-end{% endif %};
+          align-items: flex-end;
+        }
+
+        #shopify-section-{{section.id}} .block__title {
+          text-align: right;
+          order: 0;
+        }
+    {%- endcase -%}
+
+    @media only screen and (min-width: 769px) {
+      #shopify-section-{{section.id}} {
+        margin-top: {{top_margin}}px;
+        margin-bottom: {{bottom_margin}}px;
+      }
+      #shopify-section-{{section.id}} .section-title__content{
+        gap: {{grid_gap}}px;
+      }
+
+      #shopify-section-{{section.id}} .section-title__content{
+        flex-direction: row;
+      }
+
+      {%- case content_alignment -%}
+        {%- when "left" -%}
+          #shopify-section-{{section.id}} .section-title__content{
+            justify-content: {% if section.blocks.size > 0 %}space-between{% else %}flex-start{% endif %};
+            flex-direction: row;
+            align-items: center;
+          }
+
+          #shopify-section-{{section.id}} .block__title {
+            text-align: left;
+            order: 0;
+          }
+        {%- when "center" -%}
+          #shopify-section-{{section.id}} .section-title__content{
+            justify-content: {% if section.blocks.size > 0 %}space-between{% else %}center{% endif %};
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+          }
+
+          #shopify-section-{{section.id}} .block__title {
+            text-align: center;
+            order: 0;
+          }
+        {%- when "right" -%}
+          #shopify-section-{{section.id}} .section-title__content{
+            justify-content: {% if section.blocks.size > 0 %}space-between{% else %}flex-end{% endif %};
+            flex-direction: row;
+            align-items: center;
+          }
+
+          #shopify-section-{{section.id}} .block__title {
+            text-align: right;
+            order: 1;
+          }
+      {%- endcase -%}
+    }
+  {% endstyle %}
+
+  <div class="section-title--inner">
+    <div class="section-title__content">
+      {% render 'title_v2',
+        text: text,
+        tag: tag,
+        font_size_scale: font_size_scale,
+        color: color,
+        default_font_size_mobile: 32,
+        default_font_size_desktop: 36,
+        visible_on_desktop: true,
+        visible_on_mobile: true,
+        block_id: section.id
+      %}
+      {% if section.blocks.size > 0 %}
+        {% for block in section.blocks %}
+          {%- case block.type -%}
+            {%- when 'button' -%}
+              {% liquid
+                assign text = block.settings.text
+                assign link = block.settings.link
+                assign type = block.settings.type
+                assign text_color = block.settings.text_color
+                assign background_color = block.settings.background_color
+                assign border_color = block.settings.border_color
+                assign border_width = block.settings.border_width
+                assign border_radius = block.settings.border_radius
+                assign animation = block.settings.animation
+                assign show_on_mobile = block.settings.show_on_mobile
+              %}
+
+              {% render 'button_v2',
+                text: text,
+                link: link,
+                type: type,
+                text_color: text_color,
+                background_color: background_color,
+                border_color: border_color,
+                border_width: border_width,
+                border_radius: border_radius,
+                animation: animation,
+                visible_on_desktop: true,
+                visible_on_mobile: show_on_mobile,
+                block_id: block.id
+              %}
+            {%- when 'link' -%}
+              {% liquid
+                assign text = block.settings.text
+                assign link = block.settings.link | default: '#'
+              %}
+
+              {% if text != blank %}
+                <a class="section-title__link" href="{{link}}">{{ text }}</a>
+              {% endif %}
+            {%- when 'search' -%}
+              {% liquid
+                assign search_placeholder = block.settings.search_placeholder
+                assign return_products = block.settings.return_products
+                assign return_articles = block.settings.return_articles
+                assign return_pages = block.settings.return_pages
+
+                if active_block.settings.search_input_text_color.alpha != null and active_block.settings.search_input_text_color.alpha != 0.0
+                  assign icon_color = active_block.settings.search_input_text_color
+                else
+                  assign icon_color = settings.icon_color
+                endif
+              %}
+
+              <form action="/search" method="get" class="search-form">
+                <input
+                  type="hidden"
+                  name="type"
+                  value="{% if return_products %}product,{% endif %}{% if return_articles %}article,{% endif %}{% if return_pages %}page{% endif %}"
+                >
+                <input type="text" name="q" placeholder="{{search_placeholder}}" class="search-input">
+                <button type="submit">{% render 'icon_v2', icon: 'search-icon', color: icon_color %}</button>
+              </form>
+          {%- endcase -%}
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Title",
+  "tag": "section",
+  "class": "section-title container",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Add a title as its own section and amend it to your liking. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "color",
+      "id": "color",
+      "label": "Color"
+    },
+    {
+      "type": "select",
+      "id": "tag",
+      "label": "Tag",
+      "options": [
+        {
+          "value": "h1",
+          "label": "H1"
+        },
+        {
+          "value": "h2",
+          "label": "H2"
+        },
+        {
+          "value": "h3",
+          "label": "H3"
+        },
+        {
+          "value": "h4",
+          "label": "H4"
+        },
+        {
+          "value": "h5",
+          "label": "H5"
+        },
+        {
+          "value": "h6",
+          "label": "H6"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "range",
+      "id": "font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Amend the alignment of your text."
+    },
+    {
+      "type": "text_alignment",
+      "id": "content_alignment",
+      "label": "Desktop content alignment",
+      "default": "left"
+    },
+    {
+      "type": "text_alignment",
+      "id": "content_alignment_mobile",
+      "label": "Mobile content alignment",
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Content position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 300,
+      "max": 1500,
+      "step": 12,
+      "unit": "px",
+      "label": "Max width",
+      "default": 1500
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Column gap",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Personalize the background of your section to match your brand. "
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth_background",
+      "label": "Fullwidth background",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Section padding",
+      "info": "Add spacing above and below inside your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "bottom_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Section margin",
+      "info": "Add spacing above and below your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top margin",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "bottom_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom margin",
+      "default": 0
+    }
+  ],
+  "max_blocks": 1,
+  "blocks": [
+    {
+      "name": "Button",
+     "type": "button",
+     "settings": [
+         {
+            "type": "paragraph",
+            "content": "Add a button alongside your title which directs the user wherever you like. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+         },
+         {
+           "type": "inline_richtext",
+           "id": "text",
+           "label": "Text",
+           "default": "Primary button"
+         },
+         {
+           "type": "url",
+           "id": "link",
+           "label": "Link"
+         },
+         {
+          "type": "select",
+          "id": "type",
+          "label": "Type",
+          "options": [
+            {
+              "value": "primary",
+              "label": "Primary"
+            },
+            {
+              "value": "secondary",
+              "label": "Secondary"
+            },
+            {
+              "value": "override",
+              "label": "Override"
+            }
+          ],
+          "default": "primary"
+         },
+         {
+          "type": "header",
+          "content": "Override",
+          "info": "You can override your button styles by changing the type field above to 'Override'. After that just input your new values below."
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text color"
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background color"
+        },
+        {
+          "type": "color",
+          "id": "border_color",
+          "label": "Border color"
+        },
+        {
+          "type": "range",
+          "id": "border_width",
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "unit": "px",
+          "label": "Border thickness",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "border_radius",
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "label": "Corner radius",
+          "default": 6
+        },
+        {
+          "type": "select",
+          "id": "animation",
+          "label": "Hover animation",
+          "options": [
+            {
+              "value": "grow",
+              "label": "Grow"
+            },
+            {
+              "value": "shrink",
+              "label": "Shrink"
+            },
+            {
+              "value": "lighten",
+              "label": "Lighten"
+            },
+            {
+              "value": "darken",
+              "label": "Darken"
+            }
+          ],
+          "default": "shrink"
+        },
+       {
+          "type": "header",
+          "content": "Visibility",
+          "info": "Add spacing above and below your new section."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_on_mobile",
+          "label": "Show on mobile",
+          "default": true
+        }
+      ]
+    },
+    {
+      "name": "Link",
+      "type": "link",
+      "settings": [
+         {
+            "type": "paragraph",
+            "content": "Add a link alongside your title which directs the user wherever you like. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+         },
+         {
+           "type": "inline_richtext",
+           "id": "text",
+           "label": "Text",
+           "default": "Link elsewhere"
+         },
+         {
+           "type": "url",
+           "id": "link",
+           "label": "Link"
+         },
+         {
+           "type": "header",
+           "content": "Style",
+           "info": "Amended the style of your link."
+         },
+         {
+           "type": "checkbox",
+           "id": "underline",
+           "label": "Underline",
+           "default": true
+         },
+         {
+           "type": "color",
+           "id": "color",
+           "label": "Color"
+         },
+         {
+          "type": "range",
+          "id": "font_size_scale",
+          "min": 75,
+          "max": 125,
+          "step": 1,
+          "unit": "%",
+          "label": "Font size scale",
+          "default": 100
+        },
+        {
+          "type": "header",
+          "content": "Visibility",
+          "info": "Add spacing above and below your new section."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_on_mobile",
+          "label": "Show on mobile",
+          "default": true
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "type": "search",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Add a search input alongside your title so the user can quickly navigate. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+        },
+        {
+          "type": "text",
+          "id": "search_placeholder",
+          "label": "Placeholder",
+          "default": "Search this store"
+        },
+        {
+          "type": "color",
+          "id": "search_placeholder_text_color",
+          "label": "Placeholder text color"
+        },
+        {
+          "type": "color",
+          "id": "search_input_text_color",
+          "label": "Text color"
+        },
+        {
+          "type": "color",
+          "id": "search_input_background_color",
+          "label": "Background color"
+        },
+        {
+          "type": "color",
+          "id": "search_input_border_color",
+          "label": "Border color"
+        },
+        {
+          "type": "range",
+          "id": "search_input_border_width",
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "unit": "px",
+          "label": "Border thickness",
+          "default": 0
+        },
+        {
+          "type": "color",
+          "id": "search_input_active_highlight_color",
+          "label": "Active hightlight"
+        },
+        {
+          "type": "header",
+          "content": "Results",
+          "info": "Add and remove result types from the search page the user will land on. [Learn more](https://help.shopify.com/manual/customers/manage-customers)"
+        },
+        {
+          "type": "checkbox",
+          "id": "return_products",
+          "label": "Return products",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "return_articles",
+          "label": "Return articles",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "return_pages",
+          "label": "Return pages",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Visibility",
+          "info": "Add spacing above and below your new section."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_on_mobile",
+          "label": "Show on mobile",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Title",
+      "settings": {
+        "text": "Tell Us About Your Brand",
+        "content_position": "center",
+        "color": "",
+        "tag": "h2",
+        "font_size_scale": 100,
+        "max_width": 1500,
+        "content_alignment": "left",
+        "content_alignment_mobile": "left",
+        "grid_gap": 20,
+        "top_margin": 40,
+        "bottom_margin": 40
+      }
+    }
+  ]
+}
+{% endschema %}

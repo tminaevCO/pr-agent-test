@@ -1,0 +1,2463 @@
+{% liquid
+  assign leave_comment_block = section.blocks | where: 'type', 'leave_comment'
+  assign background_color = section.settings.background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign top_padding = section.settings.top_padding
+  assign bottom_padding = section.settings.bottom_padding
+  assign side_padding = section.settings.side_padding
+%}
+
+{%- if section.blocks.size > 0 -%}
+  {% style %}
+    {% if background_color.alpha != null and background_color.alpha != 0.0 %}  
+      {% if fullwidth_background %}
+        #shopify-section-{{ section.id }} {
+          background-color: {{background_color}};
+          max-width: 100%;
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: 0;
+          padding-right: 0;
+        }
+
+        #shopify-section-{{ section.id }} .blog-post--inner {
+          max-width: {{ settings.page_width }}px;
+          margin: 0 auto;
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+      {% else %}
+        #shopify-section-{{ section.id }}{
+          background-color: {{background_color}};
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: {{side_padding}}px;
+          padding-right: {{side_padding}}px;
+          box-sizing: border-box;
+        }
+      {% endif %}
+    {% endif %}
+  {% endstyle %}
+
+  <div class="blog-post--inner">
+    <div class="blog-post__content">
+      {% for block in section.blocks %}
+        {%- case block.type -%}
+          {%- when 'featured_image' -%}
+            {% liquid
+              assign shape = block.settings.shape
+              assign max_width = block.settings.max_width
+              assign image_alignment = block.settings.image_alignment
+              assign top_margin = block.settings.top_margin
+              assign bottom_margin = block.settings.bottom_margin
+            %}
+
+            <div class="blog-post__featured-image" id="article-{{ block.id }}">
+              <style>
+                #article-{{block.id}} {
+                  margin-top: {{top_margin}}px;
+                  margin-bottom: {{bottom_margin}}px;
+                  display: flex;
+                  {%- case image_alignment -%}
+                    {%- when 'left' -%}
+                      justify-content: flex-start;
+                    {%- when 'center' -%}
+                      justify-content: center;
+                    {%- when 'right' -%}
+                      justify-content: flex-end;
+                  {%- endcase -%}
+                }
+                .blog-post__featured-image--container {
+                  {% if max_width != blank and max_width != 0 %}
+                    max-width: {{max_width}}px;
+                  {% else %}
+                    max-width: 100%;
+                  {% endif %}
+                  width: 100%;
+                }
+                #article-{{block.id}} .blog-post__featured-image--wrapper {
+                  position: relative;
+                  width: 100%;
+                  border-radius: {{settings.border_radius}}px;
+                  overflow: hidden;
+                  {% case shape %}
+                    {% when "default" %}
+                      height: 100%;
+                    {% when "square" %}
+                      padding-bottom: 100%;
+                    {% when "circle" %}
+                      border-radius: 50%;
+                      padding-bottom: 100%;
+                  {% endcase %}
+                }
+                #article-{{block.id}} img,
+                #article-{{block.id}} svg {
+                  width: 100%;
+                  height: 100%;
+                  object-fit: cover;
+                  object-position: center;
+                  {% case shape %}
+                    {% when "square" %}
+                      position: absolute;
+                      top: 0;
+                      left: 0;
+                    {% when "circle" %}
+                      position: absolute;
+                      top: 0;
+                      left: 0;
+                  {% endcase %}
+                  background-color: {{settings.image_background_color}};
+                }
+                #article-{{block.id}} .svg-placeholder,
+                #article-{{block.id}} svg {
+                  background-color: {{settings.image_background_color}};
+                  stroke: {{settings.icon_color}};
+                  fill: {{settings.icon_color}};
+                }
+              </style>
+              <div class="blog-post__featured-image--container">
+                <div class="blog-post__featured-image--wrapper">
+                  {% if article.image != blank or article.image != null %}
+                    {%- assign desktop_size = settings.page_width -%}
+                    {% if forloop.index < 3 %}
+                      {%- assign fetchpriority = 'high' -%}
+                    {% endif %}
+                    {% if settings.page_width > max_width %}
+                      {%- assign desktop_size = max_width -%}
+                    {% endif %}
+                    {%- assign image_sizes = '(max-width: 769px) calc(100vw - 32px), (min-width: CONTAINERpx) DESKTOPpx, DESKTOPpx'
+                      | replace: 'CONTAINER', settings.page_width
+                      | replace: 'DESKTOP', desktop_size
+                    -%}
+                    {% render 'responsive-image-dynamic_v2',
+                      image: article.image,
+                      alt_text: article.image.alt,
+                      aria-label: 'article-featured-image',
+                      sizes: image_sizes,
+                      fetchpriority: fetchpriority
+                    %}
+                  {% else %}
+                    {{ 'lifestyle-1' | placeholder_svg_tag: 'svg-placeholder' }}
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {%- when 'title' -%}
+            {% liquid
+              assign article_title = article.title
+              assign color = block.settings.color
+              assign font_size_scale = block.settings.font_size_scale
+              assign alignment = block.settings.alignment
+              assign max_width = block.settings.max_width
+              assign content_position = block.settings.content_position
+              assign top_margin = block.settings.top_margin
+              assign bottom_margin = block.settings.bottom_margin
+            %}
+
+            <div class="blog-post__title" id="article-{{block.id}}">
+              <style>
+                #article-{{block.id}} {
+                  margin-top: {{top_margin}}px;
+                  margin-bottom: {{bottom_margin}}px;
+                }
+
+                #article-{{block.id}} .block__title {
+                  {%- case content_position -%}
+                    {%- when "center" -%}
+                      margin-left: auto;
+                      margin-right: auto;
+                    {%- when "left" -%}
+                      margin-left: 0;
+                      margin-right: 0;
+                    {%- when "right" -%}
+                      margin-left: auto;
+                      margin-right: 0;
+                  {%- endcase -%}
+                }
+              </style>
+
+              {% render 'title_v2',
+                text: article_title,
+                color: color,
+                default_color: settings.heading_color,
+                tag: 'h1',
+                font_size_scale: font_size_scale,
+                block_id: block.id,
+                max_width: max_width,
+                visible_on_desktop: true,
+                visible_on_mobile: true,
+                default_font_size_desktop: 32,
+                default_font_size_mobile: 32,
+                content_alignment: alignment,
+                content_alignment_mobile: alignment
+              %}
+            </div>
+          {%- when 'content' -%}
+            {% liquid
+              assign default_color = block.settings.default_color
+              assign font_size_scale = block.settings.font_size_scale
+              assign max_width = block.settings.max_width
+              assign content_position = block.settings.content_position
+              assign top_margin = block.settings.top_margin
+              assign bottom_margin = block.settings.bottom_margin
+            %}
+            {% style %}
+              #article-{{block.id}} {
+                margin-top: {{top_margin}}px;
+                margin-bottom: {{bottom_margin}}px;
+                {% if max_width != blank and max_width != 0 %}
+                  max-width: {{max_width}}px;
+                {% else %}
+                  max-width: 100%;
+                {% endif %}
+                width: 100%;
+                {%- case content_position -%}
+                  {%- when "center" -%}
+                    margin-left: auto;
+                    margin-right: auto;
+                  {%- when "left" -%}
+                    margin-left: 0;
+                    margin-right: 0;
+                  {%- when "right" -%}
+                    margin-left: auto;
+                    margin-right: 0;
+                {%- endcase -%}
+              }
+
+              #article-{{block.id}} img {
+                max-width: 100%;
+                width: auto;
+                border-radius: {{settings.border_radius}}px;
+              }
+
+              #article-{{block.id}} span,
+              #article-{{block.id}} p,
+              #article-{{block.id}} p span,
+              #article-{{block.id}} li,
+              #article-{{block.id}} li span,
+              #article-{{block.id}} ul,
+              #article-{{block.id}} ol,
+              #article-{{block.id}} em,
+              #article-{{block.id}} em span {
+                color: {% if default_color.alpha and default_color.alpha != 0.0 %}{{default_color}}{% else %}{{settings.paragraph_color}}{% endif %};
+                font-family: {{ settings.paragraph_font.family }}, {{ settings.paragraph_font.fallback_families }};
+                font-size: {{16 | times: settings.paragraph_font_size_scale | divided_by: 100.0 | round}}px;
+                line-height: {{16 | times: settings.paragraph_font_size_scale | divided_by: 100.0 | round | times: 160 | divided_by: 100.0 | round | times: settings.paragraph_line_spacing_scale | divided_by: 100.0 | round }}px;
+                font-weight: {{ settings.paragraph_font.weight }};
+              }
+
+              #article-{{block.id}} span > em,
+              #article-{{block.id}} span > p,
+              #article-{{block.id}} span > li,
+              #article-{{block.id}} span > b,
+              #article-{{block.id}} span > i {
+                color: inherit;
+              }
+
+              #article-{{block.id}} a,
+              #article-{{block.id}} a span {
+                color: {% if default_color.alpha and default_color.alpha != 0.0 %}{{default_color}}{% else %}{{settings.link_color}}{% endif %};
+              }
+
+              #article-{{block.id}} h1,
+              #article-{{block.id}} h1 *,
+              #article-{{block.id}} h2,
+              #article-{{block.id}} h2 *,
+              #article-{{block.id}} h3,
+              #article-{{block.id}} h3 *,
+              #article-{{block.id}} h4,
+              #article-{{block.id}} h4 *,
+              #article-{{block.id}} h5,
+              #article-{{block.id}} h5 *,
+              #article-{{block.id}} h6,
+              #article-{{block.id}} h6 * {
+                font-family: {{ settings.heading_font.family }}, {{ settings.heading_font.fallback_families }};
+                color: {% if default_color.alpha and default_color.alpha != 0.0 %}{{default_color}}{% else %}{{settings.heading_color}}{% endif %};
+                font-weight: {{ settings.heading_font.weight }};
+              }
+
+              #article-{{block.id}} h1,
+              #article-{{block.id}} h1 * {
+                font-size: {{ 36 | times: settings.heading_font_size_scale | divided_by: 100.0 | round }}px;
+                line-height: {{ 36 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: 130 | divided_by: 100.0 | round | times: settings.heading_line_spacing_scale | divided_by: 100.0 | round }}px;
+              }
+
+              #article-{{block.id}} h2,
+              #article-{{block.id}} h2 * {
+                font-size: {{ 32 | times: settings.heading_font_size_scale | divided_by: 100.0 | round }}px;
+                line-height: {{ 32 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: 130 | divided_by: 100.0 | round | times: settings.heading_line_spacing_scale | divided_by: 100.0 | round }}px;
+              }
+
+              #article-{{block.id}} h3,
+              #article-{{block.id}} h3 * {
+                font-size: {{ 24 | times: settings.heading_font_size_scale | divided_by: 100.0 | round }}px;
+                line-height: {{ 24 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: 130 | divided_by: 100.0 | round | times: settings.heading_line_spacing_scale | divided_by: 100.0 | round }}px;
+              }
+
+              #article-{{block.id}} h4,
+              #article-{{block.id}} h4 * {
+                font-size: {{ 20 | times: settings.heading_font_size_scale | divided_by: 100.0 | round }}px;
+                line-height: {{ 20 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: 130 | divided_by: 100.0 | round | times: settings.heading_line_spacing_scale | divided_by: 100.0 | round }}px;
+              }
+
+              #article-{{block.id}} h5,
+              #article-{{block.id}} h5 * {
+                font-size: {{ 18 | times: settings.heading_font_size_scale | divided_by: 100.0 | round }}px;
+                line-height: {{ 18 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: 130 | divided_by: 100.0 | round | times: settings.heading_line_spacing_scale | divided_by: 100.0 | round }}px;
+              }
+
+              #article-{{block.id}} h6,
+              #article-{{block.id}} h6 * {
+                font-size: {{ 16 | times: settings.heading_font_size_scale | divided_by: 100.0 | round }}px;
+                line-height: {{ 16 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: 130 | divided_by: 100.0 | round | times: settings.heading_line_spacing_scale | divided_by: 100.0 | round }}px;
+              }
+
+              #article-{{block.id}} blockquote {
+                font-style: italic;
+                color: rgba(18,18,18, .75);
+                border-left: .2rem solid rgba(18,18,18, .2);
+                margin-left: 1rem;
+              }
+
+              #article-{{block.id}} table:not([class]) {
+                border-collapse: collapse;
+                font-size: 1.4rem;
+                border-style: hidden;
+                box-shadow: 0 0 0 .1rem rgba(18,18,18, .2);
+              }
+
+              #article-{{block.id}} table:not([class]) td,
+              #article-{{block.id}} table:not([class]) th {
+                padding: 1em;
+                border: 0.1rem solid rgba(18,18,18, 0.2);
+              }
+
+              #article-{{block.id}} .clearfix:after {
+                content: "";
+                display: table;
+                clear: both;
+              }
+            {% endstyle %}
+
+            <div class="blog-post__content" id="article-{{block.id}}">
+              {{ article.content }}
+              <div class="clearfix"></div>
+            </div>
+          {%- when 'comments' -%}
+            {% liquid
+              assign comments_per_page = block.settings.comments_per_page
+              assign max_width = block.settings.max_width
+              assign content_position = block.settings.content_position
+              assign text_alignment = block.settings.text_alignment
+              assign names_color = block.settings.names_color
+              assign names_font_size_scale = block.settings.names_font_size_scale
+              assign tag = block.settings.tag
+
+              assign date_color = block.settings.date_color
+              assign date_font_size_scale = block.settings.date_font_size_scale
+              assign content_color = block.settings.content_color
+              assign content_font_size_scale = block.settings.content_font_size_scale
+
+              assign divider_color = block.settings.divider_color
+              if divider_color.alpha == null or divider_color.alpha == 0.0
+                assign divider_color = settings.inactive_color
+              endif
+              assign top_margin = block.settings.top_margin
+              assign bottom_margin = block.settings.bottom_margin
+            %}
+
+            {% if article.comments_count > 0 and article.comments_enabled? %}
+              <div class="blog-post__comments" id="article-{{ block.id }}">
+                {% style %}
+                  #article-{{block.id}} {
+                    margin-top: {{top_margin}}px;
+                    margin-bottom: {{bottom_margin}}px;
+                    {% if max_width != blank and max_width != 0 %}
+                      max-width: {{max_width}}px;
+                    {% else %}
+                      max-width: 100%;
+                    {% endif %}
+                    width: 100%;
+                    {%- case content_position -%}
+                      {%- when "center" -%}
+                        margin-left: auto;
+                        margin-right: auto;
+                      {%- when "left" -%}
+                        margin-left: 0;
+                        margin-right: 0;
+                      {%- when "right" -%}
+                        margin-left: auto;
+                        margin-right: 0;
+                    {%- endcase -%}
+                    text-align: {{text_alignment}};
+                  }
+
+                  #article-{{block.id}} .blog-post__comments__comment {
+                    margin-top: 32px;
+                    margin-bottom: 32px;
+                    padding-bottom: 32px;
+                    border-bottom: 1px solid {{divider_color}};
+                  }
+
+                  #article-{{block.id}} .blog-post__comments__comment:first-child {
+                    margin-top: 20px;
+                  }
+
+                  #article-{{block.id}} .blog-post__comments__comment__head {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 16px;
+                  }
+
+                  @media only screen and (min-width: 769px) {
+                    #article-{{block.id}} .blog-post__comments--wrapper > .block__title {
+                      margin-bottom: 20px;
+                    }
+                    #article-{{block.id}} .blog-post__comments__comment:first-child {
+                      margin-top: 32px;
+                    }
+                  }
+                {% endstyle %}
+
+                {% paginate article.comments by comments_per_page %}
+                  <div class="blog-post__comments--wrapper">
+                    {%- assign comments_title = 'article.blocks.comments.title' | t -%}
+                    {%- assign comment_title_id = block.id | append: '-comment-title' -%}
+                    {% render 'title_v2',
+                      text: comments_title,
+                      default_color: settings.heading_color,
+                      tag: 'h2',
+                      block_id: comment_title_id,
+                      visible_on_desktop: true,
+                      visible_on_mobile: true,
+                      default_font_size_desktop: 20,
+                      default_font_size_mobile: 20
+                    %}
+
+                    <div class="blog-post__comments__content">
+                      {% for comment in article.comments %}
+                        <div class="blog-post__comments__comment">
+                          <div class="blog-post__comments__comment__head">
+                            <div class="blog-post__comments__comment__head__author">
+                              {% render 'title_v2',
+                                text: comment.author,
+                                color: names_color,
+                                default_color: settings.heading_color,
+                                tag: tag,
+                                font_size_scale: names_font_size_scale,
+                                block_id: block.id,
+                                visible_on_desktop: true,
+                                visible_on_mobile: true,
+                                default_font_size_desktop: 16,
+                                default_font_size_mobile: 16
+                              %}
+                            </div>
+                            <div class="blog-post__comments__comment__head__date">
+                              {%- assign article_date = comment.created_at | date: '%b %d, %Y' -%}
+                              {%- assign article_date_id = block.id | append: '-date' -%}
+                              {% render 'plane-text_v2',
+                                text: article_date,
+                                color: date_color,
+                                font_size_scale: date_font_size_scale,
+                                visible_on_desktop: true,
+                                visible_on_mobile: true,
+                                block_id: article_date_id,
+                                default_font_size_desktop: 16,
+                                default_color: settings.paragraph_color
+                              %}
+                            </div>
+                          </div>
+
+                          <div class="blog-post__comments__comment__body">
+                            {%- assign paragraph_id = block.id | append: '-paragraph' -%}
+                            {% render 'paragraph_v2',
+                              text: comment.content,
+                              color: content_color,
+                              default_color: settings.paragraph_color,
+                              font_size_scale: content_font_size_scale,
+                              block_id: paragraph_id,
+                              visible_on_desktop: true,
+                              visible_on_mobile: true
+                            %}
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  {% render 'pagination',
+                    paginate: paginate,
+                    pagination_type: 'pages',
+                    target_selector: '.blog-post__comments__content'
+                  %}
+                {% endpaginate %}
+              </div>
+            {% endif %}
+          {%- when 'leave_comment' -%}
+            {% liquid
+              assign max_width = block.settings.max_width
+              assign content_position = block.settings.content_position
+              assign text_alignment = block.settings.text_alignment
+              assign label_color = block.settings.label_color
+              assign label_font_size_scale = block.settings.label_font_size_scale
+
+              assign input_background_color = block.settings.input_background_color
+              assign input_text_color = block.settings.input_text_color
+              assign input_placeholder_color = block.settings.input_placeholder_color
+              assign input_border_color = block.settings.input_border_color
+              assign input_active_highlight_color = block.settings.input_active_highlight_color
+              assign input_font_size_scale = block.settings.input_font_size_scale
+
+              assign button_text = block.settings.button_text
+              if button_text == blank
+                assign button_text = 'article.blocks.leave_comment_form.post' | t
+              endif
+
+              assign button_type = block.settings.button_type
+              assign button_text_color = block.settings.button_text_color
+              assign button_background_color = block.settings.button_background_color
+              assign button_border_color = block.settings.button_border_color
+              assign button_border_width = block.settings.button_border_width
+              assign button_border_radius = block.settings.button_border_radius
+              assign button_animation = block.settings.button_animation
+
+              assign success_message_color = block.settings.success_message_color
+              if success_message_color.alpha == null or success_message_color.alpha == 0.0
+                assign success_message_color = settings.success_message_color
+              endif
+              assign success_message_background_color = success_message_color | color_modify: 'alpha', 0.2
+              assign inline_custom_message = block.settings.inline
+
+              assign error_message_color = block.settings.error_message_color
+              if error_message_color.alpha == null or error_message_color.alpha == 0.0
+                assign error_message_color = settings.error_message_color
+              endif
+              assign error_message_background_color = error_message_color | color_modify: 'alpha', 0.2
+
+              assign top_margin = block.settings.top_margin
+              assign bottom_margin = block.settings.bottom_margin
+            %}
+
+            {% if article.comments_enabled? %}
+              <div class="blog-post__leave-comment" id="article-{{ block.id }}">
+                {% style %}
+                  #article-{{ block.id }} {
+                    margin-top: {{top_margin}}px;
+                    margin-bottom: {{bottom_margin}}px;
+                    {% if max_width != blank and max_width != 0 %}
+                      max-width: {{max_width}}px;
+                    {% else %}
+                      max-width: 100%;
+                    {% endif %}
+                    width: 100%;
+                    {%- case content_position -%}
+                      {%- when "center" -%}
+                        margin-left: auto;
+                        margin-right: auto;
+                      {%- when "left" -%}
+                        margin-left: 0;
+                        margin-right: 0;
+                      {%- when "right" -%}
+                        margin-left: auto;
+                        margin-right: 0;
+                    {%- endcase -%}
+                    text-align: {{text_alignment}};
+                  }
+
+                  #article-{{ block.id }} .blog-post__leave-comment__form--wrapper form > .block__title {
+                    margin-bottom: 20px;
+                  }
+
+                  #article-{{ block.id }} .blog-post__leave-comment__form-fields {
+                    display: flex;
+                    flex-direction: row;
+                    gap: 28px;
+                    margin-bottom: 28px;
+                  }
+
+                  #article-{{ block.id }} form .field {
+                    display: flex;
+                    flex-direction: column-reverse;
+                    flex: 1 0 auto;
+                  }
+
+                  #article-{{ block.id }} form .field input[type="text"],
+                  #article-{{ block.id }} form .field input[type="email"] {
+                    font-size: {{15 | times: input_font_size_scale | divided_by: 100.0 | round }}px;
+                    line-height: {{15 | times: input_font_size_scale | divided_by: 100.0 | round | times: 150 | divided_by: 100.0 | round}}px;
+                    padding: 8px 16px;
+                    min-height: 56px;
+                    box-sizing: border-box;
+                    width: 100%;
+                    color: {% if input_text_color.alpha != null and input_text_color.alpha != 0.0 %}{{input_text_color}}{% else %}{{settings.input_text_color}}{% endif %};
+                    background-color: {% if input_background_color.alpha != null and input_background_color.alpha != 0.0 %}{{input_background_color}}{% else %}{{settings.input_background_color}}{% endif %};
+                    border: 1px solid {% if input_border_color.alpha != null and input_border_color.alpha != 0.0 %}{{input_border_color}}{% else %}{{settings.input_border_color}}{% endif %};
+                    border-radius: {{settings.border_radius}}px;
+                    font-family: {{ settings.paragraph_font.family }}, {{ settings.paragraph_font.fallback_families }};
+                    font-weight: {{ settings.paragraph_font.weight }};
+                  }
+
+                  #article-{{ block.id }} form .field textarea {
+                    font-size: {{15 | times: input_font_size_scale | divided_by: 100.0 | round }}px;
+                    line-height: {{15 | times: input_font_size_scale | divided_by: 100.0 | round | times: 150 | divided_by: 100.0 | round}}px;
+                    padding: 8px 16px;
+                    min-height: 56px;
+                    box-sizing: border-box;
+                    width: 100%;
+                    color: {% if input_text_color.alpha != null and input_text_color.alpha != 0.0 %}{{input_text_color}}{% else %}{{settings.input_text_color}}{% endif %};
+                    background-color: {% if input_background_color.alpha != null and input_background_color.alpha != 0.0 %}{{input_background_color}}{% else %}{{settings.input_background_color}}{% endif %};
+                    border: 1px solid {% if input_border_color.alpha != null and input_border_color.alpha != 0.0 %}{{input_border_color}}{% else %}{{settings.input_border_color}}{% endif %};
+                    border-radius: {{settings.border_radius}}px;
+                    font-family: {{ settings.paragraph_font.family }}, {{ settings.paragraph_font.fallback_families }};
+                    font-weight: {{ settings.paragraph_font.weight }};
+                    resize: none;
+                  }
+
+                  #article-{{ block.id }} form .field input[type="text"].error,
+                  #article-{{ block.id }} form .field input[type="email"].error,
+                  #article-{{ block.id }} form .field textarea.error {
+                    border: 1px solid {{error_message_color}};
+                  }
+
+                  #article-{{ block.id }} form .field input[type="text"]::placeholder,
+                  #article-{{ block.id }} form .field input[type="email"]::placeholder,
+                  #article-{{ block.id }} form .field textarea::placeholder {
+                    color: {% if input_placeholder_color.alpha != null and input_placeholder_color.alpha != 0.0 %}{{input_placeholder_color}}{% else %}{{settings.input_placeholder_color}}{% endif %};
+                    font-size: {{15 | times: input_font_size_scale | divided_by: 100.0 | round }}px;
+                    line-height: {{15 | times: input_font_size_scale | divided_by: 100.0 | round | times: 150 | divided_by: 100.0 | round}}px;
+                    font-family: {{ settings.paragraph_font.family }}, {{ settings.paragraph_font.fallback_families }};
+                    font-weight: {{ settings.paragraph_font.weight }};
+                  }
+
+                  #article-{{ block.id }} form .field textarea:focus,
+                  #article-{{ block.id }} form .field input[type="text"]:focus,
+                  #article-{{ block.id }} form .field input[type="email"]:focus {
+                    outline: 1px ridge {% if input_active_highlight_color.alpha != null and input_active_highlight_color.alpha != 0.0 %}{{input_active_highlight_color}}{% else %}{{settings.input_active_highlight_color}}{% endif %};
+                  }
+
+                  #article-{{ block.id }} form .block__button {
+                    margin-top: 28px;
+                  }
+
+                  #article-{{ block.id }} form .block__button,
+                  #article-{{ block.id }} form button[type="submit"] {
+                      max-width: 100%;
+                  }
+
+                  #article-{{ block.id }} form .field label {
+                    margin-bottom: 4px;
+                  }
+
+                  /* Errors */
+                  #article-{{ block.id }} form.invalid .blog-post__leave-comment__form__errors {
+                    max-height: 1000px;
+                    transition: max-height .3s ease;
+                  }
+
+                  #article-{{ block.id }} .blog-post__leave-comment__form__errors {
+                    margin-top: 20px;
+                    max-height: 0px;
+                    height: auto;
+                    transition: max-height .3s ease;
+                    overflow: hidden;
+                  }
+
+                  #article-{{ block.id }} .form-error {
+                    position: relative;
+                    background-color: {{error_message_background_color}};
+                    width: 100%;
+                    padding: 0px 16px;
+                    border-radius: {{settings.border_radius}}px;
+                    box-sizing: border-box;
+                    display: flex;
+                    align-items: baseline;
+                    opacity: 0;
+                    max-height: 0px;
+                    transition: opacity .3s ease, max-height .3s ease, padding .3s ease;
+                    height: auto;
+                    overflow: hidden;
+                    {%- case text_alignment -%}
+                      {%- when "center" -%}
+                        justify-content: center;
+                      {%- when "left" -%}
+                        justify-content: flex-start;
+                      {%- when "right" -%}
+                        justify-content: flex-end;
+                    {%- endcase -%}
+                  }
+
+                  #article-{{ block.id }} .form-error.show {
+                    opacity: 1;
+                    transition: opacity .3s ease, max-height .3s ease, padding .3s ease;
+                    max-height: 300px;
+                    padding: 16px 16px;
+                    margin-bottom: 20px;
+                  }
+
+                  #article-{{ block.id }} .form-error svg {
+                    width: 13px;
+                    height: 9px;
+                    margin-right: 6px;
+                  }
+
+                  #article-{{ block.id }} .form-error.success {
+                    background-color: {{success_message_background_color}};
+                  }
+
+                  #article-{{ block.id }} .form-error.success svg {
+                    width: 13px;
+                    height: 9px;
+                    margin-right: 7px;
+                  }
+
+                  @media only screen and (max-width: 768px) {
+                    #article-{{ block.id }} .blog-post__leave-comment__form-fields {
+                      flex-direction: column;
+                    }
+                  }
+                {% endstyle %}
+
+                <div class="blog-post__leave-comment__form--wrapper">
+                  {% form 'new_comment', article %}
+                    {%- liquid
+                      assign post_message = 'article.blocks.leave_comment_form.success'
+                      if blog.moderated? and comment.status == 'unapproved'
+                        assign post_message = 'article.blocks.leave_comment_form.success_moderated'
+                      endif
+                      assign comments_form_title = 'article.blocks.leave_comment_form.comment_form_title' | t
+                      assign comments_form_title_id = block.id | append: '-comments-form-title'
+                    -%}
+
+                    {% render 'title_v2',
+                      text: comments_form_title,
+                      default_color: settings.heading_color,
+                      tag: 'h2',
+                      block_id: comments_form_title_id,
+                      visible_on_desktop: true,
+                      visible_on_mobile: true,
+                      default_font_size_desktop: 20,
+                      default_font_size_mobile: 20
+                    %}
+
+                    <div class="blog-post__leave-comment__form-fields">
+                      <div class="field field--with-error">
+                        <input
+                          type="text"
+                          name="comment[author]"
+                          id="CommentForm-author"
+                          class="field__input"
+                          autocomplete="name"
+                          value="{{ form.author }}"
+                          aria-required="true"
+                          required
+                          placeholder="{{ 'article.blocks.leave_comment_form.name' | t }}"
+                        >
+                        <label class="field__label" for="CommentForm-author">
+                          {%- assign label_name = 'article.blocks.leave_comment_form.name' | t -%}
+                          {%- assign label_id = block.id | append: '-name-label' -%}
+                          {% render 'plane-text_v2',
+                            text: label_name,
+                            color: label_color,
+                            font_size_scale: label_font_size_scale,
+                            visible_on_desktop: true,
+                            visible_on_mobile: true,
+                            block_id: label_id,
+                            default_font_size_desktop: 15,
+                            default_color: settings.paragraph_color
+                          %}
+                        </label>
+                      </div>
+                      <div class="field field--with-error">
+                        <input
+                          type="email"
+                          name="comment[email]"
+                          id="CommentForm-email"
+                          autocomplete="email"
+                          class="field__input"
+                          value="{{ form.email }}"
+                          autocorrect="off"
+                          autocapitalize="off"
+                          aria-required="true"
+                          required
+                          pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
+                          placeholder="{{ 'article.blocks.leave_comment_form.email' | t }}"
+                        >
+                        <label class="field__label" for="CommentForm-email">
+                          {%- assign label_name = 'article.blocks.leave_comment_form.email' | t -%}
+                          {%- assign label_id = block.id | append: '-email-label' -%}
+                          {% render 'plane-text_v2',
+                            text: label_name,
+                            color: label_color,
+                            font_size_scale: label_font_size_scale,
+                            visible_on_desktop: true,
+                            visible_on_mobile: true,
+                            block_id: label_id,
+                            default_font_size_desktop: 15,
+                            default_color: settings.paragraph_color
+                          %}
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="field field--with-error">
+                      <textarea
+                        rows="5"
+                        name="comment[body]"
+                        id="CommentForm-body"
+                        class="text-area field__input"
+                        aria-required="true"
+                        required
+                        placeholder="{{ 'article.blocks.leave_comment_form.message' | t }}"
+                      >{{ form.body }}</textarea>
+                      <label class="form__label field__label" for="CommentForm-body">
+                        {%- assign label_name = 'article.blocks.leave_comment_form.message' | t -%}
+                        {%- assign label_id = block.id | append: '-body-label' -%}
+                        {% render 'plane-text_v2',
+                          text: label_name,
+                          color: label_color,
+                          font_size_scale: label_font_size_scale,
+                          visible_on_desktop: true,
+                          visible_on_mobile: true,
+                          block_id: label_id,
+                          default_font_size_desktop: 15,
+                          default_color: settings.paragraph_color
+                        %}
+                      </label>
+                    </div>
+
+                    {%- if blog.moderated? -%}
+                      {%- assign moderate_text = 'article.blocks.leave_comment_form.moderated' | t -%}
+                      {%- assign moderate_id = block.id | append: '-moderate' -%}
+                      {% render 'paragraph_v2',
+                        text: moderate_text,
+                        default_color: settings.paragraph_color,
+                        block_id: moderate_id,
+                        visible_on_desktop: true,
+                        visible_on_mobile: true
+                      %}
+                    {%- endif -%}
+
+                    {%- assign submit_button_id = block.id | append: '-submit' -%}
+                    {% render 'button_v2',
+                      text: button_text,
+                      type: button_type,
+                      text_color: button_text_color,
+                      background_color: button_background_color,
+                      border_color: button_border_color,
+                      border_width: button_border_width,
+                      border_radius: button_border_radius,
+                      animation: button_animation,
+                      visible_on_desktop: true,
+                      visible_on_mobile: true,
+                      block_id: submit_button_id,
+                      element_type: 'submit'
+                    %}
+
+                    <div class="blog-post__leave-comment__form__errors">
+                      <div class="form-error error" data-name-required>
+                        {% render 'icon_v2', icon: 'form-message-error-icon', color: error_message_color %}
+                        {%- assign error_input = 'article.blocks.leave_comment_form.name' | t -%}
+                        {%- assign error_text = 'article.blocks.leave_comment_form.required_message'
+                          | t: input_name: error_input
+                        -%}
+                        {%- assign error_id = block.id | append: '-email-error' -%}
+                        {% render 'plane-text_v2',
+                          text: error_text,
+                          color: error_message_color,
+                          visible_on_desktop: true,
+                          visible_on_mobile: true,
+                          block_id: error_id,
+                          default_font_size_desktop: 15,
+                          default_color: settings.paragraph_color
+                        %}
+                      </div>
+
+                      <div class="form-error error" data-email-required>
+                        {% render 'icon_v2', icon: 'form-message-error-icon', color: error_message_color %}
+                        {%- assign error_input = 'article.blocks.leave_comment_form.email' | t -%}
+                        {%- assign error_text = 'article.blocks.leave_comment_form.required_message'
+                          | t: input_name: error_input
+                        -%}
+                        {%- assign error_id = block.id | append: '-email-error' -%}
+                        {% render 'plane-text_v2',
+                          text: error_text,
+                          color: error_message_color,
+                          visible_on_desktop: true,
+                          visible_on_mobile: true,
+                          block_id: error_id,
+                          default_font_size_desktop: 15,
+                          default_color: settings.paragraph_color
+                        %}
+                      </div>
+
+                      <div class="form-error error" data-email-error>
+                        {% render 'icon_v2', icon: 'form-message-error-icon', color: error_message_color %}
+                        {%- assign error_text = 'article.blocks.leave_comment_form.email_format_error' | t -%}
+                        {%- assign error_id = block.id | append: '-email-error' -%}
+                        {% render 'plane-text_v2',
+                          text: error_text,
+                          color: error_message_color,
+                          visible_on_desktop: true,
+                          visible_on_mobile: true,
+                          block_id: error_id,
+                          default_font_size_desktop: 15,
+                          default_color: settings.paragraph_color
+                        %}
+                      </div>
+
+                      <div class="form-error error" data-body-required>
+                        {% render 'icon_v2', icon: 'form-message-error-icon', color: error_message_color %}
+                        {%- assign error_input = 'article.blocks.leave_comment_form.message' | t -%}
+                        {%- assign error_text = 'article.blocks.leave_comment_form.required_message'
+                          | t: input_name: error_input
+                        -%}
+                        {%- assign error_id = block.id | append: '-body-error' -%}
+                        {% render 'plane-text_v2',
+                          text: error_text,
+                          color: error_message_color,
+                          visible_on_desktop: true,
+                          visible_on_mobile: true,
+                          block_id: error_id,
+                          default_font_size_desktop: 15,
+                          default_color: settings.paragraph_color
+                        %}
+                      </div>
+
+                      {%- if form.errors -%}
+                        <div class="form-error error" data-default-error>
+                          {% render 'icon_v2', icon: 'form-message-error-icon', color: error_message_color %}
+                          {%- assign error_text = 'article.blocks.leave_comment_form.error_heading' | t -%}
+                          {%- assign error_id = block.id | append: '-default-error' -%}
+                          {% render 'plane-text_v2',
+                            text: error_text,
+                            color: error_message_color,
+                            visible_on_desktop: true,
+                            visible_on_mobile: true,
+                            block_id: error_id,
+                            default_font_size_desktop: 15,
+                            default_color: settings.paragraph_color
+                          %}
+                        </div>
+
+                        <ul class="form-status-list caption-large">
+                          {%- for field in form.errors -%}
+                            <li>
+                              <a href="#CommentForm-{{ field }}" class="link">
+                                {%- if form.errors.translated_fields[field] contains 'author' -%}
+                                  {{ 'article.blocks.leave_comment_form.name' | t }}
+                                {%- elsif form.errors.translated_fields[field] contains 'body' -%}
+                                  {{ 'article.blocks.leave_comment_form.message' | t }}
+                                {%- else -%}
+                                  {{ form.errors.translated_fields[field] }}
+                                {%- endif -%}
+                                {{ form.errors.messages[field] }}
+                              </a>
+                            </li>
+                          {%- endfor -%}
+                        </ul>
+                      {%- elsif form.posted_successfully? -%}
+                        <div class="form-error success" data-success-message>
+                          {% render 'icon_v2', icon: 'form-message-success-icon', color: success_message_color %}
+                          {%- assign error_text = post_message | t -%}
+                          {% if inline_custom_message != blank %}
+                            {%- assign error_text = inline_custom_message -%}
+                          {% endif %}
+                          {%- assign error_id = block.id | append: '-success' -%}
+                          {% render 'plane-text_v2',
+                            text: error_text,
+                            color: success_message_color,
+                            visible_on_desktop: true,
+                            visible_on_mobile: true,
+                            block_id: error_id,
+                            default_font_size_desktop: 15,
+                            default_color: settings.paragraph_color
+                          %}
+                        </div>
+                      {%- endif -%}
+                    </div>
+                  {% endform %}
+                </div>
+              </div>
+            {% endif %}
+          {%- when 'tags' -%}
+            {% liquid
+              assign background_color = block.settings.background_color
+              if background_color.alpha == null or background_color.alpha == 0.0
+                assign background_color = settings.additional_badge_color
+              endif
+              
+              assign text_color = block.settings.text_color
+              if text_color.alpha == null or text_color.alpha == 0.0
+                assign text_color = settings.additional_badge_text_color
+              endif
+
+              assign max_width = block.settings.max_width
+              assign content_position = block.settings.content_position
+              assign content_alignment = block.settings.content_alignment
+              assign top_margin = block.settings.top_margin
+              assign bottom_margin = block.settings.bottom_margin
+            %}
+
+            {% if article.tags.size > 0 %}
+              <div class="blog-post__tags" id="article-{{block.id}}">
+                {% style %}
+                  #article-{{block.id}} {
+                    margin-top: {{top_margin}}px;
+                    margin-bottom: {{bottom_margin}}px;
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                    gap: 8px;
+                    {% if max_width != blank and max_width != 0 %}
+                      max-width: {{max_width}}px;
+                    {% else %}
+                      max-width: 100%;
+                    {% endif %}
+                    width: 100%;
+                    {%- case content_position -%}
+                      {%- when "center" -%}
+                        margin-left: auto;
+                        margin-right: auto;
+                      {%- when "left" -%}
+                        margin-left: 0;
+                        margin-right: 0;
+                      {%- when "right" -%}
+                        margin-left: auto;
+                        margin-right: 0;
+                    {%- endcase -%}
+                    {%- case content_alignment -%}
+                      {%- when "center" -%}
+                        justify-content: center;
+                      {%- when "left" -%}
+                        justify-content: flex-start;
+                      {%- when "right" -%}
+                        justify-content: flex-end;
+                    {%- endcase -%}
+                    
+                  }
+
+                  #article-{{block.id}} .blog-post__tags__tag {
+                    padding: 6px 20px;
+                    background-color: {{background_color}};
+                    border-radius: 1000px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                  }
+                {% endstyle %}
+
+                {% for tag in article.tags %}
+                  <div class="blog-post__tags__tag">
+                    {%- assign plane_text = tag | capitalize -%}
+                    {% render 'plane-text_v2',
+                      text: plane_text,
+                      color: text_color,
+                      visible_on_desktop: true,
+                      visible_on_mobile: true,
+                      block_id: block.id,
+                      default_font_size_desktop: 15,
+                      default_font_size_mobile: 15,
+                      desktop_line_height_percents: 150,
+                      mobile_line_height_percents: 150,
+                      default_color: settings.paragraph_color
+                    %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {%- when 'date_and_author' -%}
+            {% liquid
+              assign display_date = block.settings.display_date
+              assign display_author = block.settings.display_author
+              assign text_color = block.settings.text_color
+              assign divider_color = block.settings.divider_color
+              if divider_color.alpha == null or divider_color.alpha == 0.0
+                assign divider_color = settings.inactive_color
+              endif
+              assign font_size_scale = block.settings.font_size_scale
+              assign order = block.settings.order
+              assign max_width = block.settings.max_width
+              assign content_position = block.settings.content_position
+              assign text_alignment = block.settings.text_alignment
+              assign date_block_id = block.id | prepend: 'date--'
+              assign author_block_id = block.id | prepend: 'author--'
+              assign date = article.created_at | date: '%b %d, %Y'
+              assign author = article.author
+
+              if date != blank and display_date and author != blank and display_author
+                if order == 'author_first'
+                  assign date = date | prepend: '<span class="divider">|</span> '
+                else
+                  assign author = author | prepend: '<span class="divider">|</span> '
+                endif
+              endif
+
+              assign top_margin = block.settings.top_margin
+              assign bottom_margin = block.settings.bottom_margin
+            %}
+
+            <div class="blog-post__date-and-author" id="article-{{block.id}}">
+              {% style %}
+                  #article-{{block.id}} {
+                    margin-top: {{top_margin}}px;
+                    margin-bottom: {{bottom_margin}}px;
+                    {% if max_width != blank and max_width != 0 %}
+                      max-width: {{max_width}}px;
+                    {% else %}
+                      max-width: 100%;
+                    {% endif %}
+                    width: 100%;
+                    {%- case content_position -%}
+                      {%- when "center" -%}
+                        margin-left: auto;
+                        margin-right: auto;
+                      {%- when "left" -%}
+                        margin-left: 0;
+                        margin-right: 0;
+                      {%- when "right" -%}
+                        margin-left: auto;
+                        margin-right: 0;
+                    {%- endcase -%}
+                    text-align: {{text_alignment}};
+                  }
+
+                  #article-{{block.id}} .blog-post__date-and-author--wrapper {
+                    
+                  }
+
+                  #article-{{block.id}} .blog-post__date-and-author--wrapper span.divider {
+                    color: {{divider_color}};
+                  }
+              {% endstyle %}
+
+              <div class="blog-post__date-and-author--wrapper">
+                {% if order == 'author_first' %}
+                  {% render 'plane-text_v2',
+                    text: author,
+                    font_size_scale: font_size_scale,
+                    color: text_color,
+                    visible_on_desktop: display_author,
+                    visible_on_mobile: display_author,
+                    block_id: author_block_id,
+                    default_font_size_desktop: 15,
+                    block_id: author_block_id,
+                    default_color: settings.inactive_color
+                  %}
+
+                  {% render 'plane-text_v2',
+                    text: date,
+                    font_size_scale: font_size_scale,
+                    color: text_color,
+                    visible_on_desktop: display_date,
+                    visible_on_mobile: display_date,
+                    block_id: date_block_id,
+                    default_font_size_desktop: 15,
+                    default_color: settings.inactive_color
+                  %}
+                {% else %}
+                  {% render 'plane-text_v2',
+                    text: date,
+                    font_size_scale: font_size_scale,
+                    color: text_color,
+                    visible_on_desktop: display_date,
+                    visible_on_mobile: display_date,
+                    block_id: date_block_id,
+                    default_font_size_desktop: 15,
+                    default_color: settings.inactive_color
+                  %}
+
+                  {% render 'plane-text_v2',
+                    text: author,
+                    font_size_scale: font_size_scale,
+                    color: text_color,
+                    visible_on_desktop: display_author,
+                    visible_on_mobile: display_author,
+                    block_id: author_block_id,
+                    default_font_size_desktop: 15,
+                    block_id: author_block_id,
+                    default_color: settings.inactive_color
+                  %}
+                {% endif %}
+              </div>
+            </div>
+        {%- endcase -%}
+      {% endfor %}
+    </div>
+  </div>
+{%- endif -%}
+
+{% if leave_comment_block.size > 0 %}
+  <script>
+    document.addEventListener("DOMContentLoaded", ()=>{
+      let form = null;
+      let submitButton = null;
+      let nameInput = null;
+      let emailInput = null;
+      let bodyInput = null;
+
+      let nameReqError = null;
+      let emailReqError = null;
+      let emailFormatError = null;
+      let bodyReqError = null;
+
+      let defaultErrors = null;
+      let successMessage = null;
+
+      const dispatchNameError = () => {
+        if (!nameInput.checkValidity()) {
+          form.classList.add('invalid');
+          nameInput.classList.add('error');
+          nameReqError.classList.add('show');
+          setTimeout(()=>{
+            form.classList.remove('invalid');
+            nameInput.classList.remove('error');
+            nameReqError.classList.remove('show');
+          }, 3000);
+          return true
+        }
+      }
+
+      const dispatchEmailError = () => {
+        if (!emailInput.checkValidity()) {
+          form.classList.add('invalid');
+          emailInput.classList.add('error');
+          if (!emailInput.value) {
+            emailReqError.classList.add('show');
+          }
+          emailFormatError.classList.add('show');
+
+          setTimeout(()=>{
+            form.classList.remove('invalid');
+            emailInput.classList.remove('error');
+            emailReqError.classList.remove('show');
+            emailFormatError.classList.remove('show');
+          }, 3000);
+
+          return true
+        }
+      }
+
+      const dispatchBodyError = () => {
+        if (!bodyInput.checkValidity()) {
+          form.classList.add('invalid');
+          bodyInput.classList.add('error');
+          bodyReqError.classList.add('show');
+
+          setTimeout(()=>{
+            form.classList.remove('invalid');
+            bodyInput.classList.remove('error');
+            bodyReqError.classList.remove('show');
+          }, 3000);
+
+          return true
+        }
+      }
+
+      const validateForm = (e) => {
+        e.preventDefault();
+        if(form.checkValidity()) {
+          form.classList.remove('invalid');
+          submitButton.removeAttribute('disabled');
+          submitButton.removeEventListener('click', validateForm);
+          submitButton.click();
+        } else {
+          form.classList.add('invalid');
+          submitButton.setAttribute('disabled', true);
+          setTimeout(()=>{
+            form.classList.add('invalid');
+            submitButton.removeAttribute('disabled');
+          }, 3000);
+          dispatchNameError();
+          dispatchEmailError();
+          dispatchBodyError();
+        }
+      }
+
+      const loadListener = () => {
+        if (window.location.search.includes('?comment')) {
+          let newUrl = new URL(window.location.href);
+          newUrl.searchParams.delete("comment");
+          history.replaceState(null, '', newUrl);
+          form.classList.add('invalid');
+          const formYCoords = form.getBoundingClientRect().top + window.pageYOffset;
+          window.scrollTo({
+            top: formYCoords,
+            behavior: "smooth",
+          });
+
+          defaultErrors ? defaultErrors.classList.add('show') : null;
+          successMessage ? successMessage.classList.add('show') : null;
+        }
+      }
+
+      const initFormListeners = () =>{
+        form = document.getElementById('comment_form');
+        if (form) {
+          submitButton = form.querySelector('button[type="submit"]')
+          nameInput = form.querySelector('input[type="text"]');
+          emailInput = form.querySelector('input[type="email"]');
+          bodyInput = form.querySelector('textarea');
+
+          nameReqError = form.querySelector('[data-name-required]');
+          emailReqError = form.querySelector('[data-email-required]');
+          emailFormatError = form.querySelector('[data-email-error]');
+          bodyReqError = form.querySelector('[data-body-required]');
+
+          defaultErrors = form.querySelector('[data-default-error]');
+          successMessage = form.querySelector('[data-success-message]');
+
+          submitButton.addEventListener('click', validateForm)
+
+          nameInput.addEventListener('blur', (e)=>dispatchNameError())
+
+          nameInput.addEventListener('input', ()=>{
+            nameInput.classList.remove('error');
+            nameReqError.classList.remove('show');
+            if (form.checkValidity()) {
+              submitButton.removeAttribute('disabled');
+            }
+          })
+
+          emailInput.addEventListener('blur', (e)=>dispatchEmailError())
+
+          emailInput.addEventListener('input', ()=>{
+            emailInput.classList.remove('error');
+            emailReqError.classList.remove('show');
+            emailFormatError.classList.remove('show');
+            if (form.checkValidity()) {
+              submitButton.removeAttribute('disabled');
+            }
+          })
+
+          bodyInput.addEventListener('blur', (e)=>dispatchBodyError())
+
+          bodyInput.addEventListener('input', ()=>{
+            bodyInput.classList.remove('error');
+            bodyReqError.classList.remove('show')
+            if (form.checkValidity()) {
+              submitButton.removeAttribute('disabled');
+            }
+          })
+        }
+      }
+      initFormListeners();
+      loadListener();
+    })
+  </script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Blog post",
+  "class": "blog-post container",
+  "tag": "section",
+  "enabled_on": {"templates": ["article"]},
+  "settings": [
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Personalize the background of your section to match your brand. "
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth_background",
+      "label": "Fullwidth background",
+      "default": false
+    },
+    {
+      "type": "paragraph",
+      "content": "This section contains the blog post and all of its content. Customize each of the blocks to change the article’s appearance and layout. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+    },
+    {
+      "type": "header",
+      "content": "Section padding",
+      "info": "Add spacing above and below inside your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "bottom_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 24
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Featured image",
+      "type": "featured_image",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "This block displays the featured image of the article. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+        },
+        {
+          "type": "select",
+          "id": "shape",
+          "label": "Shape",
+          "options": [
+            {
+              "value": "default",
+              "label": "Default"
+            },
+            {
+              "value": "square",
+              "label": "Square"
+            },
+            {
+              "value": "circle",
+              "label": "Circle"
+            }
+          ],
+          "default": "default"
+        },
+        {
+          "type": "header",
+          "content": "Layout",
+          "info": "Amend the width and alignment of the image."
+        },
+        {
+          "type": "range",
+          "id": "max_width",
+          "min": 300,
+          "max": 1500,
+          "step": 12,
+          "unit": "px",
+          "label": "Max width",
+          "default": 1500
+        },
+        {
+          "type": "select",
+          "id": "image_alignment",
+          "label": "Alignment",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "header",
+          "content": "Block margin",
+          "info": "Add spacing above and below your block."
+        },
+        {
+          "type": "range",
+          "id": "top_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Top margin",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "bottom_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Bottom margin",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "Title",
+      "type": "title",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "This block displays the title of the article. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Color"
+        },
+        {
+          "type": "range",
+          "id": "font_size_scale",
+          "min": 75,
+          "max": 125,
+          "step": 1,
+          "unit": "%",
+          "label": "Font size scale",
+          "default": 100
+        },
+        {
+          "type": "header",
+          "content": "Layout",
+          "info": "Amend the alignment of your text as well as the width and position of the block."
+        },
+        {
+           "type": "text_alignment",
+           "id": "alignment",
+           "label": "Text alignment",
+           "default": "left"
+        },
+        {
+          "type": "range",
+          "id": "max_width",
+          "min": 300,
+          "max": 1500,
+          "step": 12,
+          "unit": "px",
+          "label": "Max width",
+          "default": 1500
+        },
+        {
+          "type": "select",
+          "id": "content_position",
+          "label": "Content position",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "header",
+          "content": "Block margin",
+          "info": "Add spacing above and below your block."
+        },
+        {
+          "type": "range",
+          "id": "top_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Top margin",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "bottom_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Bottom margin",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "Content",
+      "type": "content",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "This block displays the content of the article. You can format this content within the \"Blog posts\" section of Shopify's dashboard. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+        },
+        {
+          "type": "color",
+          "id": "default_color",
+          "label": "Default color"
+        },
+         {
+            "type": "range",
+            "id": "font_size_scale",
+            "min": 75,
+            "max": 125,
+            "step": 1,
+            "unit": "%",
+            "label": "Font size scale",
+            "default": 100
+          },
+          {
+            "type": "header",
+            "content": "Layout",
+            "info": "Amend the with and position of the content."
+          },
+          {
+            "type": "range",
+            "id": "max_width",
+            "min": 300,
+            "max": 1500,
+            "step": 12,
+            "unit": "px",
+            "label": "Max width",
+            "default": 1500
+          },
+          {
+            "type": "select",
+            "id": "content_position",
+            "label": "Content position",
+            "options": [
+              {
+                "value": "left",
+                "label": "Left"
+              },
+              {
+                "value": "center",
+                "label": "Center"
+              },
+              {
+                "value": "right",
+                "label": "Right"
+              }
+            ],
+            "default": "center"
+          },
+          {
+            "type": "header",
+            "content": "Block margin",
+            "info": "Add spacing above and below your block."
+          },
+          {
+            "type": "range",
+            "id": "top_margin",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "px",
+            "label": "Top margin",
+            "default": 0
+          },
+          {
+            "type": "range",
+            "id": "bottom_margin",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "px",
+            "label": "Bottom margin",
+            "default": 0
+          }
+      ]
+    },
+    {
+      "name": "Comments",
+      "type": "comments",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "This block displays all of the comments on your article. Pair this block with the \"Leave a comment\" block. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+        },
+        {
+          "type": "range",
+          "id": "comments_per_page",
+          "min": 1,
+          "max": 30,
+          "step": 1,
+          "label": "Comments per page",
+          "default": 5
+        },
+        {
+          "type": "header",
+          "content": "Layout",
+          "info": "Amend the width and position of the block."
+        },
+        {
+          "type": "range",
+          "id": "max_width",
+          "min": 300,
+          "max": 1500,
+          "step": 12,
+          "unit": "px",
+          "label": "Max width",
+          "default": 1500
+        },
+        {
+          "type": "select",
+          "id": "content_position",
+          "label": "Content position",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "text_alignment",
+          "id": "text_alignment",
+          "label": "Text alignment",
+          "default": "left"
+        },
+        {
+          "type": "header",
+          "content": "Names",
+          "info": "Amend the color and size of the commenters names."
+        },
+        {
+          "type": "color",
+          "id": "names_color",
+          "label": "Color"
+        },
+        {
+          "type": "range",
+          "id": "names_font_size_scale",
+          "min": 75,
+          "max": 125,
+          "step": 1,
+          "unit": "%",
+          "label": "Font size scale",
+          "default": 100
+        },
+        {
+          "type": "select",
+          "id": "tag",
+          "label": "Tag",
+          "options": [
+            {
+              "value": "h1",
+              "label": "H1"
+            },
+            {
+              "value": "h2",
+              "label": "H2"
+            },
+            {
+              "value": "h3",
+              "label": "H3"
+            },
+            {
+              "value": "h4",
+              "label": "H4"
+            },
+            {
+              "value": "h5",
+              "label": "H5"
+            },
+            {
+              "value": "h6",
+              "label": "H6"
+            }
+          ],
+          "default": "h4"
+        },
+        {
+          "type": "header",
+          "content": "Date",
+          "info": "Amend the color and size of the comments publish dates."
+        },
+        {
+          "type": "color",
+          "id": "date_color",
+          "label": "Color"
+        },
+        {
+          "type": "range",
+          "id": "date_font_size_scale",
+          "min": 75,
+          "max": 125,
+          "step": 1,
+          "unit": "%",
+          "label": "Font size scale",
+          "default": 100
+        },
+        {
+          "type": "header",
+          "content": "Content",
+          "info": "Amend the color and size of the comment itself."
+        },
+        {
+          "type": "color",
+          "id": "content_color",
+          "label": "Color"
+        },
+        {
+          "type": "range",
+          "id": "content_font_size_scale",
+          "min": 75,
+          "max": 125,
+          "step": 1,
+          "unit": "%",
+          "label": "Font size scale",
+          "default": 100
+        },
+        {
+          "type": "header",
+          "content": "Divider",
+          "info": "Amend the color of the divider."
+        },
+        {
+          "type": "color",
+          "id": "divider_color",
+          "label": "Color"
+        },
+        {
+          "type": "header",
+          "content": "Block margin",
+          "info": "Add spacing above and below your block."
+        },
+        {
+          "type": "range",
+          "id": "top_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Top margin",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "bottom_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Bottom margin",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "Leave a comment",
+      "type": "leave_comment",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "This block displays a form for a reader to leave a comment. Pair this block with the \"Comments\" block. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+        },
+        {
+          "type": "header",
+          "content": "Layout",
+          "info": "Amend the width and position of the block."
+        },
+        {
+          "type": "range",
+          "id": "max_width",
+          "min": 300,
+          "max": 1500,
+          "step": 12,
+          "unit": "px",
+          "label": "Max width",
+          "default": 1500
+        },
+        {
+          "type": "select",
+          "id": "content_position",
+          "label": "Content position",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "text_alignment",
+          "id": "text_alignment",
+          "label": "Content alignment",
+          "default": "left"
+        },
+        {
+          "type": "header",
+          "content": "Labels",
+          "info": "Amend the color and size of the input labels."
+        },
+        {
+          "type": "color",
+          "id": "label_color",
+          "label": "Label color"
+        },
+        {
+          "type": "range",
+          "id": "label_font_size_scale",
+          "min": 75,
+          "max": 125,
+          "step": 1,
+          "unit": "%",
+          "label": "Font size scale",
+          "default": 100
+        },
+        {
+          "type": "header",
+          "content": "Inputs",
+          "info": "Amend everything about the inputs within the form."
+        },
+        {
+          "type": "color",
+          "id": "input_background_color",
+          "label": "Background color"
+        },
+        {
+          "type": "color",
+          "id": "input_text_color",
+          "label": "Text color"
+        },
+        {
+          "type": "color",
+          "id": "input_placeholder_color",
+          "label": "Placeholder color"
+        },
+        {
+          "type": "color",
+          "id": "input_border_color",
+          "label": "Input border color"
+        },
+        {
+          "type": "color",
+          "id": "input_active_highlight_color",
+          "label": "Active hightlight color"
+        },
+        {
+          "type": "range",
+          "id": "input_font_size_scale",
+          "min": 75,
+          "max": 125,
+          "step": 1,
+          "unit": "%",
+          "label": "Font size scale",
+          "default": 100
+        },
+        {
+          "type": "header",
+          "content": "Button",
+          "info": "Customize the submit comment button."
+        },
+        {
+           "type": "inline_richtext",
+           "id": "button_text",
+           "label": "Text"
+         },
+         {
+          "type": "select",
+          "id": "button_type",
+          "label": "Type",
+          "options": [
+            {
+              "value": "primary",
+              "label": "Primary"
+            },
+            {
+              "value": "secondary",
+              "label": "Secondary"
+            },
+            {
+              "value": "override",
+              "label": "Override"
+            }
+          ],
+          "default": "primary"
+         },
+         {
+          "type": "header",
+          "content": "Button override",
+          "info": "You can override your button styles by changing the type field above to 'Override'. After that just input your new values below."
+        },
+        {
+          "type": "color",
+          "id": "button_text_color",
+          "label": "Text color"
+        },
+        {
+          "type": "color",
+          "id": "button_background_color",
+          "label": "Background color"
+        },
+        {
+          "type": "color",
+          "id": "button_border_color",
+          "label": "Border color"
+        },
+        {
+          "type": "range",
+          "id": "button_border_width",
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "unit": "px",
+          "label": "Border thickness",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "button_border_radius",
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "label": "Corner radius",
+          "default": 6
+        },
+        {
+          "type": "select",
+          "id": "button_animation",
+          "label": "Hover animation",
+          "options": [
+            {
+              "value": "default",
+              "label": "Default"
+            },
+            {
+              "value": "grow",
+              "label": "Grow"
+            },
+            {
+              "value": "shrink",
+              "label": "Shrink"
+            },
+            {
+              "value": "lighten",
+              "label": "Lighten"
+            },
+            {
+              "value": "darken",
+              "label": "Darken"
+            }
+          ],
+          "default": "default"
+        },
+        {
+          "type": "header",
+          "content": "Success message",
+          "info": "Add spacing above and below your block."
+        },
+        {
+          "type": "color",
+          "id": "success_message_color",
+          "label": "Color"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "inline",
+          "label": "Custom message"
+        },
+        {
+          "type": "header",
+          "content": "Error messages",
+          "info": "Add spacing above and below your block."
+        },
+        {
+          "type": "color",
+          "id": "error_message_color",
+          "label": "Color"
+        },
+        {
+          "type": "header",
+          "content": "Block margin",
+          "info": "Add spacing above and below your block."
+        },
+        {
+          "type": "range",
+          "id": "top_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Top margin",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "bottom_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Bottom margin",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "Tags",
+      "type": "tags",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Use this block to display your article's tags. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background color"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text color"
+        },
+        {
+          "type": "header",
+          "content": "Layout",
+          "info": "Amend the width and position of the block."
+        },
+        {
+          "type": "range",
+          "id": "max_width",
+          "min": 300,
+          "max": 1500,
+          "step": 12,
+          "unit": "px",
+          "label": "Max width",
+          "default": 1500
+        },
+        {
+          "type": "select",
+          "id": "content_position",
+          "label": "Content position",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "text_alignment",
+          "id": "content_alignment",
+          "label": "Text alignment",
+          "default": "left"
+        },
+        {
+          "type": "header",
+          "content": "Block margin",
+          "info": "Add spacing above and below your block."
+        },
+        {
+          "type": "range",
+          "id": "top_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Top margin",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "bottom_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Bottom margin",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "Date and author",
+      "type": "date_and_author",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Use this block to display the article’s author and the date it was first published. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+        },
+        {
+          "type": "checkbox",
+          "id": "display_author",
+          "label": "Display author",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "display_date",
+          "label": "Display date",
+          "default": true
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text color"
+        },
+        {
+          "type": "color",
+          "id": "divider_color",
+          "label": "Divider color"
+        },
+        {
+          "type": "range",
+          "id": "font_size_scale",
+          "min": 75,
+          "max": 125,
+          "step": 1,
+          "unit": "%",
+          "label": "Font size scale",
+          "default": 100
+        },
+        {
+          "type": "select",
+          "id": "order",
+          "label": "Order",
+          "options": [
+            {
+              "value": "author_first",
+              "label": "Author first"
+            },
+            {
+              "value": "date_first",
+              "label": "Date first"
+            }
+          ],
+          "default": "author_first"
+        },
+        {
+          "type": "header",
+          "content": "Layout",
+          "info": "Amend the width and position of the block."
+        },
+        {
+          "type": "range",
+          "id": "max_width",
+          "min": 300,
+          "max": 1500,
+          "step": 12,
+          "unit": "px",
+          "label": "Max width",
+          "default": 1500
+        },
+        {
+          "type": "select",
+          "id": "content_position",
+          "label": "Content position",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "text_alignment",
+          "id": "text_alignment",
+          "label": "Text alignment",
+          "default": "left"
+        },
+        {
+          "type": "header",
+          "content": "Block margin",
+          "info": "Add spacing above and below your block."
+        },
+        {
+          "type": "range",
+          "id": "top_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Top margin",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "bottom_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Bottom margin",
+          "default": 0
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Blog post",
+       "settings": {
+        "background_color": "rgba(0,0,0,0)",
+        "fullwidth_background": false,
+        "top_padding": 15,
+        "bottom_padding": 15,
+        "side_padding": 24
+      },
+      "blocks": [
+        {
+          "type": "date_and_author",
+          "settings": {
+            "display_author": true,
+            "display_date": true,
+            "text_color": "rgba(0,0,0,0)",
+            "divider_color": "rgba(0,0,0,0)",
+            "font_size_scale": 100,
+            "order": "date_first",
+            "max_width": 600,
+            "content_position": "center",
+            "text_alignment": "left",
+            "top_margin": 0,
+            "bottom_margin": 10
+          },
+        },
+        {
+           "type": "title",
+          "settings": {
+            "color": "rgba(0,0,0,0)",
+            "font_size_scale": 90,
+            "alignment": "left",
+            "max_width": 600,
+            "content_position": "center",
+            "top_margin": 0,
+            "bottom_margin": 0
+          }
+        },
+        {
+           "type": "tags",
+          "settings": {
+            "background_color": "rgba(0,0,0,0)",
+            "text_color": "rgba(0,0,0,0)",
+            "max_width": 600,
+            "content_position": "center",
+            "content_alignment": "left",
+            "top_margin": 15,
+            "bottom_margin": 20
+          }
+        },
+        {
+           "type": "featured_image",
+          "settings": {
+            "shape": "default",
+            "max_width": 600,
+            "image_alignment": "center",
+            "top_margin": 0,
+            "bottom_margin": 0
+          }
+        },
+        {
+           "type": "content",
+           "settings": {
+            "default_color": "rgba(0,0,0,0)",
+            "font_size_scale": 100,
+            "max_width": 600,
+            "content_position": "center",
+            "top_margin": 40,
+            "bottom_margin": 40
+          }
+        },
+        {
+           "type": "comments",
+          "settings": {
+            "comments_per_page": 4,
+            "max_width": 600,
+            "content_position": "center",
+            "text_alignment": "left",
+            "names_color": "rgba(0,0,0,0)",
+            "names_font_size_scale": 100,
+            "tag": "h5",
+            "date_color": "rgba(0,0,0,0)",
+            "date_font_size_scale": 100,
+            "content_color": "rgba(0,0,0,0)",
+            "content_font_size_scale": 100,
+            "divider_color": "rgba(0,0,0,0)",
+            "top_margin": 0,
+            "bottom_margin": 0
+          }
+        },
+        {
+           "type": "leave_comment",
+          "settings": {
+            "max_width": 600,
+            "content_position": "center",
+            "text_alignment": "left",
+            "label_color": "",
+            "label_font_size_scale": 100,
+            "input_background_color": "",
+            "input_text_color": "",
+            "input_placeholder_color": "",
+            "input_border_color": "",
+            "input_active_highlight_color": "",
+            "input_font_size_scale": 100,
+            "button_text": "",
+            "button_type": "primary",
+            "button_text_color": "",
+            "button_background_color": "",
+            "button_border_color": "",
+            "button_border_width": 0,
+            "button_border_radius": 6,
+            "button_animation": "default",
+            "success_message_color": "",
+            "inline": "",
+            "error_message_color": "",
+            "top_margin": 70,
+            "bottom_margin": 0
+          }
+        }
+        
+      ]
+    }
+  ]
+}
+{% endschema %}

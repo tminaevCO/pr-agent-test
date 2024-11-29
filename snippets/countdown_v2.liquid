@@ -1,0 +1,131 @@
+{% liquid
+    assign background_color = block.settings.color
+    assign numbers_color = block.settings.numbers_color
+    if numbers_color.alpha == null or numbers_color.alpha == 0.0
+        assign numbers_color = settings.secondary_text_color
+    endif
+    assign labels_color = block.settings.labels_color
+    if labels_color.alpha == null or labels_color.alpha == 0.0
+        assign labels_color = settings.secondary_text_color
+    endif
+
+    assign year = block.settings.year
+    assign month = block.settings.month
+    assign day = block.settings.day
+    assign hour = block.settings.hour
+    assign min = block.settings.min
+    assign timezones = block.settings.timezones
+    assign hide_on_completion = block.settings.hide_on_completion
+    assign top_margin = block.settings.top_margin | default: 0
+    assign bottom_margin = block.settings.bottom_margin | default: 0
+    assign block_id = block.id
+%}
+
+{% style %}
+    .block-{{block_id}} {
+        background-color: {% if background_color.alpha and background_color.alpha != 0.0 %}{{background_color}}{% else %}transparent{% endif %};
+        width: max-content;
+        margin-top: {{top_margin}}px;
+        margin-bottom: {{bottom_margin}}px;
+    }
+
+    {%- if background_color != blank and background_color.alpha != 0.0 -%}
+        .block-{{block_id}} .counter-item:first-child {
+            border: {{background_color.alpha}};
+            padding-left: 20px;
+        }
+        .block-{{block_id}} .counter-item:last-child {
+            padding-right: 20px;
+        }
+    {%- else -%}
+        .block-{{block_id}} .counter-item:first-child {
+            padding-left: 0px;
+        }
+        .block-{{block_id}} .counter-item:last-child {
+            padding-right: 0px;
+        }
+    {%- endif -%}
+
+    .block__counter {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity .3s linear;
+        overflow: hidden;
+        border-radius: {{settings.border_radius}}px;
+    }
+
+    .block__counter.hide {
+        Visibility: hidden;
+        opacity: 0;
+        transition: opacity .3s linear;
+    }
+
+    .counter-item {
+        display: flex;
+        padding: 15px 20px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    }
+
+    .counter-item::before {
+        content: ":";
+        position: absolute;
+        top: 50%;
+        right: 0;
+        transform: translate(50%, -50%);
+        width: max-content;
+        height: auto;
+        font-size: 30px;
+        line-height: 1;
+        color: {{numbers_color}};
+    }
+
+    .counter-item:last-child::before {
+        content: none;
+    }
+
+    .counter-item__value {
+        font-family: {{ settings.heading_font.family }}, {{ settings.heading_font.fallback_families }};
+        font-weight: {{ settings.heading_font.weight }};
+        color: {{numbers_color}};
+        font-size: 24px;
+        line-height: 25px;
+        margin-bottom: 6px;
+    }
+    
+    
+    .counter-item__label {
+        font-family: {{ settings.paragraph_font.family }}, {{ settings.paragraph_font.fallback_families }};
+        font-weight: {{ settings.paragraph_font.weight }};
+        color: {{labels_color}};
+        font-size: 11px;
+        line-height: 1;
+    }
+    @media only screen and (max-width: 530px) {
+        .counter-item {
+            padding: 10px 15px;
+        }
+    }
+{% endstyle %}
+
+<date-counter class="block__counter block-{{block_id}} hide" data-hide-on-completion="{{hide_on_completion}}" data-years="{{year}}" data-months="{{month}}" data-timezone="{{timezones}}">
+    <div class="block__counter__days counter-item">
+        <div class="block__counter__days-value counter-item__value" id="Days" data-value="{{day}}">{{day}}</div>
+        <span class="block__counter__days-label counter-item__label">{{'blocks.date_counter.days' | t}}</span>
+    </div>
+    <div class="block__counter__hours counter-item">
+        <div class="block__counter__hours-value counter-item__value" id="Hours" data-value="{{hour}}">{{hour}}</div>
+        <span class="block__counter__hours-label counter-item__label">{{'blocks.date_counter.hours' | t}}</span>
+    </div>
+    <div class="block__counter__mins counter-item">
+        <div class="block__counter__mins-value counter-item__value" id="Mins" data-value="{{min}}">{{min}}</div>
+        <span class="block__counter__mins-label counter-item__label">{{'blocks.date_counter.minutes' | t}}</span>
+    </div>
+    <div class="block__counter__secs counter-item">
+        <div class="block__counter__secs-value counter-item__value" id="Secs">00</div>
+        <span class="block__counter__secs-label counter-item__label">{{'blocks.date_counter.seconds' | t}}</span>
+    </div>
+</date-counter>
+

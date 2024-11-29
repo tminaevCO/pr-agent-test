@@ -1,0 +1,419 @@
+{% liquid
+    assign pagination_type = pagination_type | default: settings.pagination_type
+    assign pagination_button_type = settings.pagination_button_type
+    assign loading_animation = settings.loading_animation
+    assign target_selector = target_selector | default: ""
+    assign page_section_selector = paginate.page_param
+    assign default_page_behavior = default_page_behavior | default: false
+%}
+
+{% if default_page_behavior == true and pagination_type == "pages" %}
+    {% assign default_page_behavior = true %}
+{%- else -%}
+    {% assign default_page_behavior = false %}
+{% endif %}
+
+<style>
+    .custom-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center; 
+        margin-top: 32px;
+    }
+
+    .custom-pagination.hidden {
+        display: none;
+    }
+
+    {% if page_section_selector.size > 0 or pagination_type == "load_more" or pagination_type == "auto_load" %}
+        {% if loading_animation == 'paw' %}
+
+            .custom-pagination.loading .paw {
+                display: block;
+            }
+            .paw {
+                width: 30px;
+                height: 30px;
+                position: relative;
+                display: none;
+            }
+
+            .paw__circle {
+                width: 27%;
+                height: 30%;
+                background-color: {{settings.loader_primary_color}};
+                border-radius: 50%;
+                position: absolute;
+            }
+
+            .paw__circle--1 {
+                top: 28%;
+                animation-duration: 0.5s;
+                animation-name: pawcircle1;
+                animation-iteration-count: infinite;
+            }
+
+            @keyframes pawcircle1 {
+                from {visibility: hidden;}
+                10% {visibility: hidden;}                
+                60% {visibility: visible;} 61%{visibility: hidden;}
+                to {visibility: hidden;}
+            }
+
+            .paw__circle--2 {
+                left: 19.5%;
+                animation-duration: 0.5s;
+                animation-name: pawcircle2;
+                animation-iteration-count: infinite;
+            }
+
+            @keyframes pawcircle2 {
+                from {visibility: hidden;}
+                20% {visibility: hidden;}
+                70% {visibility: visible;} 71%{visibility: hidden;}
+                to {visibility: hidden;}
+            }
+
+            .paw__circle--3 {
+                right: 19.5%;
+                animation-duration: 0.5s;
+                animation-name: pawcircle3;
+                animation-iteration-count: infinite;
+            }
+
+            @keyframes pawcircle3 {
+                from {visibility: hidden;}
+                30% {visibility: hidden;}
+                80% {visibility: visible;} 81%{visibility: hidden;}
+                to {visibility: hidden;}
+            }
+
+            .paw__circle--4 {
+                top: 28%;
+                right: 0;
+                animation-duration: 0.5s;
+                animation-name: pawcircle4;
+                animation-iteration-count: infinite;
+            }
+
+            @keyframes pawcircle4 {
+                from {visibility: hidden;}
+                40% {visibility: hidden;}
+                90% {visibility: visible;} 91%{visibility: hidden;}
+                to {visibility: hidden;}
+            }
+
+            .paw__print {
+                position: absolute;
+                top: 4.5%;
+                left: 1.5%;
+                width: 100%;
+                animation-duration: 0.5s;
+                animation-name: pawprint;
+                animation-iteration-count: infinite;
+            }
+
+            @keyframes pawprint {
+                from {visibility: hidden;}
+                50% {visibility: hidden;}
+                to {visibility: visible;}
+            }
+        {% endif %}
+
+        .custom-pagination.loading {
+            pointer-events: none;
+        }
+
+        .custom-pagination.loading .loader {
+            display: block;
+        }
+
+        .custom-pagination.loading .block__button, 
+        .custom-pagination.loading .pagination-navigation{
+            display: none;
+        }
+
+        .loader {
+            display: none;
+            width: 30px;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 5px solid {{settings.loader_secondary_color}};
+            border-right-color: {{settings.loader_primary_color}};
+            animation: l2 1s infinite linear;
+        }
+
+        @keyframes l2 {to{transform: rotate(1turn)}}
+    {% endif %}
+</style>
+
+{%- case pagination_type -%}
+    {%- when "pages" -%}
+        {%- capture pagination_content -%}
+            <style>
+                .pagination-navigation__list {
+                    list-style: none;
+                    display: flex;
+                    padding-left: 0;
+                    gap: 8px;
+                    margin: 0;
+                }
+                .pagination__item {
+                    display: block;
+                    padding: 7px 10px;
+                    font-size: 16px;
+                    line-height: 160%;
+                    background-color: {{settings.inactive_option_background_color}};
+                    color: {{settings.inactive_option_text_color}};
+                    border: 1px solid {{settings.inactive_option_border_color}};
+                    min-width: 40px;
+                    min-height: 40px;
+                    box-sizing: border-box;
+                    text-align: center;
+                    border-radius: {{settings.border_radius}}px;
+                }
+
+                .navigation {
+                    background-color: {{settings.active_option_background_color}};
+                    color: {{settings.active_option_text_color}};
+                    border: 1px solid {{settings.active_option_border_color}};
+                }
+                .navigation[disabled] {
+                    background-color: {{settings.inactive_option_background_color}};
+                    color: {{settings.inactive_option_text_color}};
+                    border: 1px solid {{settings.inactive_option_border_color}};
+                    pointer-events: none;
+                }
+                .navigation svg path{
+                    stroke: {{settings.active_option_text_color}};
+                }
+                .navigation[disabled] svg path{
+                    stroke: {{settings.inactive_option_text_color}};
+                }
+
+                .current-page {
+                    background-color: {{settings.active_option_background_color}};
+                    color: {{settings.active_option_text_color}};
+                    border: 1px solid {{settings.active_option_border_color}};
+                }
+            </style>
+
+            {% if loading_animation == 'paw' %}
+                {% render 'paw-loader' %}
+            {% else %}
+                <div class="loader"></div>
+            {% endif %}
+
+            <nav class="pagination-navigation" role="navigation" aria-label="">
+                <ul class="pagination-navigation__list" role="list">
+                    <li>
+                        <a href="{{ paginate.previous.url }}{{ anchor }}" class="pagination__item navigation" {% if paginate.previous == null %}disabled{% endif %} aria-label="" data-page="{{paginate.current_page |  minus: 1}}">
+                            {% render 'icon_v2', icon: 'left-chevron', color: settings.icon_color %}
+                        </a>
+                    </li>
+    
+                {%- for part in paginate.parts -%}
+                    <li>
+                        {%- if part.is_link -%}
+                            <a href="{{ part.url }}{{ anchor }}" class="pagination__item link" aria-label="" data-page="{{part.title}}">{{ part.title }}</a>
+                        {%- else -%}
+                            {%- if part.title == paginate.current_page -%}
+                                <a role="link" aria-disabled="true" class="pagination__item current-page" aria-current="page" aria-label="" data-page="{{part.title}}">{{ part.title }}</a>
+                            {%- else -%}
+                                <span class="pagination__item" data-page="{{part.title}}">{{ part.title }}</span>
+                            {%- endif -%}
+                        {%- endif -%}
+                    </li>
+                {%- endfor -%}
+                    <li>
+                        <a href="{{ paginate.next.url }}{{ anchor }}" class="pagination__item navigation"  {% if paginate.next == null %}disabled{% endif %} aria-label="" data-page="{{paginate.current_page | plus: 1}}" >
+                            {% render 'icon_v2', icon: 'right-chevron', color: settings.icon_color %}
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        {%- endcapture -%}
+    {%- when "load_more" -%}
+        {%- capture pagination_content -%}
+            {% if loading_animation == 'paw' %}
+                {% comment %} {% render 'paw-loader' %} {% endcomment %}
+            {% else %}
+                <div class="loader"></div>
+            {% endif %}
+
+            {% render 'button_v2',
+                text: "Load More",
+                link: "#",
+                type: pagination_button_type,
+                border_radius: settings.border_radius,
+                visible_on_desktop: true,
+                visible_on_mobile: true,
+                block_id: "section-id",
+                class: "load-more-button"
+            %}
+        {%- endcapture -%}
+    {%- when "auto_load" -%}
+        {%- capture pagination_content -%}
+            {% if loading_animation == 'paw' %}
+                {% comment %} {% render 'paw-loader' %} {% endcomment %}
+            {% else %}
+                <div class="loader"></div>
+            {% endif %}
+        {%- endcapture -%}
+{%- endcase -%}
+
+<div class="custom-pagination {% if pagination_type == "pages" and paginate.parts.size == 0 %}hidden{% endif %}" data-target-selector="{{target_selector}}" data-section-id="{{section.id}}">
+    {{pagination_content}}
+</div>
+
+{%- if default_page_behavior == false and page_section_selector.size > 0 or pagination_type == "load_more" or pagination_type == "auto_load"  -%}
+    <script>
+        function initCustomPagination(updatedSectionId) {
+            let customPaginationElement = null;
+            let targetSelector = null;
+            let paginationPage = 1;
+            let sectionId = null;
+            let isContendUploading = false;
+            let autoloadInteval = null;
+
+            const insertContent = (content) => {
+                {% if pagination_type == "load_more" or pagination_type == "auto_load" %}
+                    const currentTarget = updatedSectionId ? document.querySelector(`#shopify-section-${updatedSectionId} ${targetSelector}`) : document.querySelector(`#shopify-section-{{section.id}} ${targetSelector}`);
+                    currentTarget.insertAdjacentHTML('beforeend', content);
+                    paginationPage+= 1;
+                    customPaginationElement.classList.remove('loading');
+                {% else %}
+                    const currentTarget = updatedSectionId ? document.querySelector(`#shopify-section-${updatedSectionId}`) : document.querySelector(`#shopify-section-{{section.id}}`);
+                    currentTarget.innerHTML = content
+                    const sectionId = currentTarget.getAttribute('id').replace('shopify-section-', '')
+                    window.initCustomPagination(sectionId)
+                {% endif %}
+            }
+            
+            const checkNextPage = async () => {
+                const url = updateUrl(paginationPage + 1)
+                fetch(url)
+                    .then(response=>{
+                        return response.text();
+                    }).then(data=>{
+                        const dataDom = new DOMParser().parseFromString(data, 'text/html');
+                        const newTarget = dataDom.querySelector(`${targetSelector}`);
+                        if(!newTarget.innerHTML.trim().length) {
+                            customPaginationElement.classList.add('hidden')
+                        }
+                    })
+            }
+
+            const fetchContent = (url) => {
+                customPaginationElement.classList.add('loading');
+                isContendUploading = true;
+                fetch(url)
+                    .then(response=>{
+                        return response.text();
+                    }).then(data=>{
+                        const dataDom = new DOMParser().parseFromString(data, 'text/html');
+                        {% if pagination_type == "load_more" or pagination_type == "auto_load" %}
+                            const newTarget = updatedSectionId ? dataDom.querySelector(`#shopify-section-${updatedSectionId} ${targetSelector}`) : dataDom.querySelector(`#shopify-section-{{section.id}} ${targetSelector}`);
+                            if (newTarget) {
+                                const hasResult = checkNextPage();
+                                const newContent = newTarget.innerHTML;
+                                insertContent(newContent);
+                            }
+                        {% else %}
+                            const newTarget = updatedSectionId ? dataDom.querySelector(`#shopify-section-${updatedSectionId}`) : dataDom.querySelector(`#shopify-section-{{section.id}}`);
+                            if (newTarget) {
+                                const newContent = newTarget.innerHTML;
+                                insertContent(newContent);
+                            }
+                        {% endif %}
+                        isContendUploading = false;
+                    }).catch(()=>{
+                        customPaginationElement.classList.remove('loading');
+                        isContendUploading = false;
+                    })
+            }
+
+            const updateUrl = (page = null) => {
+                const currentPage = page || paginationPage
+                const currentUrl = window.location.href;
+                const url = new URL(currentUrl);
+                const urlParams = new URLSearchParams(url.search);
+                {% if request.design_mode == false %}
+                    urlParams.set('page', `${currentPage}`);
+                {% else %}
+                    urlParams.set('{{page_section_selector}}', `${currentPage}`);
+                {% endif %}
+                return window.location.origin + window.location.pathname + '?' + urlParams.toString();
+            }
+
+            const initListeners = () => {
+                {% if pagination_type == "auto_load" %}
+                    const options = {
+                        root: null,
+                        rootMargin: '0px 0px',
+                        threshold: 0, 
+                    };
+                    
+                    const callback = (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                isSectionInView = true;
+                                autoloadInteval = setInterval(()=>{
+                                    const url = updateUrl();
+                                    if (isContendUploading == false) {
+                                        fetchContent(url);
+                                    }
+                                }, 1000)
+                            } else {
+                                clearInterval(autoloadInteval)
+                            }
+                        });
+                    };
+
+                    const observer = new IntersectionObserver(callback, options);
+                    observer.observe(customPaginationElement);
+                {% elsif pagination_type == "load_more" %}
+                    const pagination_items = customPaginationElement.querySelector('.load-more-button');
+                    if (pagination_items) {
+                        pagination_items.addEventListener("click", (e)=>{
+                            e.preventDefault();
+                            const url = updateUrl();
+                            fetchContent(url);
+                        })
+                    }
+                {% elsif pagination_type == "pages" and page_section_selector.size > 0 and request.design_mode == false %}
+                    const pagination_items = customPaginationElement.querySelectorAll('.pagination__item');
+                    if(pagination_items.length) {
+                        pagination_items.forEach(item=>{
+                            item.addEventListener('click', (e)=>{
+                                e.preventDefault();
+                                const requiredPage = e.currentTarget.getAttribute('data-page')
+                                const url = updateUrl(requiredPage);
+                                fetchContent(url);
+                            })
+                        })
+                    }
+                {% endif %}
+            }
+
+            const init = () =>{
+                customPaginationElement = updatedSectionId ? document.querySelector(`#shopify-section-${updatedSectionId} .custom-pagination`) : document.querySelector(`#shopify-section-{{section.id}} .custom-pagination`);
+                targetSelector = customPaginationElement.dataset.targetSelector;
+                paginationPage = 2;
+                initListeners();
+            }
+            init();
+        }
+
+        initCustomPagination();
+        window.initCustomPagination = initCustomPagination
+
+        document.addEventListener('shopify:section:load', (event)=>{
+            if(event.target.querySelector('.custom-pagination')) {
+                initCustomPagination();
+                window.initCustomPagination = initCustomPagination
+            }
+        })
+    </script>
+{%- endif -%}
+

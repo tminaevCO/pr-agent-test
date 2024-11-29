@@ -1,0 +1,184 @@
+{%- assign type = type | default: 'primary' -%}
+{%- assign animation = animation | default: settings.primary_button_animation -%}
+{%- assign top_padding = top_padding | default: 0 -%}
+{%- assign bottom_padding = bottom_padding | default: 0 -%}
+
+{% case type %}
+  {% when 'primary' %}
+    {%- assign text_color = settings.primary_button_text_color -%}
+    {%- assign background_color = settings.primary_button_background_color | default: 'transparent' -%}
+    {%- assign border_color = settings.primary_button_border_color -%}
+    {%- assign border_width = settings.primary_button_border_width -%}
+    {%- assign border_radius = settings.border_radius -%}
+  {% when 'secondary' %}
+    {%- assign text_color = settings.secondary_button_text_color | default: settings.paragraph_color -%}
+    {%- assign background_color = settings.secondary_button_background_color | default: 'transparent' -%}
+    {%- assign border_color = settings.secondary_button_border_color | default: transparent -%}
+    {%- assign border_width = settings.secondary_button_border_width -%}
+    {%- assign border_radius = settings.border_radius -%}
+  {% when 'override' %}
+    {%- assign text_color = text_color -%}
+    {%- assign background_color = background_color -%}
+    {%- assign border_color = border_color -%}
+    {%- assign border_width = border_width | default: 0 -%}
+    {%- assign border_radius = border_radius |  default: settings.border_radius -%}
+{% endcase %}
+
+{%- assign button_background_color_lightness = background_color | color_to_hsl | color_extract: 'lightness' -%}
+{%- if button_background_color_lightness > 20 -%}
+  {%- assign button_background_color_darken_lightness = background_color
+    | color_to_hsl
+    | color_extract: 'lightness'
+    | minus: 5
+  -%}
+{%- else -%}
+  {%- assign button_background_color_darken_lightness = 0 -%}
+{%- endif -%}
+
+{%- assign button_background_color_lighten_lightness = background_color
+  | color_to_hsl
+  | color_extract: 'lightness'
+  | plus: 5
+-%}
+
+{%- assign button_background_color_lighten = background_color
+  | color_to_hsl
+  | color_modify: 'lightness', button_background_color_lighten_lightness
+-%}
+{%- assign button_background_color_darken = background_color
+  | color_to_hsl
+  | color_modify: 'lightness', button_background_color_darken_lightness
+-%}
+
+{%- assign default_font_size_mobile = default_font_size_mobile | default: 16 -%}
+{%- assign default_font_size_desktop = default_font_size_desktop | default: 16 -%}
+
+{%- assign global_setting_font_size_scale = settings.buttons_font_size_scale | default: 100 -%}
+{%- assign global_setting_line_height_scale = settings.buttons_font_line_spacing_scale | default: 100 -%}
+
+{%- assign font_size = default_font_size_mobile | times: global_setting_font_size_scale | divided_by: 100.0 | round -%}
+{%- assign font_size_desktop = default_font_size_desktop
+  | times: global_setting_font_size_scale
+  | divided_by: 100.0
+  | round
+-%}
+
+{%- assign line_height = font_size
+  | times: 200
+  | divided_by: 100.0
+  | round
+  | times: global_setting_line_height_scale
+  | divided_by: 100.0
+  | round
+-%}
+{%- assign line_height_desktop = font_size_desktop
+  | times: 200
+  | divided_by: 100.0
+  | round
+  | times: global_setting_line_height_scale
+  | divided_by: 100.0
+  | round
+-%}
+
+{% style %}
+  button.button-{{button_id}}, a[type="button"].button-{{button_id}} {
+      font-family: {{ settings.buttons_font.family }}, {{ settings.buttons_font.fallback_families }};
+      padding: 8px 16px;
+      font-size: {{ font_size }}px;
+      line-height: {{ line_height }}px;
+      font-weight: {{ settings.buttons_font.weight }};
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      text-align: center;
+      cursor: pointer;
+      max-width: 194px;
+      width: 100%;
+      min-height: 50px;
+      word-break: break-word;
+  }
+
+    .button-{{button_id}} .button-with-animation-icon {
+        margin-right: 4px;
+        width: 24px;
+        height: 24px;
+    }
+
+    .button-{{button_id}} .button-with-animation-icon svg {
+        width: 100%;
+        height: 100%;
+    }
+
+    button.button-{{button_id}}[disabled],
+    a[type="button"].button-{{button_id}}[disabled]
+    button.button-{{button_id}}.disabled,
+    a[type="button"].button-{{button_id}}.disabled {
+        pointer-events: none;
+    }
+
+    @media only screen and (min-widthL: 768px) {
+        button.button-{{button_id}}, a[type="button"].button-{{button_id}} {
+            font-size: {{ font_size_desktop }}px;
+            line-height: {{ line_height_desktop }}px;
+        }
+    }
+
+  button.button-{{button_id}}, a[type="button"].button-{{button_id}} {
+      color: {{text_color}};
+      background-color: {{background_color}};
+      border: {{border_width}}px solid {{border_color}};
+      border-radius: {{border_radius}}px;
+  }
+
+  {% case animation %}
+      {% when "grow" %}
+          button.button-{{button_id}}, a[type="button"].button-{{button_id}} {
+              background-color: {{background_color}};
+              transform: scale(1);
+              transition: transform .1s linear;
+          }
+
+          button.button-{{button_id}}:hover, a[type="button"].button-{{button_id}}:hover {
+              background-color: {{background_color}};
+              transform: scale(1.05);
+              transition: transform .1s linear;
+          }
+      {% when "shrink" %}
+          button.button-{{button_id}}, a[type="button"].button-{{button_id}} {
+              background-color: {{background_color}};
+              transform: scale(1);
+              transition: transform .1s linear;
+          }
+
+          button.button-{{button_id}}:hover, a[type="button"].button-{{button_id}}:hover {
+              background-color: {{background_color}};
+              transform: scale(0.95);
+              transition: transform .1s linear;
+          }
+      {% when "lighten" %}
+          button.button-{{button_id}}, a[type="button"].button-{{button_id}} {
+              background-color: {{background_color}};
+              transform: scale(1);
+              transition: background-color .1s linear;
+          }
+
+          button.button-{{button_id}}:hover, a[type="button"].button-{{button_id}}:hover {
+              background-color: {{button_background_color_lighten}};
+              transform: scale(1);
+              transition: background-color .1s linear;
+          }
+      {% when "darken" %}
+          button.button-{{button_id}}, a[type="button"].button-{{button_id}} {
+              background-color: {{background_color}};
+              transform: scale(1);
+              transition: background-color .1s linear;
+          }
+
+          button.button-{{button_id}}:hover, a[type="button"].button-{{button_id}}:hover {
+              background-color: {{button_background_color_darken}};
+              transform: scale(1);
+              transition: background-color .1s linear;
+          }
+  {% endcase %}
+{% endstyle %}

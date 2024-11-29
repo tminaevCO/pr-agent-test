@@ -1,0 +1,294 @@
+{% liquid
+  assign text = section.settings.text
+  assign font_size_scale = section.settings.font_size_scale
+  assign max_width = section.settings.max_width
+  assign color = section.settings.color
+  assign content_alignment = section.settings.content_alignment
+  assign content_alignment_mobile = section.settings.content_alignment_mobile
+  assign top_margin = section.settings.top_margin
+  assign bottom_margin = section.settings.bottom_margin
+  assign top_margin_mobile = section.settings.top_margin | divided_by: 2
+  assign bottom_margin_mobile = section.settings.bottom_margin | divided_by: 2
+
+  assign background_color = section.settings.background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign top_padding = section.settings.top_padding
+  assign bottom_padding = section.settings.bottom_padding
+  assign side_padding = section.settings.side_padding
+%}
+
+{%- if text != blank -%}
+  {% style %}
+    #shopify-section-{{section.id}} {
+      margin-top: {{top_margin_mobile}}px;
+      margin-bottom: {{bottom_margin_mobile}}px;
+    }
+
+    {% if background_color.alpha != null and background_color.alpha != 0.0 %}
+      {% if fullwidth_background %}
+        #shopify-section-{{ section.id }} {
+          background-color: {{background_color}};
+          max-width: 100%;
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: 0;
+          padding-right: 0;
+        }
+
+        #shopify-section-{{ section.id }} .section-paragraph--inner {
+          max-width: {{ settings.page_width }}px;
+          margin: 0 auto;
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+      {% else %}
+        #shopify-section-{{ section.id }}{
+          background-color: {{background_color}};
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: {{side_padding}}px;
+          padding-right: {{side_padding}}px;
+          box-sizing: border-box;
+        }
+      {% endif %}
+    {% endif %}
+
+    #shopify-section-{{section.id}} .section-paragraph__content{
+      display: flex;
+      flex-direction: row;
+    }
+
+    #shopify-section-{{section.id}} {
+      display: block;
+    }
+
+    {%- case content_alignment_mobile -%}
+      {%- when "left" -%}
+        #shopify-section-{{section.id}} .section-paragraph__content{
+          justify-content: flex-start;
+        }
+
+        #shopify-section-{{section.id}} .block__paragraph {
+          text-align: left;
+        }
+      {%- when "center" -%}
+        #shopify-section-{{section.id}} .section-paragraph__content{
+          justify-content: center;
+        }
+
+        #shopify-section-{{section.id}} .block__paragraph {
+          text-align: center;
+        }
+      {%- when "right" -%}
+        #shopify-section-{{section.id}} .section-paragraph__content{
+          justify-content: flex-end;
+        }
+
+        #shopify-section-{{section.id}} .block__paragraph {
+          text-align: right;
+        }
+    {%- endcase -%}
+
+    @media only screen and (min-width: 769px) {
+      #shopify-section-{{section.id}} {
+        margin-top: {{top_margin}}px;
+        margin-bottom: {{bottom_margin}}px;
+      }
+
+      #shopify-section-{{section.id}} {
+        display: block;
+      }
+
+      {%- case content_alignment -%}
+        {%- when "left" -%}
+          #shopify-section-{{section.id}} .section-paragraph__content{
+            justify-content: flex-start;
+          }
+
+          #shopify-section-{{section.id}} .block__paragraph {
+            text-align: left;
+          }
+        {%- when "center" -%}
+          #shopify-section-{{section.id}} .section-paragraph__content{
+            justify-content: center;
+          }
+
+          #shopify-section-{{section.id}} .block__paragraph {
+            text-align: center;
+          }
+        {%- when "right" -%}
+          #shopify-section-{{section.id}} .section-paragraph__content{
+            justify-content: flex-end;
+          }
+          #shopify-section-{{section.id}} .block__paragraph {
+            text-align: right;
+          }
+      {%- endcase -%}
+    }
+  {% endstyle %}
+  <div class="section-paragraph--inner">
+    <div class="section-paragraph__content">
+      {% render 'paragraph_v2',
+        text: text,
+        font_size_scale: font_size_scale,
+        color: color,
+        max_width: max_width,
+        visible_on_desktop: true,
+        visible_on_mobile: true,
+        block_id: section.id
+      %}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Paragraph",
+  "tag": "section",
+  "class": "section-paragraph container",
+  "settings": [
+     {
+        "type": "paragraph",
+        "content": "Add a block of text as a section and amend it to your liking. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+     },
+     {
+       "type": "richtext",
+       "id": "text",
+       "label": "Text"
+     },
+     {
+      "type": "color",
+      "id": "color",
+      "label": "Color"
+    },
+     {
+        "type": "range",
+        "id": "font_size_scale",
+        "min": 75,
+        "max": 125,
+        "step": 1,
+        "unit": "%",
+        "label": "Font size scale",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "max_width",
+        "min": 300,
+        "max": 1500,
+        "step": 12,
+        "unit": "px",
+        "label": "Max width",
+        "default": 600
+      },
+      {
+        "type": "header",
+        "content": "Layout",
+        "info": "Amend the alignment of your text."
+      },
+      {
+        "type": "text_alignment",
+        "id": "content_alignment",
+        "label": "Desktop content alignment",
+        "default": "left"
+      },
+      {
+        "type": "text_alignment",
+        "id": "content_alignment_mobile",
+        "label": "Mobile content alignment",
+        "default": "left"
+      },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Customize the background of your section."
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth_background",
+      "label": "Fullwidth background",
+      "default": false
+    },
+      {
+      "type": "header",
+      "content": "Section padding",
+      "info": "Add spacing above and below inside your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "bottom_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 24
+    },
+      {
+        "type": "header",
+        "content": "Section margin",
+        "info": "Add spacing above and below your new section."
+      },
+      {
+        "type": "range",
+        "id": "top_margin",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Top margin",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "bottom_margin",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Bottom margin",
+        "default": 0
+      }
+   ],
+  "presets": [
+    {
+      "name": "Paragraph",
+      "settings": {
+        "text": "<p>Tell us some more about your brand!<\/p>",
+        "color": "",
+        "font_size_scale": 100,
+        "max_width": 1500,
+        "content_alignment": "left",
+        "content_alignment_mobile": "left",
+        "top_margin": 40,
+        "bottom_margin": 40
+      }
+    }
+  ]
+}
+{% endschema %}

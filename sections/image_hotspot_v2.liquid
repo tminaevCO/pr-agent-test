@@ -1,0 +1,854 @@
+{% liquid
+  assign desktop_image = section.settings.desktop_image
+  assign mobile_image = section.settings.mobile_image
+  assign content_alignment = section.settings.content_alignment
+  assign display_title = section.settings.display_title
+  assign display_price = section.settings.display_price
+
+  assign marker_default_background = section.settings.marker_default_background
+  if marker_default_background.alpha == null or marker_default_background.alpha == 0.0
+    assign marker_default_background = settings.icon_color
+  endif
+
+  assign marker_selected_background = section.settings.marker_selected_background
+  if marker_selected_background.alpha == null or marker_selected_background.alpha == 0.0
+    assign marker_selected_background = settings.primary_background_color
+  endif
+
+  assign marker_icon_color = section.settings.marker_icon_color
+  if marker_icon_color.alpha == null or marker_icon_color.alpha == 0.0
+    assign marker_icon_color = settings.primary_background_color
+  endif
+
+  assign marker_selected_icon_color = section.settings.marker_selected_icon_color
+  if marker_selected_icon_color.alpha == null or marker_selected_icon_color.alpha == 0.0
+    assign marker_selected_icon_color = settings.icon_color
+  endif
+
+  assign card_background_color = section.settings.card_background_color
+
+  if card_background_color == blank or card_background_color.alpha == 0.0
+    assign card_background_color = settings.card_background_color
+  endif
+
+  assign text_color = section.settings.text_color
+  assign card_font_size_scale = section.settings.card_font_size_scale
+
+  assign top_margin = section.settings.top_margin
+  assign bottom_margin = section.settings.bottom_margin
+  assign top_margin_mobile = section.settings.top_margin | divided_by: 2
+  assign bottom_margin_mobile = section.settings.bottom_margin | divided_by: 2
+
+  assign aspect_ratio_desktop = 1 | divided_by: desktop_image.aspect_ratio | times: 100
+  assign aspect_ratio_mobile = 1 | divided_by: mobile_image.aspect_ratio | times: 100
+
+  if aspect_ratio_desktop == null
+    assign aspect_ratio_desktop = 50
+  endif
+
+  if aspect_ratio_mobile == null
+    assign aspect_ratio_mobile = 50
+  endif
+
+  assign desktop_focal_x_point = desktop_image.presentation.focal_point.x
+  assign desktop_focal_y_point = desktop_image.presentation.focal_point.y
+  assign mobile_focal_x_point = mobile_image.presentation.focal_point.x
+  assign mobile_focal_y_point = mobile_image.presentation.focal_point.y
+
+  assign background_color = section.settings.background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign top_padding = section.settings.top_padding
+  assign bottom_padding = section.settings.bottom_padding
+  assign side_padding = section.settings.side_padding
+%}
+
+{% stylesheet %}
+  main {
+    overflow: hidden;
+  }
+
+  .image-hotspot {
+    position: relative;
+    overflow-y: visible;
+  }
+
+  .image-hotspot--inner {
+    position: relative;
+  }
+
+  .image-hotspot__content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+  }
+
+  .image-hotspot__hotspot {
+    position: absolute;
+    cursor: pointer;
+  }
+
+  .image-hotspot__hotspot__point {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .image-hotspot__hotspot__point svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .image-hotspot__hotspot.active .image-hotspot__hotspot__info-box {
+    opacity: 1;
+    visibility: visible;
+    z-index: 2;
+  }
+
+  .image-hotspot__hotspot__info-box {
+    position: absolute;
+    overflow: hidden;
+    max-width: 182px;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    visibility: hidden;
+    z-index: -2;
+  }
+
+  .image-hotspot__hotspot:hover::after {
+    content: "";
+    position: absolute;
+    width: 140%;
+    height: 130%;
+    top: 0;
+    left: 0;
+    transform: translate(-9px, -10px);
+  }
+
+  .image-hotspot__hotspot__info-box--wrapper {
+    width: 182px;
+    padding: 16px;
+    display: block;
+    box-sizing: border-box;
+  }
+
+  .image-hotspot__background-image, .image-hotspot__background-image--mobile {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media only screen and (min-width: 1024px) {
+    .image-hotspot__hotspot:hover .image-hotspot__hotspot__info-box {
+      opacity: 1;
+      visibility: visible;
+      z-index: 2;
+    }
+  }
+{% endstylesheet %}
+
+{% style %}
+  {% if background_color.alpha != null and background_color.alpha != 0.0 %}
+    {% if fullwidth_background %}
+      #shopify-section-{{ section.id }} {
+        background-color: {{background_color}};
+        max-width: 100%;
+        padding-top: {{top_padding}}px;
+        padding-bottom: {{bottom_padding}}px;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      #shopify-section-{{ section.id }} .image-hotspot--inner {
+        max-width: calc({{ settings.page_width }}px - 32px);
+        margin: 0 auto;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+    {% else %}
+      #shopify-section-{{ section.id }}{
+        background-color: {{background_color}};
+        padding-top: {{top_padding}}px;
+        padding-bottom: {{bottom_padding}}px;
+        padding-left: {{side_padding}}px;
+        padding-right: {{side_padding}}px;
+        box-sizing: border-box;
+      }
+    {% endif %}
+  {% endif %}
+
+  #shopify-section-{{section.id}} .svg-placeholder {
+    background-color: {{settings.image_background_color}};
+    stroke: {{settings.icon_color}};
+    fill: {{settings.icon_color}};
+  }
+
+  {% if mobile_image != blank %}
+    #shopify-section-{{section.id}} {
+      margin: {{top_margin_mobile}}px auto {{bottom_margin_mobile}}px;
+    }
+
+    #shopify-section-{{section.id}} .image-hotspot--inner {
+      padding-bottom: {{aspect_ratio_mobile}}%;
+      border-radius: {{settings.border_radius}}px;
+      overflow: hidden;
+    }
+
+  {%- else -%}
+    #shopify-section-{{section.id}} {
+      margin: {{top_margin_mobile}}px auto {{bottom_margin_mobile}}px;
+    }
+
+    #shopify-section-{{section.id}} .image-hotspot--inner {
+      padding-bottom: {{aspect_ratio_desktop}}%;
+      border-radius: {{settings.border_radius}}px;
+      overflow: hidden;
+    }
+  {% endif %}
+
+  #shopify-section-{{section.id}} .image-hotspot__background-image, #shopify-section-{{section.id}} .image-hotspot__background-image--mobile {
+    background-color: {{settings.image_background_color}}
+  }
+
+  #shopify-section-{{section.id}} .image-hotspot__background-image {
+    display: none;
+  }
+
+  #shopify-section-{{section.id}} .image-hotspot__background-image--mobile {
+    display: block;
+  }
+
+  #shopify-section-{{section.id}} .image-hotspot__background-image--mobile {
+    object-position: {{mobile_focal_x_point}}% {{mobile_focal_y_point}}%;
+  }
+
+
+  #shopify-section-{{section.id}} .image-hotspot__hotspot__point {
+    background-color: {{marker_default_background}};
+  }
+
+  #shopify-section-{{section.id}} .image-hotspot__hotspot__point svg path {
+    stroke: {{marker_icon_color}};
+  }
+
+  #shopify-section-{{section.id}} .image-hotspot__hotspot.active .image-hotspot__hotspot__point {
+    background-color: {{marker_selected_background}};
+  }
+
+  #shopify-section-{{section.id}} .image-hotspot__hotspot.active .image-hotspot__hotspot__point svg path {
+    stroke: {{marker_selected_icon_color}};
+  }
+
+  #shopify-section-{{section.id}} .image-hotspot__hotspot__info-box {
+    background-color: {{card_background_color}};
+    color: {{text_color}};
+    border-radius: {{settings.border_radius}}px;
+  }
+
+  #shopify-section-{{section.id}} .image-hotspot__hotspot__info-box__title {
+    font-size: {{16 | times: card_font_size_scale |  divided_by: 100.0 | round}}px;
+    line-height: {{19.6 | times: card_font_size_scale |  divided_by: 100.0 | round}}px;
+    color: {{text_color}};
+  }
+
+  #shopify-section-{{section.id}} .image-hotspot__hotspot__info-box__price {
+    font-size: {{16 | times: card_font_size_scale |  divided_by: 100.0 | round}}px;
+    line-height: {{20 | times: card_font_size_scale |  divided_by: 100.0 | round}}px;
+    color: {{text_color}};
+  }
+
+  {%- case content_alignment -%}
+    {%- when 'left' -%}
+      #shopify-section-{{section.id}} .image-hotspot__hotspot__info-box {
+        text-align: left;
+      }
+    {%- when 'center' -%}
+      #shopify-section-{{section.id}} .image-hotspot__hotspot__info-box {
+        text-align: center;
+      }
+    {%- when 'right' -%}
+      #shopify-section-{{section.id}} .image-hotspot__hotspot__info-box {
+        text-align: right;
+      }
+  {%- endcase -%}
+
+    @media only screen and (min-width: 769px) {
+      #shopify-section-{{section.id}} {
+        margin: {{top_margin}}px auto {{bottom_margin}}px;
+      }
+
+      #shopify-section-{{section.id}} .image-hotspot__hotspot__point {
+        background-color: {{marker_default_background}};
+      }
+
+      #shopify-section-{{section.id}} .image-hotspot--inner {
+        padding-bottom: {{aspect_ratio_desktop}}%;
+      }
+
+      #shopify-section-{{section.id}} .image-hotspot__hotspot:hover .image-hotspot__hotspot__point {
+        background-color: {{marker_selected_background}};
+      }
+
+      #shopify-section-{{section.id}} .image-hotspot__hotspot:hover .image-hotspot__hotspot__point svg path {
+        stroke: {{marker_selected_icon_color}};
+      }
+
+      #shopify-section-{{section.id}} .image-hotspot__background-image {
+        display: block;
+      }
+
+      #shopify-section-{{section.id}} .image-hotspot__background-image--mobile {
+        display: none;
+      }
+
+      #shopify-section-{{section.id}} .image-hotspot__background-image {
+        object-position: {{desktop_focal_x_point}}% {{desktop_focal_y_point}}%;
+      }
+    }
+{% endstyle %}
+
+<div class="image-hotspot--inner">
+  <div class="image-hotspot__content">
+    {%- for block in section.blocks -%}
+      {% liquid
+        assign product = block.settings.product
+        assign desktop_top_position = block.settings.desktop_vertical_position
+        assign desktop_left_position = block.settings.desktop_horizontal_position
+        assign mobile_top_position = block.settings.mobile_vertical_position
+        assign mobile_left_position = block.settings.mobile_horizontal_position
+      %}
+
+      {% style %}
+        #block-{{block.id}} {
+          top: {{mobile_top_position}}%;
+          left: {{mobile_left_position}}%;
+          {% if mobile_left_position >= 96 and mobile_top_position < 96 %}
+            transform: translateX(-100%);
+          {% endif %}
+          {% if mobile_left_position < 96 and mobile_top_position >= 96 %}
+            transform: translateY(-100%);
+          {% endif %}
+          {% if mobile_left_position >= 96 and mobile_top_position >= 96 %}
+            transform: translate(-100%, -100%);
+          {% endif %}
+        }
+
+        #block-{{block.id}} .image-hotspot__hotspot__info-box {
+          {% if mobile_top_position <= 40 and mobile_left_position <= 20 %}
+              transform: translate(25%, 5%);
+            {% endif %}
+
+            {% if mobile_top_position <= 20 and mobile_left_position >= 80 %}
+              transform: translate(-105%, 5%);
+            {% endif %}
+
+            {% if mobile_top_position > 20 and desktop_top_position <= 80 and mobile_left_position >= 80 %}
+              transform: translate(-105%, -90%);
+            {% endif %}
+
+            {% if mobile_top_position >= 80 and mobile_left_position >= 80 %}
+              transform: translate(-105%, -90%);
+            {% endif %}
+
+            {% if mobile_top_position >= 80 and mobile_left_position <= 20 or mobile_left_position <= 80  %}
+              transform: translate(25%, -90%);
+            {% endif %}
+
+            {% if mobile_top_position <= 50 and mobile_left_position >= 80 and mobile_left_position < 20  %}
+              transform: translate(25%, -90%);
+            {% endif %}
+            {% if mobile_top_position <= 50 and mobile_left_position >= 80 and mobile_left_position < 80  %}
+              transform: translate(25%, -90%);
+            {% endif %}
+
+            {% if mobile_top_position < 80 and mobile_top_position > 40 and mobile_left_position > 20 and mobile_left_position < 80  %}
+              transform: translate(25%, -90%);
+            {% endif %}
+
+            {% if mobile_top_position < 80 and mobile_top_position > 40 and mobile_left_position <= 20  %}
+              transform: translate(25%, -90%);
+            {% endif %}
+
+            {% if mobile_top_position < 40 and mobile_left_position > 20 and mobile_left_position < 80  %}
+              transform: translate(25%, 5%);
+            {% endif %}
+        }
+
+        @media only screen and (min-width: 769px) {
+          #block-{{block.id}} {
+            top: {{desktop_top_position}}%;
+            left: {{desktop_left_position}}%;
+            {% if desktop_left_position >= 96 and desktop_top_position < 96 %}
+              transform: translateX(-100%);
+            {% endif %}
+            {% if desktop_left_position < 96 and desktop_top_position >= 96 %}
+              transform: translateY(-100%);
+            {% endif %}
+            {% if desktop_left_position >= 96 and desktop_top_position >= 96 %}
+              transform: translate(-100%, -100%);
+            {% endif %}
+          }
+
+          #block-{{block.id}} .image-hotspot__hotspot__info-box {
+            {% if desktop_top_position <= 40 and desktop_left_position <= 20 %}
+              transform: translate(25%, 5%);
+            {% endif %}
+
+            {% if desktop_top_position <= 20 and desktop_left_position >= 80 %}
+              transform: translate(-105%, 5%);
+            {% endif %}
+
+            {% if desktop_top_position > 20 and desktop_top_position <= 80 and desktop_left_position >= 80 %}
+              transform: translate(-105%, -90%);
+            {% endif %}
+
+            {% if desktop_top_position >= 80 and desktop_left_position >= 80 %}
+              transform: translate(-105%, -90%);
+            {% endif %}
+
+            {% if desktop_top_position >= 80 and desktop_left_position <= 20 or desktop_left_position <= 80  %}
+              transform: translate(25%, -90%);
+            {% endif %}
+
+            {% if desktop_top_position <= 50 and desktop_left_position >= 80 and desktop_left_position < 20  %}
+              transform: translate(25%, -90%);
+            {% endif %}
+            {% if desktop_top_position <= 50 and desktop_left_position >= 80 and desktop_left_position < 80  %}
+              transform: translate(25%, -90%);
+            {% endif %}
+
+            {% if desktop_top_position < 80 and desktop_top_position > 40 and desktop_left_position > 20 and desktop_left_position < 80  %}
+              transform: translate(25%, -90%);
+            {% endif %}
+
+            {% if desktop_top_position < 80 and desktop_top_position > 40 and desktop_left_position <= 20  %}
+              transform: translate(25%, -90%);
+            {% endif %}
+
+            {% if desktop_top_position < 40 and desktop_left_position > 20 and desktop_left_position < 80  %}
+              transform: translate(25%, 5%);
+            {% endif %}
+          }
+        }
+      {% endstyle %}
+
+      <product-hotspot class="image-hotspot__hotspot" id="block-{{block.id}}">
+        <div class="image-hotspot__hotspot__point">
+          {% render 'icon_v2', icon: 'plus' %}
+        </div>
+        {% if product != blank %}
+          <div class="image-hotspot__hotspot__info-box">
+            {%- assign card_id = block.id -%}
+            {%- assign image_sizes = '150px' -%}
+            <style>
+              #product-card-{{card_id}}.image-hotspot__hotspot__info-box--wrapper a > div.product-card__content {
+                padding: 16px 0 0;
+              }
+              #product-card-{{card_id}}.image-hotspot__hotspot__info-box--wrapper .product-card__image {
+                border-radius: {{settings.border_radius}}px;
+                overflow: hidden;
+              }
+            </style>
+            {% render 'product-card_v2',
+              product: product,
+              class: 'image-hotspot__hotspot__info-box--wrapper',
+              card_background_color: card_background_color,
+              show_title: display_title,
+              name_color: text_color,
+              name_font_size_scale: card_font_size_scale,
+              show_price: display_price,
+              price_color: text_color,
+              price_font_size_scale: card_font_size_scale,
+              alignment: content_alignment,
+              id: card_id,
+              image_sizes: image_sizes,
+              fetchpriority: 'auto',
+              loading: 'lazy',
+              badge_limit: 1
+            %}
+          </div>
+        {% endif %}
+      </product-hotspot>
+    {%- endfor -%}
+  </div>
+
+  {% if desktop_image != blank %}
+    {% render 'responsive-image-dynamic_v2',
+      srcset: '320, 480, 768, 992, 1024, 1220, 1440',
+      image: desktop_image,
+      loading: 'lazy',
+      class: 'image-hotspot__background-image'
+    %}
+  {%- else -%}
+    {{ 'lifestyle-2' | placeholder_svg_tag: 'image-hotspot__background-image svg-placeholder' }}
+  {% endif %}
+
+  {% if mobile_image != blank %}
+    {% render 'responsive-image-dynamic_v2',
+      srcset: '320, 480, 576, 768',
+      sizes: 'calc(100vw - 32px)',
+      image: mobile_image,
+      class: 'image-hotspot__background-image--mobile'
+    %}
+  {% elsif desktop_image != blank %}
+    {% render 'responsive-image-dynamic_v2',
+      srcset: '320, 480, 576, 768',
+      sizes: 'calc(100vw - 32px)',
+      image: desktop_image,
+      class: 'image-hotspot__background-image--mobile'
+    %}
+  {%- else -%}
+    {{ 'collection-1' | placeholder_svg_tag: 'image-hotspot__background-image--mobile svg-placeholder' }}
+  {% endif %}
+</div>
+
+{% javascript %}
+    class ProductHotspot extends HTMLElement {
+      constructor() {
+        super();
+        this.wrapper = this.closest('.image-hotspot__content')
+      }
+
+      initHotspotListener() {
+        document.addEventListener('click', ({target})=>{
+          if (!target.closest('.image-hotspot')) {
+            if(this.wrapper.querySelector('product-hotspot.active')) {
+              this.wrapper.querySelector('product-hotspot.active').classList.remove('active')
+            }
+          }
+        })
+
+        if (this.wrapper) {
+          this.wrapper.addEventListener('click', ({target})=>{
+            if (window.innerWidth < 1024) {
+              if(target === this.wrapper) {
+                if(this.wrapper.querySelector('product-hotspot.active')) {
+                  this.wrapper.querySelector('product-hotspot.active').classList.remove('active')
+                }
+              }
+            }
+          })
+        }
+
+        this.addEventListener('click', ({currentTarget})=>{
+          if (window.innerWidth < 1024) {
+            const activeHotspot = this.closest('.image-hotspot__content').querySelector('product-hotspot.active')
+            if (activeHotspot && activeHotspot === currentTarget) {
+              this.classList.remove('active');
+            } else {
+              this.classList.add('active');
+            }
+
+            if (activeHotspot) {
+              activeHotspot.classList.remove('active')
+            }
+          }
+        })
+      }
+      
+      connectedCallback() {
+        document.addEventListener("DOMContentLoaded", ()=>{
+          this.initHotspotListener();
+        })
+      }
+  }
+
+  if (customElements.get('product-hotspot') === undefined) {
+    customElements.define("product-hotspot", ProductHotspot);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Image with hotspots",
+  "class": "image-hotspot container",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Tag your products directly on an image in order to send the user through to a product page. If you do not provide a mobile image, this section will default to your desktop image and hotspots for mobile resolutions. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+    },
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop image"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile image"
+    },
+    {
+      "type": "header",
+      "content": "Marker",
+      "info": "Customize the look and feel of your hotspot marker."
+    },
+    {
+      "type": "color",
+      "id": "marker_default_background",
+      "label": "Background color"
+    },
+    {
+      "type": "color",
+      "id": "marker_selected_background",
+      "label": "Selected background color"
+    },
+    {
+      "type": "color",
+      "id": "marker_icon_color",
+      "label": "Icon color"
+    },
+    {
+      "type": "color",
+      "id": "marker_selected_icon_color",
+      "label": "Selected icon color"
+    },
+    {
+      "type": "header",
+      "content": "Card",
+      "info": "Customize the look, layout and feel of your hotspot card."
+    },
+    {
+      "type": "text_alignment",
+      "id": "content_alignment",
+      "label": "Content alignment",
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "display_title",
+      "label": "Display title",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "display_price",
+      "label": "Display price",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "card_background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color"
+    },
+    {
+      "type": "range",
+      "id": "card_font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Personalize the background of your section to match your brand. "
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth_background",
+      "label": "Fullwidth background",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Section padding",
+      "info": "Add spacing above and below inside your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "bottom_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 24
+    },
+    {
+        "type": "header",
+        "content": "Section margin",
+        "info": "Add spacing above and below your new section."
+    },
+    {
+        "type": "range",
+        "id": "top_margin",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Top margin",
+        "default": 0
+    },
+    {
+        "type": "range",
+        "id": "bottom_margin",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Bottom margin",
+        "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Product hotspot",
+      "type": "hotspot",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Add a product to be tagged on the main image, then amend the position of the hotspot on desktop and mobile individually. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "header",
+          "content": "Desktop position",
+          "info": "Input the position of your hotspot on desktop resolutions."
+        },
+        {
+          "type": "range",
+          "id": "desktop_vertical_position",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Vertical position",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "desktop_horizontal_position",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Horizontal position",
+          "default": 50
+        },
+        {
+          "type": "header",
+          "content": "Mobile position",
+          "info": "Input the position of your hotspot on mobile resolutions."
+        },
+        {
+          "type": "range",
+          "id": "mobile_vertical_position",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Vertical position",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "mobile_horizontal_position",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Horizontal position",
+          "default": 50
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+        "name": "Image with hotspots",
+        "settings": {
+          "marker_default_background": "",
+          "marker_selected_background": "",
+          "marker_icon_color": "",
+          "marker_selected_icon_color": "",
+          "content_alignment": "left",
+          "display_title": true,
+          "display_price": true,
+          "card_background_color": "",
+          "text_color": "",
+          "card_font_size_scale": 100,
+          "top_margin": 40,
+          "bottom_margin": 40
+        },
+        "blocks": [
+          {
+            "type": "hotspot",
+            "settings": {
+              "product": "",
+              "desktop_vertical_position": 18,
+              "desktop_horizontal_position": 28,
+              "mobile_vertical_position": 28,
+              "mobile_horizontal_position": 24
+          }
+          },
+          {
+            "type": "hotspot",
+            "settings": {
+              "product": "",
+              "desktop_vertical_position": 79,
+              "desktop_horizontal_position": 59,
+              "mobile_vertical_position": 64,
+              "mobile_horizontal_position": 28
+            }
+          },
+          {
+            "type": "hotspot",
+            "settings": {
+              "product": "",
+              "desktop_vertical_position": 46,
+              "desktop_horizontal_position": 80,
+              "mobile_vertical_position": 47,
+              "mobile_horizontal_position": 63
+            }
+          }
+        ]
+    }
+  ]
+}
+{% endschema %}

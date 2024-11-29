@@ -1,0 +1,185 @@
+{% comment %}
+  This Liquid snippet is used to render a customizable paragraph block with responsive typography, alignment, and visibility settings.
+
+  Parameters:
+  - `text`: The paragraph text to display; defaults to `block.settings.text`.
+  - `font_size_scale`: Scale factor for font size; defaults to `block.settings.font_size_scale` or `100`.
+  - `color`: Custom color for the paragraph; defaults to `block.settings.color`.
+  - `default_color`: Fallback color if `color` is not specified; defaults to `settings.paragraph_color`.
+  - `max_width`: Maximum width of the paragraph block; defaults to `block.settings.max_width`.
+  - `visible_on_desktop`: Boolean indicating if the paragraph should be visible on desktop; defaults to `block.settings.visible_on_desktop`.
+  - `visible_on_mobile`: Boolean indicating if the paragraph should be visible on mobile; defaults to `block.settings.visible_on_mobile`.
+  - `block_id`: Unique identifier for the block; defaults to `block.id`.
+  - `margin_top`: Top margin for the paragraph; defaults to `block.settings.margin_top` or `0`.
+  - `margin_bottom`: Bottom margin for the paragraph; defaults to `block.settings.margin_bottom` or `0`.
+  - `max_rows`: Maximum number of lines to display before truncating the text (optional).
+  - `top_padding`: Top padding for the paragraph; defaults to `block.settings.top_padding` or `0`.
+  - `bottom_padding`: Bottom padding for the paragraph; defaults to `block.settings.bottom_padding` or `0`.
+  - `content_alignment`: Text alignment for desktop view; defaults to `block.settings.content_alignment` or `inherit`.
+  - `content_alignment_mobile`: Text alignment for mobile view; defaults to `block.settings.content_alignment_mobile` or `inherit`.
+  - `default_font_size_mobile`: Default font size for mobile, typically set to `16px`.
+  - `default_font_size_desktop`: Default font size for desktop, typically set to `16px`.
+  - `global_setting_font_size_scale`: Global font size scale for paragraphs; defaults to `settings.paragraph_font_size_scale` or `100`.
+  - `global_setting_line_height_scale`: Global line height scale for paragraphs; defaults to `settings.paragraph_line_spacing_scale` or `100`.
+
+  Logic:
+  - Determines font size and line height based on global settings and the specified font size scale.
+  - Applies custom styles for desktop and mobile views, including alignment, color, and visibility.
+  - Truncates text if `max_rows` is set, using CSS for multi-line ellipsis.
+
+  Usage:
+  - Use this snippet to add a responsive, customizable paragraph block in your Liquid template.
+  - Ensure that all required settings are correctly passed in to achieve the desired appearance.
+
+{% endcomment %}
+
+{% liquid
+  assign default_color = default_color | default: settings.paragraph_color
+  assign text = text | default: block.settings.text
+  assign font_size_scale = font_size_scale | default: block.settings.font_size_scale | default: 100
+  assign color = color | default: block.settings.color
+
+  if color == blank or color.alpha == 0.0
+    assign color = default_color
+  endif
+
+  assign max_width = max_width | default: block.settings.max_width
+  assign visible_on_desktop = visible_on_desktop | default: block.settings.visible_on_desktop
+  assign visible_on_mobile = visible_on_mobile | default: block.settings.visible_on_mobile
+  assign block_id = block_id | default: block.id
+  assign margin_top = margin_top | default: block.settings.margin_top | default: 0
+  assign margin_bottom = margin_bottom | default: block.settings.margin_bottom | default: 0
+  assign max_rows = max_rows | times: 1
+
+  assign top_padding = top_padding | default: block.settings.top_padding | default: 0
+  assign bottom_padding = bottom_padding | default: block.settings.bottom_padding | default: 0
+
+  assign content_alignment = content_alignment | default: block.settings.content_alignment | default: 'inherit'
+  assign content_alignment_mobile = content_alignment_mobile | default: block.settings.content_alignment_mobile | default: 'inherit'
+
+  assign default_font_size_mobile = default_font_size_mobile | default: 16
+  assign default_font_size_desktop = default_font_size_desktop | default: 16
+  assign global_setting_font_size_scale = settings.paragraph_font_size_scale | default: 100
+  assign global_setting_line_height_scale = settings.paragraph_line_spacing_scale | default: 100
+
+  assign font_size = default_font_size_mobile | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round
+  assign font_size_desktop = default_font_size_desktop | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round
+
+  assign line_height = font_size | times: 160 | divided_by: 100.0 | round | times: global_setting_line_height_scale | divided_by: 100.0 | round
+  assign line_height_desktop = font_size_desktop | times: 160 | divided_by: 100.0 | round | times: global_setting_line_height_scale | divided_by: 100.0 | round
+%}
+
+{%- if text != blank -%}
+  {% style %}
+    .block__paragraph.block-{{block_id}} {
+        font-family: {{ settings.paragraph_font.family }}, {{ settings.paragraph_font.fallback_families }};
+        color: {% if color.alpha and color.alpha != 0.0 %}{{color}}{% else %}{{settings.paragraph_color}}{% endif %};
+        font-size: {{font_size}}px;
+        line-height: {{line_height}}px;
+        font-weight: {{ settings.paragraph_font.weight }};
+        margin: {{margin_top}}px 0 {{margin_bottom}}px;
+        padding: {{top_padding}}px 0 {{bottom_padding}}px;
+        text-align: {{content_alignment_mobile}};
+        {%- case content_alignment_mobile -%}
+            {%- when "center" -%}
+                margin-left: auto;
+                margin-right: auto;
+                text-align: center;
+            {%- when "middle" -%}
+                margin-left: auto;
+                margin-right: auto;
+                text-align: center;
+            {%- when "left" -%}
+                margin-left: 0;
+                margin-right: auto;
+                text-align: left;
+            {%- when "right" -%}
+                margin-left: auto;
+                margin-right: 0;
+                text-align: right;
+        {%- endcase -%}
+        word-break: break-word;
+        {% if max_rows != 0 %}
+            height: {{line_height_desktop |  times: max_rows }}px;
+            text-overflow: -o-ellipsis-lastline;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: {{ max_rows }};
+            overflow: hidden;
+        {% endif %}
+    }
+
+    {% if visible_on_mobile %}
+        .block__paragraph.block-{{block_id}} {
+            display: block;
+            {% if max_rows != 0 %}
+                display: -webkit-box;
+            {% endif %}
+        }
+    {% else %}
+    .block__paragraph.block-{{block_id}} {
+            display: none;
+        }
+    {% endif %}
+
+    @media only screen and (min-width: 769px) {
+        .block__paragraph.block-{{block_id}} {
+            font-size: {{font_size_desktop}}px;
+            line-height: {{line_height_desktop}}px;
+            text-align: {{content_alignment}};
+            {%- case content_alignment -%}
+                {%- when "center" -%}
+                    margin-left: auto;
+                    margin-right: auto;
+                    text-align: center;
+                {%- when "middle" -%}
+                    margin-left: auto;
+                    margin-right: auto;
+                    text-align: center;
+                {%- when "left" -%}
+                    margin-left: 0;
+                    margin-right: auto;
+                    text-align: left;
+                {%- when "right" -%}
+                    margin-left: auto;
+                    margin-right: 0;
+                    text-align: right;
+            {%- endcase -%}
+            {% if max_rows != 0 %}
+                height: {{line_height_desktop |  times: max_rows }}px;
+                text-overflow: -o-ellipsis-lastline;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: {{ max_rows }};
+                overflow: hidden;
+            {% endif %}
+        }
+
+        {% if max_width != blank and max_width > 0 %}
+            .block__paragraph.block-{{block_id}} {
+                max-width: {{max_width}}px;
+            }
+        {% endif %}
+
+        {% if visible_on_desktop %}
+            .block__paragraph.block-{{block_id}} {
+                display: block;
+                {% if max_rows != 0 %}
+                    display: -webkit-box;
+                {% endif %}
+            }
+        {% else %}
+            .block__paragraph.block-{{block_id}} {
+                display: none;
+            }
+        {% endif %}
+    }
+  {% endstyle %}
+
+  <div
+    class="block__paragraph inherit-inner-content block-{{block_id}}"
+    aria-label="{{'accessibility.general.description' | t}}"
+  >
+    {{ text }}
+  </div>
+{%- endif -%}

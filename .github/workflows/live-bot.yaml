@@ -1,0 +1,73 @@
+name: Auto Create and Merge PR from Live to Develop
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - live
+# Add bot as author
+
+jobs:
+  check_author:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Live Branch
+        uses: actions/checkout@v4
+        with:
+          ref: live
+
+      - name: Check commit author
+        id: check_author
+        run: |
+          COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')  
+          echo "Commit author is $COMMIT_AUTHOR"
+          echo "commit_author=$COMMIT_AUTHOR" >> $GITHUB_OUTPUT
+
+      - name: Trigger if author is allowed
+        if: steps.check_author.outputs.commit_author == 'shopify[bot]'  # Condition to check author
+        run: echo "Running job because the commit author is allowed."
+
+      - name: Trigger if author is not allowed
+        if: steps.check_author.outputs.commit_author != 'shopify[bot]'  # Condition to check author
+        run: |
+          echo "Running job because the commit author is not allowed."
+          exit 1
+
+  create_pr:
+    runs-on: ubuntu-latest
+    if: ${{ always() && contains(join(needs.*.result, ','), 'success') }}
+    needs: [check_author]  
+    steps:
+      - name: Checkout Live Branch
+        uses: actions/checkout@v4
+
+      - name: create pull request
+        run: gh pr create -B develop -H live --title 'Merge live into develop' --body 'Created by Github action'
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  check_conflicts:
+    runs-on: ubuntu-latest
+    if: ${{ always() && contains(join(needs.*.result, ','), 'success') }}
+    needs: [create_pr]  
+    steps:
+      - name: Checkout Live Branch
+        uses: actions/checkout@v4
+
+      - name: check pull request
+        run: gh pr view --json mergeable
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}      
+
+  merge_pr:
+    runs-on: ubuntu-latest
+    if: ${{ always() && contains(join(needs.*.result, ','), 'success') }}
+    needs: [check_conflicts]  
+    steps:
+      - name: Checkout Live Branch
+        uses: actions/checkout@v4
+
+      - name: check pull request
+        run: gh pr merge --merge
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}                    

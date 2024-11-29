@@ -1,0 +1,305 @@
+{%- case icon -%}
+  {%- when 'globe' -%}
+    <svg
+      class="{{ class }}"
+
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+    >
+      <path d="M9.99984 18.3332C14.6022 18.3332 18.3332 14.6022 18.3332 9.99984C18.3332 5.39746 14.6022 1.6665 9.99984 1.6665C5.39746 1.6665 1.6665 5.39746 1.6665 9.99984C1.6665 14.6022 5.39746 18.3332 9.99984 18.3332Z" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6.66667 2.5H7.5C5.875 7.36667 5.875 12.6333 7.5 17.5H6.66667" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12.5 2.5C14.125 7.36667 14.125 12.6333 12.5 17.5" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M2.5 13.3333V12.5C7.36667 14.125 12.6333 14.125 17.5 12.5V13.3333" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M2.5 7.5C7.36667 5.875 12.6333 5.875 17.5 7.5" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    {%- break -%}
+  {%- when 'close' -%}
+    <svg
+      class="{{ class }}"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M13.5907 12L21 4.59075L19.4093 3L12 10.4093L4.59075 3L3 4.59075L10.4093 12L3 19.4093L4.59075 21L12 13.5907L19.4093 21L21 19.4093L13.5907 12Z" fill="white"/>
+    </svg>
+    {%- break -%}
+  {%- when 'customer' -%}
+    <svg
+      class="{{ class }}"
+
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M15.8337 17.5V15.8333C15.8337 14.9493 15.4825 14.1014 14.8573 13.4763C14.2322 12.8512 13.3844 12.5 12.5003 12.5H7.50033C6.61627 12.5 5.76842 12.8512 5.1433 13.4763C4.51818 14.1014 4.16699 14.9493 4.16699 15.8333V17.5" stroke="#0A0300" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"/>
+      <path d="M10.0003 9.16667C11.8413 9.16667 13.3337 7.67428 13.3337 5.83333C13.3337 3.99238 11.8413 2.5 10.0003 2.5C8.15938 2.5 6.66699 3.99238 6.66699 5.83333C6.66699 7.67428 8.15938 9.16667 10.0003 9.16667Z" stroke="#0A0300" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    {%- break -%}
+  {%- when 'wishlist' -%}
+    <svg
+      class="{{ class }}"
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M15.8337 11.6667C17.0753 10.45 18.3337 8.99167 18.3337 7.08333C18.3337 5.86776 17.8508 4.70197 16.9912 3.84243C16.1317 2.98289 14.9659 2.5 13.7503 2.5C12.2837 2.5 11.2503 2.91667 10.0003 4.16667C8.75033 2.91667 7.71699 2.5 6.25033 2.5C5.03475 2.5 3.86896 2.98289 3.00942 3.84243C2.14988 4.70197 1.66699 5.86776 1.66699 7.08333C1.66699 9 2.91699 10.4583 4.16699 11.6667L10.0003 17.5L15.8337 11.6667Z" stroke="#0A0300" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    {%- break -%}
+  {%- when 'caret-down' -%}
+    <svg
+      class="{{ class }}"
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M3 4.5L6 7.5L9 4.5" stroke="#848180" stroke-linecap="square" stroke-linejoin="round"/>
+    </svg>
+    {%- break -%}
+  {%- when 'cart' -%}
+    <svg
+      class="{{ class }}"
+
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g clip-path="url(#clip0_508_195)">
+      <path d="M6.66634 18.3334C7.12658 18.3334 7.49967 17.9603 7.49967 17.5001C7.49967 17.0398 7.12658 16.6667 6.66634 16.6667C6.2061 16.6667 5.83301 17.0398 5.83301 17.5001C5.83301 17.9603 6.2061 18.3334 6.66634 18.3334Z" stroke="#0A0300" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M15.8333 18.3334C16.2936 18.3334 16.6667 17.9603 16.6667 17.5001C16.6667 17.0398 16.2936 16.6667 15.8333 16.6667C15.3731 16.6667 15 17.0398 15 17.5001C15 17.9603 15.3731 18.3334 15.8333 18.3334Z" stroke="#0A0300" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M1.70801 1.70825H3.37467L5.59134 12.0583C5.67266 12.4373 5.88357 12.7761 6.18777 13.0165C6.49197 13.2568 6.87043 13.3835 7.25801 13.3749H15.408C15.7873 13.3743 16.1551 13.2443 16.4505 13.0064C16.746 12.7686 16.9515 12.437 17.033 12.0666L18.408 5.87492H4.26634" stroke="#0A0300" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"/>
+      </g>
+      <defs>
+      <clipPath id="clip0_508_195">
+      <rect width="20" height="20" fill="white"/>
+      </clipPath>
+      </defs>
+    </svg>
+    {%- break -%}
+  {%- when 'menu' -%}
+    <svg
+      class="{{ class }}"
+
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M20 12L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"/>
+      <path d="M20 6L4 6" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"/>
+      <path d="M20 18L4 18" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"/>
+    </svg>
+    {%- break -%}
+  {%- when 'arrow-left' -%}
+    <svg
+      width="44"
+      height="44"
+      viewBox="0 0 44 44"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect width="44" height="44" rx="8" transform="matrix(-1 0 0 1 44 0)" fill="#E6E6E6"/>
+      <path d="M29.707 23.2071L18.121 23.2071L22.621 27.7071L21.207 29.1211L14.293 22.2071L21.207 15.2931L22.621 16.7071L18.121 21.2071L29.707 21.2071V23.2071Z" fill="#0A0300"/>
+    </svg>
+    {%- break -%}
+  {%- when 'search' -%}
+    <svg
+      class="{{ class }}"
+
+      width="44"
+      height="44"
+      viewBox="0 0 44 44"
+
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect width="44" height="44" rx="6" fill="#FF4C01"/>
+      <path d="M21.1667 27.8333C24.8486 27.8333 27.8333 24.8486 27.8333 21.1667C27.8333 17.4848 24.8486 14.5 21.1667 14.5C17.4848 14.5 14.5 17.4848 14.5 21.1667C14.5 24.8486 17.4848 27.8333 21.1667 27.8333Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M29.4998 29.5001L25.9165 25.9167" stroke="white" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"/>
+    </svg>
+    {%- break -%}
+  {%- when 'navigation-expand' -%}
+    <svg
+      class="{{ class }}"
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g opacity="0.5">
+      <path d="M4.5 3L7.5 6L4.5 9" stroke="#0A0300" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"/>
+      </g>
+    </svg>
+    {%- break -%}
+  {%- when 'expand' -%}
+    <svg
+      class="{{ class }}"
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M5 7.5L10 12.5L15 7.5" stroke="white" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"/>
+    </svg>
+    {%- break -%}
+  {%- when 'email' -%}
+    <svg
+      class="{{ class }}"
+
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M20 4H4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M22 7L13.03 12.7C12.7213 12.8934 12.3643 12.996 12 12.996C11.6357 12.996 11.2787 12.8934 10.97 12.7L2 7" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    {%- break -%}
+  {%- when 'location' -%}
+    <svg
+      class="{{ class }}"
+
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M20 10C20 14.993 14.461 20.193 12.601 21.799C12.4277 21.9293 12.2168 21.9998 12 21.9998C11.7832 21.9998 11.5723 21.9293 11.399 21.799C9.539 20.193 4 14.993 4 10C4 7.87827 4.84285 5.84344 6.34315 4.34315C7.84344 2.84285 9.87827 2 12 2C14.1217 2 16.1566 2.84285 17.6569 4.34315C19.1571 5.84344 20 7.87827 20 10Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    {%- break -%}
+  {%- when 'select-arrow' -%}
+    <svg
+      class="{{ class }}"
+
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M3 4.5L6 7.5L9 4.5" stroke="#848180" stroke-linecap="square" stroke-linejoin="round"/>
+    </svg>
+    {%- break -%}
+  {%- when 'subscribe' -%}
+    <svg
+      class="{{ class }}"
+
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M9.93507 2.50133C9.66108 2.51308 9.39561 2.59882 9.1675 2.74921L3.16825 6.70068L3.067 6.77329C2.89018 6.91206 2.74735 7.08848 2.64917 7.28939C2.551 7.4903 2.5 7.71052 2.5 7.93362V16.0181L2.50375 16.1292C2.53213 16.5021 2.7021 16.8505 2.97959 17.1047C3.25707 17.3589 3.62157 17.5001 4 17.5H16L16.1125 17.4963C16.4899 17.4683 16.8426 17.3003 17.0999 17.0262C17.3572 16.7521 17.5001 16.392 17.5 16.0181V7.93362L17.4948 7.81062C17.476 7.58823 17.4066 7.37291 17.2918 7.18072C17.177 6.98853 17.0197 6.82443 16.8317 6.70068L10.8317 2.74921C10.5581 2.5837 10.2589 2.48743 9.93507 2.50133ZM10.0001 4.64227L4.64299 7.85657L10.0001 11.0709L15.3573 7.85657L10.0001 4.64227Z" fill="white"/>
+    </svg>
+    {%- break -%}
+  {%- when 'tick' -%}
+    <svg
+      class="{{ class }}"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M6.65295 11.2826C6.5432 11.3164 6.43345 11.3332 6.3237 11.3332C6.21395 11.3332 6.1042 11.3164 5.99445 11.2826C5.8847 11.2405 5.78867 11.1773 5.70635 11.0932L3.33301 8.9079L4.5677 7.75841L6.3237 9.3753L11.4317 4.6665L12.6663 5.816L6.94105 11.0932C6.85873 11.1773 6.7627 11.2405 6.65295 11.2826Z" fill="#0A0300"/>
+    </svg>
+    {%- break -%}
+  {%- when 'checkbox' -%}
+    <svg
+      class="{{ class }}"
+      width="17"
+      height="16"
+      viewBox="0 0 17 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M7.15344 11.2828C7.04369 11.3166 6.93394 11.3334 6.82418 11.3334C6.71443 11.3334 6.60469 11.3166 6.49494 11.2828C6.38519 11.2408 6.28916 11.1776 6.20684 11.0935L3.8335 8.90815L5.06818 7.75865L6.82418 9.37554L11.9321 4.66675L13.1668 5.81624L7.44154 11.0935C7.35922 11.1776 7.26319 11.2408 7.15344 11.2828Z" fill="white"/>
+    </svg>
+    {%- break -%}
+  {%- when 'mega-close' -%}
+    <svg
+      class="{{ class }}"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M13.0605 12L18 7.0605L16.9395 6L12 10.9395L7.0605 6L6 7.0605L10.9395 12L6 16.9395L7.0605 18L12 13.0605L16.9395 18L18 16.9395L13.0605 12Z" fill="#0A0300"/>
+    </svg>
+    {%- break -%}
+  {%- when 'expand' -%}
+    <svg
+      class="{{ class }}"
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g opacity="0.5">
+      <path d="M4.5 3L7.5 6L4.5 9" stroke="#0A0300" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"/>
+      </g>
+    </svg>
+    {%- break -%}
+  {%- when 'arrow-right' -%}
+    <svg
+      class="{{ class }}"
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M13.586 8.64045L10.1896 5.24401L10.6608 4.77278L15.7153 9.82734L10.6608 14.8819L10.1896 14.4107L13.586 11.0142L14.4396 10.1607H13.2325L4.07745 10.1607L4.07745 9.49401L13.2325 9.49401H14.4396L13.586 8.64045Z" fill="#0A0300" stroke="#0A0300"/>
+    </svg>
+  {%- when 'arrow-left' -%}
+    <svg
+      class="{{ class }}"
+      width="44"
+      height="44"
+      viewBox="0 0 44 44"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect width="44" height="44" rx="8" transform="matrix(-1 0 0 1 44 0)" fill="#E6E6E6"/>
+      <path d="M29.707 23.2071L18.121 23.2071L22.621 27.7071L21.207 29.1211L14.293 22.2071L21.207 15.2931L22.621 16.7071L18.121 21.2071L29.707 21.2071V23.2071Z" fill="#0A0300"/>
+    </svg>
+    {%- break -%}
+  {%- when 'star_rating' -%}
+    <svg
+      class="{{ class }}"
+      width="208"
+      height="40"
+      viewBox="0 0 208 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect width="208" height="40" fill="white"/>
+      <path d="M20 5L24.2321 14.1751L34.2658 15.3647L26.8476 22.2249L28.8168 32.1353L20 27.2L11.1832 32.1353L13.1524 22.2249L5.73415 15.3647L15.7679 14.1751L20 5Z" fill="#FF4C01"/>
+      <path d="M62 5L66.2321 14.1751L76.2658 15.3647L68.8476 22.2249L70.8168 32.1353L62 27.2L53.1832 32.1353L55.1524 22.2249L47.7342 15.3647L57.7679 14.1751L62 5Z" fill="#FF4C01"/>
+      <path d="M104 5L108.232 14.1751L118.266 15.3647L110.848 22.2249L112.817 32.1353L104 27.2L95.1832 32.1353L97.1524 22.2249L89.7342 15.3647L99.7679 14.1751L104 5Z" fill="#FF4C01"/>
+      <path d="M146 5L150.232 14.1751L160.266 15.3647L152.848 22.2249L154.817 32.1353L146 27.2L137.183 32.1353L139.152 22.2249L131.734 15.3647L141.768 14.1751L146 5Z" fill="#FF4C01"/>
+      <path d="M188 5L192.232 14.1751L202.266 15.3647L194.848 22.2249L196.817 32.1353L188 27.2L179.183 32.1353L181.152 22.2249L173.734 15.3647L183.768 14.1751L188 5Z" fill="#FF4C01"/>
+    </svg>
+    {%- break -%}
+{%- endcase -%}

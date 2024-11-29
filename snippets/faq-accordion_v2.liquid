@@ -1,0 +1,186 @@
+{% liquid
+    assign title = title 
+    assign question_tag = question_tag | default: "h4"
+    assign content = content
+    assign icon = icon
+    assign icon_color = icon_color
+    assign custom_icon = custom_icon
+    assign width = width
+    assign id = id
+    assign show_icons = show_icons
+
+    if icon_color == blank or icon_color.alpha == 0.0
+        assign icon_color = settings.icon_color
+    endif
+
+    assign question_font_size_scale = question_font_size_scale | default: 100
+    assign answer_font_size_scale = answer_font_size_scale | default: 100
+    
+    assign default_font_size_mobile = default_font_size_mobile | default: 18
+    assign default_font_size_desktop = default_font_size_desktop | default: 18
+    
+    assign global_setting_font_size_scale = settings.heading_font_size_scale | default: 100
+    assign global_setting_line_height_scale = settings.heading_line_spacing_scale | default: 100
+
+    assign question_font_size_desktop = default_font_size_desktop | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: question_font_size_scale | divided_by: 100.0 | round
+    assign question_font_size_mobile = default_font_size_mobile | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: question_font_size_scale | divided_by: 100.0 | round
+    assign question_line_height_desktop = question_font_size_desktop | times: 150 |  divided_by: 100.0 | round | times: global_setting_line_height_scale |  divided_by: 100.0 | round 
+    assign question_line_height_mobile = question_font_size_mobile | times: 150 |  divided_by: 100.0 | round | times: global_setting_line_height_scale |  divided_by: 100.0 | round 
+
+    assign answer_font_size_desktop = 16 | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: answer_font_size_scale | divided_by: 100.0 | round
+    assign answer_font_size_mobile = 16 | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: answer_font_size_scale | divided_by: 100.0 | round
+    assign answer_line_height_desktop = answer_font_size_desktop | times: 160 |  divided_by: 100.0 | round | times: global_setting_line_height_scale |  divided_by: 100.0 | round 
+    assign answer_line_height_mobile = answer_font_size_mobile | times: 160 |  divided_by: 100.0 | round | times: global_setting_line_height_scale |  divided_by: 100.0 | round 
+%}
+
+{% style %}
+    #faq-accordion-{{id}} {
+        padding: 24px;
+        display: block;
+        cursor: pointer;
+    }
+
+    #faq-accordion-{{id}} .heading {
+        color: {{settings.heading_color}};
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    
+    #faq-accordion-{{id}} .heading .heading__title {
+        margin: 0;
+        font-size: {{question_font_size_mobile}}px;
+        line-height: {{question_line_height_mobile}}px;
+    }
+
+    #faq-accordion-{{id}} .heading .heading__icon {
+        width: {{width}}px;
+        height: {{width}}px;
+        margin-left: 10px;
+        flex: 0 0 auto;
+    }
+
+    #faq-accordion-{{id}} .heading .heading__icon svg,
+    #faq-accordion-{{id}} .heading .heading__icon img {
+        width: 100%;
+        height: 100%;
+    }
+    
+    #faq-accordion-{{id}} .content {
+        color: {{settings.paragraph_color}};
+        font-size: {{answer_font_size_mobile}}px;
+        line-height: {{answer_line_height_mobile}}px;
+        max-height: 0px;
+        height: auto;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        cursor: auto;
+    }
+
+    #faq-accordion-{{id}}.active .content {
+        max-height: 700px;
+        transition: all 0.8s ease;
+    }
+
+    #faq-accordion-{{id}} .content > *:first-child {
+        margin-top: 16px;
+    }
+    
+
+    {% if icon == "plus/minus" %}
+        #faq-accordion-{{id}} .heading__icon {
+            position: relative;
+        }
+
+        #faq-accordion-{{id}} .plus-icon,
+        #faq-accordion-{{id}} .minus-icon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #faq-accordion-{{id}} .plus-icon {
+            visibility: visible;
+            opacity: 1;
+            transition: all .3s ease;
+        }
+
+        #faq-accordion-{{id}} .minus-icon {
+            visibility: hidden;
+            opacity: 0;
+            transition: all .3s ease;
+        }
+
+        #faq-accordion-{{id}}.active .plus-icon {
+            visibility: hidden;
+            opacity: 0;
+            transition: all .3s ease;
+        }
+
+        #faq-accordion-{{id}}.active .minus-icon {
+            visibility: visible;
+            opacity: 1;
+            transition: all .3s ease;
+        }
+
+    {% endif %}
+
+    {% if icon == "chevron" %}
+        #faq-accordion-{{id}} .chevron-icon {
+            transform: rotate(0deg);
+            transition: all .3s ease;
+        }
+
+        #faq-accordion-{{id}}.active .chevron-icon {
+            transform: rotate(180deg);
+            transition: all .3s ease;
+        }
+    {% endif %}
+
+    @media only screen and (min-width: 768px) {
+        #faq-accordion-{{id}} {
+            padding: 40px;
+            display: block;
+        }
+
+        #faq-accordion-{{id}} .heading .heading__title {
+            font-size: {{question_font_size_desktop}}px;
+            line-height: {{question_line_height_desktop}}px;
+        }
+        
+        #faq-accordion-{{id}} .content {
+            font-size: {{answer_font_size_desktop}}px;
+            line-height: {{answer_line_height_desktop}}px;
+        }
+
+        #faq-accordion-{{id}} .content > *:first-child {
+            margin-top: 10px;
+        }
+    }
+{% endstyle %}
+
+<custom-accordion class="faq-accordion" id="faq-accordion-{{id}}" data-multi="{{multi_open}}">
+    <div class="heading">
+        <{{question_tag}} class="heading__title inherit-inner-content"> {{title}} </{{question_tag}}>
+        <span class="heading__icon">
+            {%- if show_icons and icon != blank or custom_icon != blank -%}
+                {%- if custom_icon != blank -%}
+					{% render 'responsive-image-dynamic_v2', image: custom_icon, width: 24, height: 24, crop: 'center' %}
+				{%- else -%}
+                    {%- if icon == 'plus/minus' -%}
+                        {% render 'icon_v2', icon: "plus", color: icon_color %}
+                        {% render 'icon_v2', icon: "minus", color: icon_color %}
+                    {%- else -%}
+                        {% render 'icon_v2', icon: icon, color: icon_color %}
+                    {%- endif -%}
+				{%- endif -%}
+            {%- endif -%}
+        </span>
+    </div>
+    <div class="content inherit-inner-content">
+        {{content}}
+    </div>
+</custom-accordion>

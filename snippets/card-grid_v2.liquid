@@ -1,0 +1,371 @@
+{% liquid
+  assign desktop_image = block.settings.desktop_image
+  assign mobile_image = block.settings.mobile_image
+
+  assign desktop_focal_x_point = desktop_image.presentation.focal_point.x
+  assign desktop_focal_y_point = desktop_image.presentation.focal_point.y
+  assign mobile_focal_x_point = mobile_image.presentation.focal_point.x
+  assign mobile_focal_y_point = mobile_image.presentation.focal_point.y
+
+  assign width = block.settings.width
+  assign height = block.settings.height
+  assign content_alignment = block.settings.content_alignment
+  assign horizontal_content_position = block.settings.horizontal_content_position
+  assign vertical_content_position = block.settings.vertical_content_position
+  assign content_max_width = block.settings.content_max_width
+
+  assign text = block.settings.text
+  assign tag = block.settings.tag
+  assign font_size_scale = block.settings.font_size_scale
+  assign color = block.settings.color
+  assign visible_on_desktop = block.settings.visible_on_desktop
+  assign visible_on_moble = block.settings.visible_on_moble
+
+  assign paragraph_text = block.settings.paragraph_text
+  assign paragraph_font_size_scale = block.settings.paragraph_font_size_scale
+  assign paragraph_color = block.settings.paragraph_color
+  assign paragraph_visible_on_desktop = block.settings.paragraph_visible_on_desktop
+  assign paragraph_visible_on_moble = block.settings.paragraph_visible_on_moble
+
+  assign primary_text = block.settings.primary_text
+  assign primary_link = block.settings.primary_link
+  assign primary_type = block.settings.primary_type
+  assign primary_text_color = block.settings.primary_text_color
+  assign primary_background_color = block.settings.primary_background_color
+  assign primary_border_color = block.settings.primary_border_color
+  assign primary_border_width = block.settings.primary_border_width
+  assign primary_button_border_radius = block.settings.primary_button_border_radius
+  assign primary_button_animation = block.settings.primary_button_animation
+  assign p_btn_visible_on_desktop = block.settings.p_btn_visible_on_desktop
+  assign p_btn_visible_on_moble = block.settings.p_btn_visible_on_moble
+
+  assign secondary_text = block.settings.secondary_text
+  assign secondary_link = block.settings.secondary_link
+  assign secondary_type = block.settings.secondary_type
+  assign secondary_text_color = block.settings.secondary_text_color
+  assign secondary_background_color = block.settings.secondary_background_color
+  assign secondary_border_color = block.settings.secondary_border_color
+  assign secondary_border_width = block.settings.secondary_border_width
+  assign secondary_button_border_radius = block.settings.secondary_button_border_radius
+  assign secondary_buttons_animation = block.settings.secondary_buttons_animation
+  assign s_btn_visible_on_desktop = block.settings.s_btn_visible_on_desktop
+  assign s_btn_visible_on_moble = block.settings.s_btn_visible_on_moble
+
+  assign columns = columns
+%}
+
+{% style %}
+  #block-{{block.id}} {
+      position: relative;
+      padding: 150px 20px;
+      border-radius: {{settings.border_radius}}px;
+      overflow: hidden;
+  }
+
+  .card-grid-block--inner {
+      display: flex;
+      height: 100%;
+  }
+
+  {%- case content_alignment -%}
+      {%- when "left" -%}
+          #block-{{block.id}} .card-grid-block__content {
+              text-align: left;
+          }
+
+          #block-{{block.id}} .card-grid-block__content .card-grid-block__content__buttons {
+              justify-content: flex-start;
+          }
+      {%- when "center" -%}
+          #block-{{block.id}} .card-grid-block__content {
+              text-align: center;
+          }
+
+          #block-{{block.id}} .card-grid-block__content .card-grid-block__content__buttons {
+              justify-content: center;
+          }
+      {%- when "right" -%}
+          #block-{{block.id}} .card-grid-block__content {
+              text-align: right;
+          }
+
+          #block-{{block.id}} .card-grid-block__content .card-grid-block__content__buttons {
+              justify-content: flex-end;
+          }
+  {%- endcase -%}
+
+  {%- case horizontal_content_position -%}
+      {%- when "left" -%}
+          #block-{{block.id}} .card-grid-block--inner {
+              justify-content: flex-start;
+          }
+      {%- when "center" -%}
+          #block-{{block.id}} .card-grid-block--inner {
+              justify-content: center;
+          }
+      {%- when "right" -%}
+          #block-{{block.id}} .card-grid-block--inner {
+              justify-content: flex-end;
+          }
+  {%- endcase -%}
+
+  {%- case vertical_content_position -%}
+      {%- when "top" -%}
+          #block-{{block.id}} {
+              padding-top: 20px;
+              padding-bottom: 170px;
+          }
+
+          #block-{{block.id}} .card-grid-block--inner {
+              align-items: flex-start;
+          }
+      {%- when "center" -%}
+          #block-{{block.id}} {
+              padding-top: 150px;
+              padding-bottom: 150px;
+          }
+
+          #block-{{block.id}} .card-grid-block--inner {
+              align-items: center;
+          }
+      {%- when "bottom" -%}
+          #block-{{block.id}} {
+              padding-top: 150px;
+              padding-bottom: 20px;
+          }
+          #block-{{block.id}} .card-grid-block--inner {
+              align-items: flex-end;
+          }
+  {%- endcase -%}
+
+  #block-{{block.id}} .card-grid-block__content {
+      position: relative;
+      z-index: 2;
+      {% if content_max_width > 0 %}
+          max-width: {{content_max_width}}px;
+      {% endif %}
+  }
+
+  .card-grid-block__content .block__title {
+      margin-bottom: 12px;
+  }
+
+  .card-grid-block__content .block__paragraph {
+      margin-bottom: 24px;
+  }
+
+  .card-grid-block__content .card-grid-block__content__buttons {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+  }
+
+  .card-grid-block__content .card-grid-block__content__buttons .block__button {
+      max-width: 154px;
+      width: 100%;
+  }
+
+  .card-grid-block__content .card-grid-block__content__buttons .block__button + style + .block__button {
+      margin-left: 8px;
+  }
+
+  .card-grid-block__backgound-images {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+  }
+
+  #block-{{block.id}} .card-grid-block__backgound-images__sorce {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+  }
+
+  {%- if mobile_image != blank -%}
+      #block-{{block.id}} .card-grid-block__backgound-images__sorce {
+          object-position: {{mobile_focal_x_point}}% {{mobile_focal_y_point}}%
+      }
+  {%- else -%}
+      #block-{{block.id}} .card-grid-block__backgound-images__sorce {
+          object-position: {{desktop_focal_x_point}}% {{desktop_focal_y_point}}%
+      }
+  {%- endif -%}
+
+  @media only screen and (min-width: 769px) {
+      #block-{{block.id}} {
+          padding: 100px 32px;
+          grid-column: span {{width | at_most: columns}};
+          grid-row: span {{height}};
+      }
+      {%- case vertical_content_position -%}
+          {%- when "top" -%}
+              #block-{{block.id}} {
+                  padding-top: 32px;
+                  padding-bottom: 168px;
+              }
+
+              #block-{{block.id}} .card-grid-block--inner {
+                  align-items: flex-start;
+              }
+          {%- when "center" -%}
+              #block-{{block.id}} {
+                  padding-top: 100px;
+                  padding-bottom: 100px;
+              }
+
+              #block-{{block.id}} .card-grid-block--inner {
+                  align-items: center;
+              }
+
+          {%- when "bottom" -%}
+              #block-{{block.id}} {
+                  padding-top: 168px;
+                  padding-bottom: 32px;
+              }
+              #block-{{block.id}} .card-grid-block--inner {
+                  align-items: flex-end;
+              }
+      {%- endcase -%}
+      .card-grid-block__content .block__title {
+          margin-bottom: 6px;
+      }
+
+      .card-grid-block__content .block__paragraph {
+          margin-bottom: 16px;
+      }
+
+      #block-{{block.id}} .card-grid-block__backgound-images__sorce {
+          object-position: {{desktop_focal_x_point}}% {{desktop_focal_y_point}}%;
+          background-color: {{settings.image_background_color}}
+      }
+  }
+{% endstyle %}
+
+<div class="card-grid-block" id="block-{{block.id}}">
+  <div class="card-grid-block--inner">
+    <div class="card-grid-block__content">
+      {%- if text != blank -%}
+        {%- assign title_block_id = 'title-' | append: block.id -%}
+        {% render 'title_v2',
+          text: text,
+          tag: tag,
+          font_size_scale: font_size_scale,
+          color: color,
+          visible_on_desktop: visible_on_desktop,
+          visible_on_mobile: visible_on_moble,
+          block_id: title_block_id,
+          default_color: settings.heading_color
+        %}
+      {%- endif -%}
+
+      {%- if paragraph_text != blank -%}
+        {%- assign paragraph_block_id = 'paragraph-' | append: block.id -%}
+        {% render 'paragraph_v2',
+          text: paragraph_text,
+          font_size_scale: paragraph_font_size_scale,
+          color: paragraph_color,
+          visible_on_desktop: paragraph_visible_on_desktop,
+          visible_on_mobile: paragraph_visible_on_moble,
+          block_id: paragraph_block_id,
+          default_color: settings.paragraph_color
+        %}
+      {%- endif -%}
+
+      <div class="card-grid-block__content__buttons">
+        {%- if primary_text != blank and primary_link != blank -%}
+          {%- assign primary_block_id = 'primary-btn-' | append: block.id -%}
+          {% render 'button_v2',
+            text: primary_text,
+            link: primary_link,
+            type: primary_type,
+            text_color: primary_text_color,
+            background_color: primary_background_color,
+            border_color: primary_border_color,
+            border_width: primary_border_width,
+            border_radius: primary_button_border_radius,
+            animation: primary_button_animation,
+            visible_on_desktop: p_btn_visible_on_desktop,
+            visible_on_mobile: p_btn_visible_on_moble,
+            block_id: primary_block_id
+          %}
+        {%- endif -%}
+
+        {%- if secondary_text != blank and secondary_link != blank -%}
+          {%- assign secondary_block_id = 'secondary-btn-' | append: block.id -%}
+          {% render 'button_v2',
+            text: secondary_text,
+            link: secondary_link,
+            type: secondary_type,
+            text_color: secondary_text_color,
+            background_color: secondary_background_color,
+            border_color: secondary_border_color,
+            border_width: secondary_border_width,
+            border_radius: secondary_button_border_radius,
+            animation: secondary_buttons_animation,
+            visible_on_desktop: s_btn_visible_on_desktop,
+            visible_on_mobile: s_btn_visible_on_moble,
+            block_id: secondary_block_id
+          %}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  <div class="card-grid-block__backgound-images">
+    {%- if desktop_image != blank or mobile_image != blank -%}
+      {%- if card_index == 1 -%}
+        {%- assign fetchpriority = 'high' -%}
+      {%- else -%}
+        {%- assign fetchpriority = 'low' -%}
+        {%- assign loading = 'lazy' -%}
+      {%- endif -%}
+
+      {% if columns > 1 %}
+        {%- assign tablet_size = '50' -%}
+      {%- else -%}
+        {%- assign tablet_size = '100' -%}
+      {% endif %}
+      {%- assign width = width | times: 1 -%}
+      {%- assign desktop_size = 100 | divided_by: columns | times: width | round -%}
+      {%- assign image_sizes = '769:mobile,992:tablet,1440:desktop,1920:desktop'
+        | replace: 'mobile', '100'
+        | replace: 'tablet', tablet_size
+        | replace: 'desktop', desktop_size
+      -%}
+
+      {% render 'responsive-image-dynamic_v2',
+        image: desktop_image,
+        image_mobile: mobile_image,
+        min: 768,
+        max: 1440,
+        class: 'card-grid-block__backgound-images__sorce',
+        fetchpriority: fetchpriority,
+        loading: loading,
+        decoding: decoding
+      %}
+
+    {%- else -%}
+      {% assign remainder = card_index | modulo: 6 %}
+
+      {% case remainder %}
+        {% when 0 %}
+          {{ 'collection-1' | placeholder_svg_tag: 'card-grid-block__backgound-images__sorce svg-placeholder' }}
+        {% when 1 %}
+          {{ 'collection-2' | placeholder_svg_tag: 'card-grid-block__backgound-images__sorce svg-placeholder' }}
+        {% when 2 %}
+          {{ 'collection-3' | placeholder_svg_tag: 'card-grid-block__backgound-images__sorce svg-placeholder' }}
+        {% when 3 %}
+          {{ 'collection-4' | placeholder_svg_tag: 'card-grid-block__backgound-images__sorce svg-placeholder' }}
+        {% when 4 %}
+          {{ 'collection-5' | placeholder_svg_tag: 'card-grid-block__backgound-images__sorce svg-placeholder' }}
+        {% when 5 %}
+          {{ 'collection-6' | placeholder_svg_tag: 'card-grid-block__backgound-images__sorce svg-placeholder' }}
+      {% endcase %}
+    {%- endif -%}
+  </div>
+</div>

@@ -1,0 +1,516 @@
+{% liquid
+  assign display_type = section.settings.display_type
+  assign background_color = section.settings.background_color
+  assign border_color = section.settings.border_color
+  assign border_width = section.settings.border_width
+  assign border_radius = settings.border_radius
+  assign question_color = section.settings.question_color
+  assign answer_color = section.settings.answer_color
+  assign question_tag = section.settings.question_tag
+  assign question_font_size_scale = section.settings.question_font_size_scale
+  assign answer_font_size_scale = section.settings.answer_font_size_scale
+  assign top_margin = section.settings.top_margin
+  assign bottom_margin = section.settings.bottom_margin
+  assign top_margin_mobile = section.settings.top_margin | divided_by: 2
+  assign bottom_margin_mobile = section.settings.bottom_margin | divided_by: 2
+
+  assign columns = section.settings.columns
+  assign grid_gap = section.settings.grid_gap
+  assign show_icons = section.settings.show_icons
+  assign icon_color = section.settings.icon_color
+  assign width = section.settings.width
+
+  assign section_background_color = section.settings.section_background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign top_padding = section.settings.top_padding
+  assign bottom_padding = section.settings.bottom_padding
+  assign side_padding = section.settings.side_padding
+%}
+
+{%- if section.blocks.size > 0 -%}
+  {% style %}
+    #shopify-section-{{section.id}} {
+      margin-top: {{top_margin_mobile}}px;
+      margin-bottom: {{bottom_margin_mobile}}px;
+    }
+
+    {% if section_background_color.alpha != null and section_background_color.alpha != 0.0 %}
+      {% if fullwidth_background %}
+        #shopify-section-{{ section.id }} {
+          background-color: {{section_background_color}};
+          max-width: 100%;
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: 0;
+          padding-right: 0;
+        }
+
+        #shopify-section-{{ section.id }} .faq-section--inner {
+          max-width: {{ settings.page_width }}px;
+          margin: 0 auto;
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+      {% else %}
+        #shopify-section-{{ section.id }}{
+          background-color: {{section_background_color}};
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: {{side_padding}}px;
+          padding-right: {{side_padding}}px;
+          box-sizing: border-box;
+        }
+      {% endif %}
+    {% endif %}
+
+    #shopify-section-{{section.id}} .faq-grid-card {
+      {% if display_type == 'card' %}
+        background-color: {% if background_color.alpha and background_color.alpha != 0.0 %}{{background_color}}{% else %}{{settings.card_background_color}}{% endif %};
+        border-radius: {{border_radius}}px;
+        border: {{border_width}}px solid {% if border_color.alpha and border_color.alpha != 0.0 %}{{border_color}}{% else %}{{settings.inactive_color}}{% endif %};
+        padding: 24px;
+      {% endif %}
+    }
+
+    #shopify-section-{{section.id}} .faq-grid-card .heading__title {
+      color: {% if question_color.alpha and question_color.alpha != 0.0 %}{{question_color}}{% else %}{{settings.heading_color}}{% endif %};
+    }
+
+    #shopify-section-{{section.id}} .faq-grid-card .content {
+      color: {% if answer_color.alpha and answer_color.alpha != 0.0 %}{{answer_color}}{% else %}{{settings.paragraph_color}}{% endif %};
+    }
+
+    #shopify-section-{{section.id}} .faq-section__content {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    #shopify-section-{{section.id}} .faq-section__content {
+      gap: {{grid_gap}}px;
+      column-gap: {{grid_gap}}px;
+      row-gap: {{grid_gap}}px;
+    }
+
+    @media only screen and (min-width: 769px) {
+      #shopify-section-{{section.id}} {
+        margin-top: {{top_margin}}px;
+        margin-bottom: {{bottom_margin}}px;
+      }
+
+      #shopify-section-{{section.id}} .faq-section__content {
+        display: grid;
+        grid-template-columns: {% if columns >= 2 %}1fr 1fr{% else %}1fr{% endif %};
+      }
+
+      #shopify-section-{{section.id}} .faq-section__content {
+        gap: {{grid_gap}}px;
+        column-gap: {{grid_gap}}px;
+        row-gap: {{grid_gap}}px;
+      }
+    }
+
+    @media only screen and (min-width: 1320px) {
+      #shopify-section-{{section.id}} .faq-section__content {
+        display: grid;
+        grid-template-columns: repeat({{columns}}, 1fr);
+      }
+    }
+  {% endstyle %}
+
+  {%- capture faq_content -%}
+    {%- for block in section.blocks -%}
+      {% liquid
+        assign question = block.settings.question
+        assign answer = block.settings.answer
+        assign icon = block.settings.icon
+        assign custom_icon = block.settings.custom_icon
+      %}
+      {%- if question != blank and answer != blank -%}
+        {% render "faq-grid-card_v2",
+          question_tag: question_tag,
+          title: question,
+          content: answer,
+          question_font_size_scale: question_font_size_scale,
+          answer_font_size_scale: answer_font_size_scale,
+          icon: icon,
+          icon_color: icon_color,
+          custom_icon: custom_icon,
+          show_icons: show_icons,
+          width: width,
+          id: block.id
+        %}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endcapture -%}
+
+  <div class="faq-section--inner">
+    <div class="faq-section__content">
+      {{ faq_content }}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "FAQ grid",
+  "class": "faq-grid container",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Add frequently asked questions to your card grid to cover general or product specific questions. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+    },
+    {
+      "type": "select",
+      "id": "display_type",
+      "label": "Display type",
+      "options": [
+        {
+          "value": "borderless",
+          "label": "Borderless"
+        },
+        {
+          "value": "card",
+          "label": "Card"
+        }
+      ],
+      "default": "borderless"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "label": "Columns",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 10,
+      "max": 110,
+      "step": 1,
+      "unit": "px",
+      "label": "Grid gap",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Card",
+      "info": "Edit the look and feel of the cards that your questions and answers are contained within."
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Border width",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Icons",
+      "info": "Edit the color and size of your icons."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_icons",
+      "label": "Show icons",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon color"
+    },
+    {
+      "type": "range",
+      "id": "width",
+      "min": 1,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Width",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Question",
+      "info": "Edit the styling of your question text."
+    },
+    {
+      "type": "color",
+      "id": "question_color",
+      "label": "Color"
+    },
+    {
+      "type": "select",
+      "id": "question_tag",
+      "label": "Tag",
+      "options": [
+        {
+          "value": "h1",
+          "label": "H1"
+        },
+        {
+          "value": "h2",
+          "label": "H2"
+        },
+        {
+          "value": "h3",
+          "label": "H3"
+        },
+        {
+          "value": "h4",
+          "label": "H4"
+        },
+        {
+          "value": "h5",
+          "label": "H5"
+        },
+        {
+          "value": "h6",
+          "label": "H6"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "range",
+      "id": "question_font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Answer",
+      "info": "Edit the styling of your answer text."
+    },
+    {
+      "type": "color",
+      "id": "answer_color",
+      "label": "Color"
+    },
+    {
+      "type": "range",
+      "id": "answer_font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Customize the background of your section."
+    },
+    {
+      "type": "color",
+      "id": "section_background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth_background",
+      "label": "Fullwidth background",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Section padding",
+      "info": "Add spacing above and below inside your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "bottom_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Section margin",
+      "info": "Add spacing above and below your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top margin",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "bottom_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom margin",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Question",
+      "type": "question",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "This block represents one question and its related answer within your FAQ section. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "question",
+          "label": "Question",
+          "default": "Your question here"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Your answer here</p>"
+        },
+        {
+          "type": "header",
+          "content": "Icon",
+          "info": "Add an icon preceding question and size it to your liking."
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+              {
+                "value": "chevron",
+                "label": "Chevron"
+              },
+              {
+                "value": "plus/minus",
+                "label": "Plus/minus"
+              },
+              {
+                "value": "question",
+                "label": "Question mark"
+              },
+              {
+                  "value": "send",
+                  "label": "Send"
+              },
+              {
+                  "value": "gift",
+                  "label": "Gift"
+              },
+              {
+                  "value": "delivery",
+                  "label": "Delivery"
+              },
+              {
+                  "value": "dog",
+                  "label": "Dog"
+              },
+              {
+                  "value": "cat",
+                  "label": "Cat"
+              },
+              {
+                  "value": "fish",
+                  "label": "Fish"
+              },
+              {
+                  "value": "rabbit",
+                  "label": "Rabbit"
+              },
+              {
+                  "value": "snake",
+                  "label": "Snake"
+              },
+              {
+                  "value": "bird",
+                  "label": "Bird"
+              },
+              {
+                  "value": "pills",
+                  "label": "Pills"
+              }
+          ],
+          "default": "question"
+        },
+        {
+            "type": "image_picker",
+            "id": "custom_icon",
+            "label": "Custom icon"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ grid",
+      "settings": {
+        "display_type": "card",
+        "columns": 2,
+        "grid_gap": 20,
+        "background_color": "",
+        "border_color": "",
+        "border_width": 0,
+        "show_icons": true,
+        "icon_color": "",
+        "width": 24,
+        "question_color": "",
+        "question_tag": "h2",
+        "question_font_size_scale": 100,
+        "answer_color": "",
+        "answer_font_size_scale": 100,
+        "top_margin": 40,
+        "bottom_margin": 40
+      }
+    }
+  ]
+}
+{% endschema %}
