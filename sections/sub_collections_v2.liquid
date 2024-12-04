@@ -1,0 +1,542 @@
+{% liquid
+  assign source_menu = section.settings.source_menu
+  assign type = section.settings.type
+  assign columns_desktop = section.settings.columns_desktop | times: 1
+  assign grid_gap = section.settings.grid_gap
+  assign drop_shadow = section.settings.drop_shadow
+
+  assign card_background_color = section.settings.card_background_color
+  if card_background_color.alpha == null or card_background_color.alpha == 0.0
+    assign card_background_color = settings.card_background_color
+  endif
+
+  assign image_background_color = section.settings.image_background_color
+  if image_background_color.alpha == null or image_background_color.alpha == 0.0
+    assign image_background_color = settings.image_background_color
+  endif
+
+  assign text_color = section.settings.text_color
+  if text_color.alpha == null or text_color.alpha == 0.0
+    assign text_color = settings.heading_color
+  endif
+
+  assign font_size_scale = section.settings.font_size_scale
+  assign text_position = section.settings.text_position
+  assign alignment = section.settings.alignment
+  assign overlay_color = section.settings.overlay_color
+  assign opacity = section.settings.opacity
+
+  assign show_links = section.settings.show_links
+  assign show_link_arrows = section.settings.show_link_arrows
+
+  assign top_margin = section.settings.top_margin
+  assign bottom_margin = section.settings.bottom_margin
+
+  assign target_collection_link = null
+  assign section_collection_handles = ''
+
+  assign background_color = section.settings.background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign top_padding = section.settings.top_padding
+  assign bottom_padding = section.settings.bottom_padding
+  assign side_padding = section.settings.side_padding
+%}
+
+{% for link in source_menu.links %}
+  {% if link.url == collection.url %}
+    {%- assign target_collection_link = link -%}
+    {% break %}
+  {%- else -%}
+    {% if link.levels > 0 %}
+      {% for first_level_link in link.links %}
+        {% if first_level_link.url == collection.url %}
+          {%- assign target_collection_link = first_level_link -%}
+          {% break %}
+        {%- else -%}
+          {% if first_level_link.levels > 0 %}
+            {% for second_level_links in first_level_link.links %}
+              {% if second_level_links.url == collection.url %}
+                {%- assign target_collection_link = second_level_links -%}
+                {% break %}
+              {%- else -%}
+                {% if second_level_links.levels > 0 %}
+                  {% for third_level_links in second_level_links.links %}
+                    {% if third_level_links.url == collection.url %}
+                      {%- assign target_collection_link = third_level_links -%}
+                      {% break %}
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+{% if target_collection_link != null and target_collection_link.levels > 0 %}
+  {% for target_collection_link_inner in target_collection_link.links %}
+    {% if target_collection_link_inner.url contains 'collections' %}
+      {%- assign collection_hanlde = target_collection_link_inner.url
+        | split: 'collections/'
+        | last
+        | split: '?'
+        | first
+      -%}
+      {% if collection_hanlde != blank %}
+        {%- assign section_collection_handles = section_collection_handles | append: collection_hanlde | append: ',' -%}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{%- assign section_collection_handles = section_collection_handles | replace_last: ',', '' -%}
+
+{% if section_collection_handles.size > 0 %}
+  {%- assign section_collection_handles = section_collection_handles | split: ',' -%}
+{% endif %}
+
+{% if section_collection_handles.size > 0 %}
+  {% style %}
+    #shopify-section-{{section.id}} {
+      margin-top: {{ top_margin |  divided_by: 2}}px;
+      margin-bottom: {{ bottom_margin | divided_by: 2}}px;
+    }
+
+    {% if background_color.alpha != null and background_color.alpha != 0.0 %}
+      {% if fullwidth_background %}
+        #shopify-section-{{ section.id }} {
+          background-color: {{background_color}};
+          max-width: 100%;
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: 0;
+          padding-right: 0;
+        }
+
+        #shopify-section-{{ section.id }} .sub-collections--inner {
+          max-width: {{ settings.page_width }}px;
+          margin: 0 auto;
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+      {% else %}
+        #shopify-section-{{ section.id }}{
+          background-color: {{background_color}};
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: {{side_padding}}px;
+          padding-right: {{side_padding}}px;
+          box-sizing: border-box;
+        }
+      {% endif %}
+    {% endif %}
+
+    @media only screen and (min-width: 769px) {
+      #shopify-section-{{section.id}} {
+        margin-top: {{ top_margin }}px;
+        margin-bottom: {{ bottom_margin }}px;
+      }
+    }
+  {% endstyle %}
+
+  {% if type == 'grid' %}
+    {%- capture grid_template -%}
+      {% style %}
+        #shopify-section-{{section.id}} .sub-collections__grid {
+          display: grid;
+          grid-template-columns: repeat(1, minmax(0, 1fr));
+          grid-gap: {{grid_gap}}px;
+        }
+  
+        @media only screen and (min-width: 769px) {
+          #shopify-section-{{section.id}} .sub-collections__grid {
+            grid-template-columns: repeat({{columns_desktop}}, minmax(0, 1fr));
+          }
+        }
+  
+      {% endstyle %}
+      <div class="sub-collections__grid">
+        {% for collection_handle in section_collection_handles %}
+          {%- assign target_collection = collections[collection_handle] -%}
+          {% if target_collection.url != blank %}
+            {% render 'collection-covered-card_v2'
+              collection: target_collection,
+              columns_mobile: 1,
+              columns_desktop: columns_desktop,
+              grid_gap: grid_gap,
+              drop_shadow: drop_shadow,
+              card_background_color: card_background_color,
+              image_background_color: image_background_color,
+              text_color: text_color,
+              font_size_scale: font_size_scale,
+              text_position: text_position,
+              alignment: alignment,
+              overlay_color: overlay_color,
+              opacity: opacity,
+              show_links: show_links,
+              show_link_arrows: show_link_arrows
+            %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {%- endcapture -%}
+  {% endif %}
+
+  {% if type == 'slider' %}
+    {%- capture slider_template -%}
+      {% liquid
+        assign slides_count = section_collection_handles.size | divided_by: 3 | ceil
+        assign breakpoints = "0-M-G;769-D-G;992-D-G" | replace: "D", columns_desktop | replace: "G", grid_gap | replace: "M", 1
+      %}
+  
+      {% style %}
+        #shopify-section-{{section.id}} custom-slider .custom-slider-track-wrapper {
+          padding-left: 5px;
+          padding-right: 5px;
+          padding-top: 5px;
+          padding-bottom: 5px;
+          box-sizing: border-box;
+          width: 86%;
+          margin: 0 auto;
+        }
+  
+        #shopify-section-{{section.id}} custom-slider .custom-slider-button {
+          width: 32px;
+          height: 32px;
+          padding: 0px;
+          box-sizing: content-box;
+        }
+  
+        #shopify-section-{{section.id}} custom-slider .custom-slider-button svg path {
+          stroke: {{settings.link_color}};
+        }
+  
+        #shopify-section-{{section.id}} custom-slider .custom-slider-button[disabled] svg path {
+          stroke: {{settings.inactive_color}};
+        }
+  
+        #shopify-section-{{section.id}} custom-slider .custom-slider-button-next {
+          background-color: transparent;
+          right: 0;
+        }
+  
+        #shopify-section-{{section.id}} custom-slider .custom-slider-button-prev {
+          background-color: transparent;
+          left: 0;
+        }
+  
+        #shopify-section-{{section.id}} custom-slider .custom-slider-button svg {
+          width: 32px;
+          height: 32px;
+        }
+      {% endstyle %}
+  
+      {%- capture content -%}
+        {% for collection_handle in section_collection_handles %}
+          {%- assign target_collection = collections[collection_handle] -%}
+          {% if target_collection.url != blank %}
+            <div class="sub-collections__slider-slide">
+              {% render 'collection-covered-card_v2'
+                collection: target_collection,
+                columns_mobile: 1,
+                columns_desktop: columns_desktop,
+                grid_gap: grid_gap,
+                drop_shadow: drop_shadow,
+                card_background_color: card_background_color,
+                image_background_color: image_background_color,
+                text_color: text_color,
+                font_size_scale: font_size_scale,
+                text_position: text_position,
+                alignment: alignment,
+                overlay_color: overlay_color,
+                opacity: opacity,
+                show_links: show_links,
+                show_link_arrows: show_link_arrows,
+                link_color: link_color,
+                link_text: link_text
+              %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      {%- endcapture -%}
+  
+      {% comment %} {% render 'slider'
+          content: content,
+          content_size: section_collection_handles.size,
+          content_size_mobile: section_collection_handles.size, 
+          navigation: true,
+          pagination: false,
+          pagination_group: false,
+          pagination_group_mobile: false,
+          draggable: true,
+          autoplay: false,
+          breakpoints: breakpoints,
+          slidesPerView: 3,
+          spaceBetween: grid_gap,
+          grid_rows: 1,
+          slides_count: slides_count,
+          id: section.id 
+        %} {% endcomment %}
+    {%- endcapture -%}
+  {% endif %}
+
+  <div class="sub-collections--inner">
+    <div class="sub-collections__content">
+      {% if type == 'slider' %}
+        {{ slider_template }}
+      {%- else -%}
+        {{ grid_template }}
+      {% endif %}
+    </div>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Sub collections",
+  "class": "sub-collections container",
+  "tag": "section",
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "This section allows you to display a list of sub collections built from a source menu. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+    },
+    {
+      "type": "link_list",
+      "id": "source_menu",
+      "label": "Source menu"
+    },
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Amend the layout of the sub collections."
+    },
+    {
+      "type": "select",
+      "id": "type",
+      "label": "Type",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "slider",
+          "label": "Slider"
+        }
+      ],
+      "default": "slider"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Columns",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 1,
+      "max": 30,
+      "unit": "px",
+      "step": 1,
+      "label": "Grid gap",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Card",
+      "info": "Customize the collections card and the image within it."
+    },
+    {
+      "type": "checkbox",
+      "id": "drop_shadow",
+      "label": "Drop shadow",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "card_background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "color",
+      "id": "image_background_color",
+      "label": "Image background color"
+    },
+    {
+      "type": "header",
+      "content": "Text",
+      "info": "Customize the text within the collection cards."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color"
+    },
+    {
+      "type": "range",
+      "id": "font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "text_position",
+      "label": "Position",
+      "options": [
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "underneath",
+          "label": "Underneath"
+        }
+      ],
+      "default": "top"
+    },
+    {
+      "type": "text_alignment",
+      "id": "alignment",
+      "label": "Alignment",
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Overlay",
+      "info": "Add an overlay between the image and the text in order to increase legibility."
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Color"
+    },
+    {
+      "type": "range",
+      "id": "opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Opacity",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Links",
+      "info": "Add a link prompting the user to view the full collection."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_links",
+      "label": "Show links",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_link_arrows",
+      "label": "Show link arrows",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Personalize the background of your section to match your brand. "
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth_background",
+      "label": "Fullwidth background",
+      "default": false
+    },
+     {
+    "type": "header",
+    "content": "Section padding",
+    "info": "Add spacing above and below inside your new section."
+  },
+  {
+    "type": "range",
+    "id": "top_padding",
+    "min": 0,
+    "max": 100,
+    "step": 1,
+    "unit": "px",
+    "label": "Top padding",
+    "default": 15
+  },
+  {
+    "type": "range",
+    "id": "bottom_padding",
+    "min": 0,
+    "max": 100,
+    "step": 1,
+    "unit": "px",
+    "label": "Bottom padding",
+    "default": 15
+  },
+  {
+    "type": "range",
+    "id": "side_padding",
+    "min": 10,
+    "max": 60,
+    "step": 1,
+    "unit": "px",
+    "label": "Side padding",
+    "default": 24
+  },
+    {
+      "type": "header",
+      "content": "Section margin",
+      "info": "Add spacing above and below your section."
+    },
+    {
+      "type": "range",
+      "id": "top_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "bottom_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sub collections"
+    }
+  ]
+}
+{% endschema %}

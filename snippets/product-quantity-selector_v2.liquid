@@ -1,0 +1,134 @@
+{% liquid
+    assign product = product
+    assign product_form_id = product_form_id
+    assign input_background_color = input_background_color
+    if input_background_color.alpha == null or input_background_color.alpha == 0.0
+        assign input_background_color = settings.input_background_color
+    endif
+
+    assign input_text_color = input_text_color
+    if input_text_color.alpha == null or input_text_color.alpha == 0.0
+        assign input_text_color = settings.input_text_color
+    endif
+
+    assign input_placeholder_color = input_placeholder_color
+    if input_placeholder_color.alpha == null or input_placeholder_color.alpha == 0.0
+        assign input_placeholder_color = settings.input_placeholder_color
+    endif
+
+    assign input_border_color = input_border_color
+    if input_border_color.alpha == null or input_border_color.alpha == 0.0
+        assign input_border_color = settings.input_border_color
+    endif
+
+    assign icon_color = icon_color
+    if icon_color.alpha == null or icon_color.alpha == 0.0
+        assign icon_color = settings.icon_color
+    endif
+
+    assign cart_qty = cart | item_count_for_variant: product.selected_or_first_available_variant.id
+
+    if product.selected_or_first_available_variant.quantity_rule.max != null 
+        assign max_value = product.selected_or_first_available_variant.quantity_rule.max
+    elsif product.selected_or_first_available_variant.quantity_rule == "continue" 
+        assign max_value = 200
+    elsif product.selected_or_first_available_variant.inventory_quantity > 0
+        assign max_value = product.selected_or_first_available_variant.inventory_quantity
+    else 
+        assign max_value = product.selected_or_first_available_variant.quantity_rule.min
+    endif 
+
+    assign min_value = product.selected_or_first_available_variant.quantity_rule.min
+%}
+
+<product-quantity-selector id="Quantity-Selector-{{section.id}}">
+    {% style %}
+        #Quantity-Selector-{{section.id}} {
+            min-height: 28px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 126px;
+            box-sizing: border-box;
+            overflow: hidden;
+            background-color: {{input_background_color}};
+            border: 1px solid {{input_border_color}};
+            border-radius: {{settings.border_radius}};
+        }
+
+        #Quantity-Selector-{{section.id}} button {
+            background: none;
+            border: none;
+            padding: 6px 12px;
+            flex: 1 0 auto;
+            box-sizing: content-box;
+            height: 14px;
+            cursor: pointer;
+        }
+
+        #Quantity-Selector-{{section.id}} button[disabled] {
+            opacity: .5;
+            pointer-events: none;
+        }
+
+        #Quantity-Selector-{{section.id}} button svg {
+            width: 14px;
+            height: 14px
+        }
+
+        #Quantity-Selector-{{section.id}} input {
+            flex: 1 1 auto;
+            width: 100%;
+            text-align: center;
+            border: none;
+            color: {{settings.input_text_color}};
+            font-size: 16px;
+            line-height: 24px;
+            font-family: {{ settings.paragraph_font.family }}, {{ settings.paragraph_font.fallback_families }};
+            color: {{input_text_color}};
+            background-color: {{input_background_color}};
+        }   
+
+        #Quantity-Selector-{{section.id}} input::placeholder{ 
+            color: {{input_placeholder_color}};
+        }
+
+        #Quantity-Selector-{{section.id}} input::-webkit-outer-spin-button,
+        #Quantity-Selector-{{section.id}} input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        #Quantity-Selector-{{section.id}} input[type=number] {
+            -moz-appearance: textfield;
+        }
+    {% endstyle %}
+
+    <button class="quantity__button" name="minus" type="button" disabled="true">
+        <span class="visually-hidden">{{- 'products.product.quantity.decrease' | t: product: product.title | escape -}}</span>
+        {% render 'icon', icon: 'quantity-minus', color: icon_color %}
+    </button>
+
+    <input
+        class="quantity__input"
+        type="number"
+        name="quantity"
+        id="Quantity-{{ section.id }}"
+        data-cart-quantity="{{ cart_qty }}"
+        min="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
+        max="{{max_value}}"
+        step="{{ product.selected_or_first_available_variant.quantity_rule.increment }}"
+        value="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
+        form="{{ product_form_id }}"
+        aria-label="Product Quantity Input"
+        {% if max_value == min_value %}
+            disabled readonly
+        {% endif %}
+    >
+
+<button class="quantity__button" name="plus" type="button" {% if max_value == min_value %}disabled="true" {% endif %}>
+        <span class="visually-hidden">{{- 'products.product.quantity.increase' | t: product: product.title | escape -}}</span>
+        {% render 'icon', icon: 'quantity-plus', color: icon_color %}
+    </button>
+</product-quantity-selector>

@@ -1,0 +1,357 @@
+{% liquid
+  assign image = section.settings.image
+  assign aspect_ratio = 1 | divided_by: image.aspect_ratio | times: 100
+
+  if aspect_ratio < 0 or aspect_ratio == null
+    assign aspect_ratio = 100
+  endif
+
+  assign focal_x_point = image.presentation.focal_point.x
+  assign focal_y_point = image.presentation.focal_point.y
+  assign shape = section.settings.shape
+  assign border_radius = settings.border_radius
+  assign max_width = section.settings.max_width
+  assign desktop_image_position = section.settings.desktop_image_position
+  assign mobile_image_position = section.settings.mobile_image_position
+  assign top_margin = section.settings.top_margin
+  assign bottom_margin = section.settings.bottom_margin
+  assign top_margin_mobile = section.settings.top_margin | divided_by: 2
+  assign bottom_margin_mobile = section.settings.bottom_margin | divided_by: 2
+  assign section_index = section.index
+
+  assign background_color = section.settings.background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign top_padding = section.settings.top_padding
+  assign bottom_padding = section.settings.bottom_padding
+  assign side_padding = section.settings.side_padding
+%}
+
+{% stylesheet %}
+  .section-image__content {
+    display: flex;
+  }
+{% endstylesheet %}
+
+{% style %}
+  {% if background_color.alpha != null and background_color.alpha != 0.0 %}
+    {% if fullwidth_background %}
+      #shopify-section-{{ section.id }} {
+        background-color: {{background_color}};
+        max-width: 100%;
+        padding-top: {{top_padding}}px;
+        padding-bottom: {{bottom_padding}}px;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      #shopify-section-{{ section.id }} .section-image--inner {
+        max-width: {{ settings.page_width }}px;
+        margin: 0 auto;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+    {% else %}
+      #shopify-section-{{ section.id }}{
+        background-color: {{background_color}};
+        padding-top: {{top_padding}}px;
+        padding-bottom: {{bottom_padding}}px;
+        padding-left: {{side_padding}}px;
+        padding-right: {{side_padding}}px;
+        box-sizing: border-box;
+      }
+    {% endif %}
+  {% endif %}
+
+  #shopify-section-{{section.id}} .svg-placeholder {
+    background-color: {{settings.image_background_color}};
+    stroke: {{settings.icon_color}};
+    fill: {{settings.icon_color}};
+  }
+
+  #shopify-section-{{section.id}} {
+    margin-top: {{top_margin_mobile}}px;
+    margin-bottom: {{bottom_margin_mobile}}px;
+    display: block;
+  }
+
+  #shopify-section-{{section.id}} .section-image__content {
+    {%- case mobile_image_position -%}
+      {%- when "left" -%}
+        justify-content: flex-start;
+      {%- when "center" -%}
+        justify-content: center;
+      {%- when "right" -%}
+        justify-content: flex-end;
+    {%- endcase -%}
+  }
+  #shopify-section-{{section.id}} .section-image__content__image--wrapper {
+    width: 100%;
+    {% if max_width != blank and max_width > 0 %}
+      max-width: {{max_width}}px;
+    {% endif %}
+  }
+
+  #shopify-section-{{section.id}} .section-image__content__image {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    {%- case shape -%}
+      {%- when "default" -%}
+        padding-bottom: {{aspect_ratio}}%;
+      {%- when "square" -%}
+        padding-bottom: 100%;
+        border-radius: {{border_radius}}px;
+      {%- when "circle" -%}
+        border-radius: 50%;
+        padding-bottom: 100%;
+    {%- endcase -%}
+
+  }
+
+  #shopify-section-{{section.id}} .section-image__content img,
+  #shopify-section-{{section.id}} .section-image__content svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-position: {{focal_x_point}}% {{focal_y_point}}%;
+  }
+
+  @media only screen and (min-width: 769px) {
+    #shopify-section-{{section.id}} {
+      margin-top: {{top_margin}}px;
+      margin-bottom: {{bottom_margin}}px;
+      display: block;
+    }
+
+    #shopify-section-{{section.id}} .section-image__content {
+      {%- case desktop_image_position -%}
+        {%- when "left" -%}
+          justify-content: flex-start;
+        {%- when "center" -%}
+          justify-content: center;
+        {%- when "right" -%}
+          justify-content: flex-end;
+      {%- endcase -%}
+    }
+  }
+{% endstyle %}
+
+<div class="section-image--inner">
+  <div class="section-image__content">
+    <div class="section-image__content__image--wrapper">
+      <div class="section-image__content__image">
+        {% if section_index < 3 %}
+          {%- assign fetchpriority = 'high' -%}
+        {% else %}
+          {%- assign fetchpriority = 'low' -%}
+          {%- assign loading = 'lazy' -%}
+        {% endif %}
+        {% if max_width != blank and max_width > 0 %}
+          {%- assign image_sizes = '(min-width: MAXpx) MAXpx, (max-width: MAXpx) calc(100vw - 32px), 93.85vw'
+            | replace: 'MAX', max_width
+          -%}
+        {%- else -%}
+          {%- assign image_sizes = '93.85vw' -%}
+        {% endif %}
+
+        {% if image != blank %}
+          {% render 'responsive-image-dynamic_v2',
+            image: image,
+            srcset: '320,480,576,720,768,992,1024,1220,1440',
+            sizes: image_sizes,
+            fetchpriority: fetchpriority,
+            loading: loading
+          %}
+        {%- else -%}
+          {{ 'image' | placeholder_svg_tag: 'svg-placeholder' }}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Image",
+  "class": "section-image container",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Add an image to your page, then ammend it's size, shape and layout.  [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "shape",
+      "label": "Shape",
+      "options": [
+        {
+          "value": "default",
+          "label": "Default"
+        },
+        {
+          "value": "square",
+          "label": "Square"
+        },
+        {
+          "value": "circle",
+          "label": "Circle"
+        }
+      ],
+      "default": "square"
+    },
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Add spacing above and below your new section."
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 300,
+      "max": 1500,
+      "step": 12,
+      "unit": "px",
+      "label": "Max width",
+      "default": 600
+    },
+    {
+      "type": "select",
+      "id": "desktop_image_position",
+      "label": "Desktop image position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "mobile_image_position",
+      "label": "Mobile image position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Personalize the background of your section to match your brand. "
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth_background",
+      "label": "Fullwidth background",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Section padding",
+      "info": "Add spacing above and below inside your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "bottom_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Section margin",
+      "info": "Add spacing above and below your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top margin",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "bottom_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom margin",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image",
+      "settings": {
+        "shape": "default",
+        "max_width": 600,
+        "desktop_image_position": "center",
+        "mobile_image_position": "center",
+        "top_margin": 40,
+        "bottom_margin": 40
+      }
+    }
+  ]
+}
+{% endschema %}

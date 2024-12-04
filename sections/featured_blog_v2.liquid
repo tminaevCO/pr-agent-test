@@ -1,0 +1,483 @@
+{% liquid
+  assign blog = section.settings.blog
+  assign articles_shown = section.settings.articles_shown
+  assign enlarge_first_article = section.settings.enlarge_first_article
+  assign columns = section.settings.columns
+  assign grid_gap = section.settings.grid_gap
+  assign title_tag = section.settings.title_tag
+  assign title_color = section.settings.title_color
+  assign title_font_size_scale = section.settings.title_font_size_scale
+  assign display_date = section.settings.display_date
+  assign date_color = section.settings.date_color
+  assign date_font_size_scale = section.settings.date_font_size_scale
+  assign display_author = section.settings.display_author
+  assign author_color = section.settings.author_color
+  assign author_font_size_scale = section.settings.author_font_size_scale
+  assign top_margin = section.settings.top_margin
+  assign bottom_margin = section.settings.bottom_margin
+  assign section_index = section.index
+  assign border_radius = settings.border_radius
+
+  assign background_color = section.settings.background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign top_padding = section.settings.top_padding
+  assign bottom_padding = section.settings.bottom_padding
+  assign side_padding = section.settings.side_padding
+%}
+
+{% stylesheet %}
+  .featured-blog__content {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-flow: dense;
+  }
+
+  /* Card styles */
+
+  .article-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .article-card__media {
+    display: flex;
+    height: -webkit-fill-available;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .article-card__media img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .article-card__author-date {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+{% endstylesheet %}
+
+{% style %}
+  #shopify-section-{{section.id}} {
+    margin: {{ top_margin | divided_by: 2 }}px auto {{ bottom_margin | divided_by: 2 }}px
+  }
+
+  {% if background_color.alpha != null and background_color.alpha != 0.0 %}
+    {% if fullwidth_background %}
+      #shopify-section-{{ section.id }} {
+        background-color: {{background_color}};
+        max-width: 100%;
+        padding-top: {{top_padding}}px;
+        padding-bottom: {{bottom_padding}}px;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      #shopify-section-{{ section.id }} .featured-blog--inner {
+        max-width: {{ settings.page_width }}px;
+        margin: 0 auto;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+    {% else %}
+      #shopify-section-{{ section.id }}{
+        background-color: {{background_color}};
+        padding-top: {{top_padding}}px;
+        padding-bottom: {{bottom_padding}}px;
+        padding-left: {{side_padding}}px;
+        padding-right: {{side_padding}}px;
+        box-sizing: border-box;
+      }
+    {% endif %}
+  {% endif %}
+
+  #shopify-section-{{ section.id }} .featured-blog__content{
+    gap: {{ grid_gap }}px;
+  }
+
+  .article-card__media {
+    border-radius: {{ border_radius }}px;
+  }
+
+  @media only screen and (min-width: 769px) {
+      #shopify-section-{{ section.id }} .featured-blog__content {
+          {% if columns > 1 %}
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+          {% endif %}
+          grid-template-rows: repeat(auto-fill, minmax(250px, max-content));
+      }
+  }
+
+  @media only screen and (min-width: 1050px) {
+      #shopify-section-{{section.id}} {
+        margin: {{ top_margin }}px auto {{ bottom_margin }}px
+      }
+
+      #shopify-section-{{ section.id }} .featured-blog__content {
+          grid-template-columns: repeat({{ columns }}, minmax(0, 1fr));
+          grid-template-rows: repeat(auto-fill, minmax(220px, max-content));
+      }
+  }
+{% endstyle %}
+
+<div class="featured-blog--inner">
+  <div class="featured-blog__content">
+    {% if blog != blank %}
+      {%- for article in blog.articles limit: articles_shown -%}
+        {% assign block_id = section.id | append: article.id %}
+        {% if forloop.first and enlarge_first_article %}
+          {% render 'article-card_v2',
+            article: article,
+            card_index: forloop.index,
+            section_index: section_index,
+            columns: columns,
+            display_title: true,
+            title_tag: title_tag,
+            title_color: title_color,
+            title_font_size_scale: title_font_size_scale,
+            display_date: display_date,
+            date_color: date_color,
+            date_font_size_scale: date_font_size_scale,
+            display_author: display_author,
+            author_color: author_color,
+            author_font_size_scale: author_font_size_scale,
+            width: 2,
+            height: 2,
+            block_id: block_id
+          %}
+        {% else %}
+          {% render 'article-card_v2',
+            article: article,
+            section_index: section_index,
+            card_index: forloop.index,
+            columns: columns,
+            display_title: true,
+            title_tag: title_tag,
+            title_color: title_color,
+            title_font_size_scale: title_font_size_scale,
+            display_date: display_date,
+            date_color: date_color,
+            date_font_size_scale: date_font_size_scale,
+            display_author: display_author,
+            author_color: author_color,
+            author_font_size_scale: author_font_size_scale,
+            width: 1,
+            height: 1,
+            block_id: block_id
+          %}
+        {% endif %}
+      {%- endfor -%}
+    {%- else -%}
+      {% for i in (1..articles_shown) %}
+        {% assign block_id = section.id | append: 'block-' | append: forloop.index %}
+        {% if forloop.first and enlarge_first_article %}
+          {% render 'article-card_v2',
+            article: article,
+            card_index: forloop.index,
+            section_index: section_index,
+            columns: columns,
+            display_title: true,
+            title_tag: title_tag,
+            title_color: title_color,
+            title_font_size_scale: title_font_size_scale,
+            display_date: display_date,
+            date_color: date_color,
+            date_font_size_scale: date_font_size_scale,
+            display_author: display_author,
+            author_color: author_color,
+            author_font_size_scale: author_font_size_scale,
+            width: 2,
+            height: 2,
+            block_id: block_id
+          %}
+        {% else %}
+          {% render 'article-card_v2',
+            article: article,
+            section_index: section_index,
+            card_index: forloop.index,
+            columns: columns,
+            display_title: true,
+            title_tag: title_tag,
+            title_color: title_color,
+            title_font_size_scale: title_font_size_scale,
+            display_date: display_date,
+            date_color: date_color,
+            date_font_size_scale: date_font_size_scale,
+            display_author: display_author,
+            author_color: author_color,
+            author_font_size_scale: author_font_size_scale,
+            width: 1,
+            height: 1,
+            block_id: block_id
+          %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Featured blog",
+  "class": "featured-blog container",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Add a grid of articles pulled from one of your blogs. This section will automatically update over time. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "Blog"
+    },
+    {
+      "type": "range",
+      "id": "articles_shown",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "label": "Articles shown",
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Change the layout of your article grid by amending the columns, spacing and highlighting your most recent blog."
+    },
+    {
+      "type": "checkbox",
+      "id": "enlarge_first_article",
+      "label": "Enlarge first article",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columns",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Grid gap",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Titles",
+      "info": "Amend your article's titles to your liking."
+    },
+    {
+      "type": "select",
+      "id": "title_tag",
+      "label": "Tag",
+      "options": [
+        {
+          "value": "h1",
+          "label": "H1"
+        },
+        {
+          "value": "h2",
+          "label": "H2"
+        },
+        {
+          "value": "h3",
+          "label": "H3"
+        },
+        {
+          "value": "h4",
+          "label": "H4"
+        },
+        {
+          "value": "h5",
+          "label": "H5"
+        },
+        {
+          "value": "h6",
+          "label": "H6"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Dates",
+      "info": "Amend your article's date text to your liking."
+    },
+    {
+      "type": "checkbox",
+      "id": "display_date",
+      "label": "Display date",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "date_color",
+      "label": "Color"
+    },
+    {
+      "type": "range",
+      "id": "date_font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Authors",
+      "info": "Amend your article's author text to your liking."
+    },
+    {
+      "type": "checkbox",
+      "id": "display_author",
+      "label": "Display author",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "author_color",
+      "label": "Color"
+    },
+    {
+      "type": "range",
+      "id": "author_font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Personalize the background of your section to match your brand. "
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth_background",
+      "label": "Fullwidth background",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Section padding",
+      "info": "Add spacing above and below inside your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "bottom_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Section margin",
+      "info": "Add spacing above and below your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top margin",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "bottom_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom margin",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured blog",
+      "settings": {
+        "blog": "",
+        "articles_shown": 5,
+        "enlarge_first_article": true,
+        "columns": 4,
+        "grid_gap": 15,
+        "title_tag": "h2",
+        "title_color": "",
+        "title_font_size_scale": 100,
+        "display_date": true,
+        "date_color": "",
+        "date_font_size_scale": 100,
+        "display_author": true,
+        "author_color": "",
+        "author_font_size_scale": 100,
+        "top_margin": 40,
+        "bottom_margin": 40
+      }
+    }
+  ]
+}
+{% endschema %}

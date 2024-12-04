@@ -1,0 +1,11 @@
+[environments.dev]
+store = "wicked-cushions"
+path = "."
+output = "json"
+
+
+[environments.prod]
+store = "wicked-cushions"
+path = "."
+output = "json"
+theme-editor-sync = true

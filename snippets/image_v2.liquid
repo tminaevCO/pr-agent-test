@@ -1,0 +1,184 @@
+{% liquid
+    assign image = image | default: block.settings.image
+    assign shape = shape | default: block.settings.shape
+    assign overlay_title = overlay_title | default: block.settings.overlay_title
+    assign font_size_scale = font_size_scale | default: block.settings.font_size_scale | default: 100
+    assign overlay_color = overlay_color | default: block.settings.overlay_color | default: "#000"
+    assign overlay_opacity = overlay_opacity | default: block.settings.overlay_opacity
+    assign max_width = max_width | default: block.settings.max_width
+    assign overlay_text_color = overlay_text_color | default: block.settings.overlay_text_color
+    assign overlay_text_vertical_offset = overlay_text_vertical_offset | default: block.settings.overlay_text_vertical_offset
+    assign overlay_text_horizontal_offset = overlay_text_horizontal_offset | default: block.settings.overlay_text_horizontal_offset
+    assign visible_on_desktop = visible_on_desktop | default: block.settings.visible_on_desktop
+    assign visible_on_mobile = visible_on_mobile | default: block.settings.visible_on_mobile
+    assign block_id = block_id | default: block.id 
+
+    assign default_font_size_mobile = default_font_size_mobile | default: 32
+    assign default_font_size_desktop = default_font_size_desktop | default: 36
+
+    assign global_setting_font_size_scale = settings.heading_font_size_scale | default: 100
+    assign global_setting_line_height_scale = settings.heading_line_spacing_scale | default: 100
+
+    assign font_size = default_font_size_mobile  | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round 
+    assign font_size_desktop = default_font_size_desktop | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round 
+
+    assign line_height = font_size | times: 130 | divided_by: 100.0 | round | times: global_setting_line_height_scale | divided_by: 100.0 | round
+    assign line_height_desktop = font_size_desktop | times: 130 | divided_by: 100.0 | round | times: global_setting_line_height_scale | divided_by: 100.0 | round
+
+    assign aria_label = 'accessibility.general.image' | t
+    assign aspect_ratio = 1 | divided_by: image.aspect_ratio | times: 100
+
+    assign sizes = sizes
+%}
+
+{% style %}
+    {% case shape %}
+        {% when 'default' %}
+            .block-{{block_id}} {
+                height: auto;
+                border-radius: {{settings.border_radius}}px;
+                overflow: hidden;
+            }
+
+            .block-{{block_id}} img{
+                position: relative;
+                height: auto;
+            }
+
+        {% when 'circle' %}
+            .block-{{block_id}} {
+                position: relative;
+                border-radius: 50%;
+                overflow: hidden;
+                padding-bottom: 100%;
+                background-color: transparent;
+            }
+
+            .block-{{block_id}} img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-position: {{image.presentation.focal_point.x}}% {{image.presentation.focal_point.y}}%;
+                object-fit: cover;
+                background-color: transparent;
+            }
+
+        {% when 'square' %}
+            .block-{{block_id}} {
+                position: relative;
+                border-radius: {{settings.border_radius}}px;
+                overflow: hidden;
+                padding-bottom: 100%;
+            }
+
+            .block-{{block_id}} img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-position: {{image.presentation.focal_point.x}}% {{image.presentation.focal_point.x}}%;
+                object-fit: cover;
+                background-color: transparent;
+            }
+    {% endcase %}
+    
+    {% if overlay_title != blank %}
+        .block-{{block_id}}__overlay-text {
+            font-family: {{ settings.heading_font.family }}, {{ settings.heading_font.fallback_families }};
+            position: absolute;
+            top: calc(50% + {{overlay_text_horizontal_offset}}%);
+            left: calc(50% + {{overlay_text_vertical_offset}}%);
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            font-size: {{ font_size }}px;
+            color: {% if overlay_text_color.alpha and overlay_text_color.alpha != 0.0 %}{{overlay_text_color}}{% else %}#fff{% endif %};
+            line-height: {{ line_height }}px;
+            width: 100%;
+            font-weight: {{ settings.heading_font.weight }};
+            text-align: center;
+            margin: 0;
+            max-width: {% if max_width > 0 %}{{max_width}}px{% else %}100%{% endif %};
+            padding-left: 16px;
+            padding-right: 16px;
+            box-sizing: border-box;
+        }
+    {% endif %}
+    
+    {% if overlay_color.alpha and overlay_text_color.alpha != 0.0 %}
+        .block-{{block_id}}__overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: {{overlay_color}};
+            opacity: {{overlay_opacity | divided_by: 100.0}};
+        }
+    {% endif %}
+
+    {% if visible_on_mobile %}
+        .block__image.block-{{block_id}} {
+            display: flex;
+        }
+    {% else %}
+        .block__image.block-{{block_id}} {
+            display: none;
+        }
+    {% endif %}
+
+    @media only screen and (min-width: 768px) {
+        {% if overlay_title != blank %}
+            .block-{{block_id}}__overlay-text {
+                font-size: {{ font_size_desktop }}px;
+                line-height: {{ line_height_desktop }}px;
+            }
+        {% endif %}
+
+        {% if visible_on_desktop %}
+            .block__image.block-{{block_id}} {
+                display: flex;
+            }
+        {% else %}
+            .block__image.block-{{block_id}} {
+                display: none;
+            }
+        {% endif %}
+        {% if shape == 'default' %}
+            .block-{{block_id}} {
+                border-radius: 0px;
+            }
+        {% endif %}
+    }
+{% endstyle %}
+
+<div class="block__image block-{{block_id}} shape-{{ shape }}">
+    {%- if image != blank -%}
+        {% if section.index < 3 %}
+            {%- assign fetchpriority = 'high' -%}
+        {% else %}
+            {%- assign fetchpriority = 'low' -%}
+            {%- assign loading = 'lazy' -%}
+        {% endif %}
+        
+        {% render 'responsive-image-dynamic_v2', 
+            image: image, 
+            aria-label: aria_label,
+            fetchpriority: fetchpriority,
+            loading: loading,
+            sizes: sizes
+        %}
+
+    {%- else -%}
+        {{ 'image' | placeholder_svg_tag: "svg-placeholder" }}
+    {%- endif -%}
+
+    {%- if overlay_title != blank -%}
+        <p class="block-{{block_id}}__overlay-text" aria-label="{{ "accessibility.general.overlay_text" | t }}">{{overlay_title}}</p>
+    {%- endif -%}
+    {%- if overlay_color.alpha and overlay_text_color.alpha != 0.0 -%}
+        <div class="block-{{block_id}}__overlay"></div>
+    {%- endif -%}
+</div>

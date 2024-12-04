@@ -1,0 +1,524 @@
+{% liquid
+  assign products_source = section.settings.products_source
+  assign upsell_product_list = section.settings.upsell_product_list
+  assign columns = section.settings.columns
+  assign columns_mobile = section.settings.columns_mobile
+  assign grid_gap = section.settings.grid_gap
+  assign display_type = section.settings.display_type
+  assign drop_shadow = section.settings.drop_shadow
+  assign card_background_color = section.settings.card_background_color
+  if card_background_color.alpha == null or card_background_color.alpha == 0.0
+    assign card_background_color = settings.card_background_color
+  endif
+  assign image_background_color = section.settings.image_background_color
+  if image_background_color.alpha == null or image_background_color.alpha == 0.0
+    assign image_background_color = settings.image_background_color
+  endif
+  assign alignment = section.settings.alignment
+  assign name_color = section.settings.name_color
+  assign name_tag = section.settings.name_tag
+  assign name_font_size_scale = section.settings.name_font_size_scale
+  assign show_price = section.settings.show_price
+  assign price_color = section.settings.price_color
+  assign price_font_size_scale = section.settings.price_font_size_scale
+
+  assign top_margin = section.settings.top_margin
+  assign bottom_margin = section.settings.bottom_margin
+
+  assign background_color = section.settings.background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign top_padding = section.settings.top_padding
+  assign bottom_padding = section.settings.bottom_padding
+  assign side_padding = section.settings.side_padding
+%}
+
+<style>
+  #shopify-section-{{section.id}} {
+    margin-top: {{ top_margin }}px;
+    margin-bottom: {{ bottom_margin }}px;
+  }
+  {% if background_color.alpha != null and background_color.alpha != 0.0 %}
+    {% if fullwidth_background %}
+      #shopify-section-{{ section.id }} {
+        background-color: {{background_color}};
+        max-width: 100%;
+        padding-top: {{top_padding}}px;
+        padding-bottom: {{bottom_padding}}px;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      #shopify-section-{{ section.id }} .related-products-grid--inner {
+        max-width: {{ settings.page_width }}px;
+        margin: 0 auto;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+    {% else %}
+      #shopify-section-{{ section.id }}{
+        background-color: {{background_color}};
+        padding-top: {{top_padding}}px;
+        padding-bottom: {{bottom_padding}}px;
+        padding-left: {{side_padding}}px;
+        padding-right: {{side_padding}}px;
+        box-sizing: border-box;
+      }
+    {% endif %}
+  {% endif %}
+
+  #shopify-section-{{section.id}} .related-products-grid__content-grid {
+    display: grid;
+    grid-template-columns: repeat({{columns_mobile}}, minmax(0, 1fr));
+    grid-gap: {{grid_gap}}px;
+  }
+
+  @media screen and (min-width: 769px) {
+    #shopify-section-{{section.id}} .related-products-grid__content-grid {
+      grid-template-columns: repeat({{columns}}, minmax(0, 1fr));
+    }
+  }
+</style>
+
+{% capture placeholder_products %}
+  {% for i in (1..columns) %}
+    {%- assign card_id = section.id | append: '-card-' | append: forloop.index -%}
+    {%- assign image_sizes = '' -%}
+    {%- assign mobile_size = 100 | divided_by: columns_mobile | append: 'vw' -%}
+    {%- assign desktop_size = 100 | divided_by: columns | append: 'vw' -%}
+    {%- assign image_sizes = '(max-width: 769px) MOBILE, DESKTOP'
+      | replace: 'MOBILE', mobile_size
+      | replace: 'DESKTOP', desktop_size
+    -%}
+
+    {% if section.index <= 3 and forloop.index == 1 %}
+      {%- assign fetchpriority = 'high' -%}
+      {%- assign loading = 'defer' -%}
+    {% else %}
+      {%- assign loading = 'lazy' -%}
+    {% endif %}
+
+    {%- assign index = forloop.index0 | times: 1.0 -%}
+    {%- assign additional_price = 1000 | times: index -%}
+    {%- assign default_price = 990 | plus: additional_price -%}
+    {%- assign placeholder_name = 'product-' | append: forloop.index -%}
+
+    {% render 'product-card_v2',
+      product: blank,
+      selected_variant: blank,
+      display_type: display_type,
+      drop_shadow: drop_shadow,
+      card_background_color: card_background_color,
+      image_background_color: image_background_color,
+      name_color: name_color,
+      name_tag: name_tag,
+      name_font_size_scale: name_font_size_scale,
+      price_color: price_color,
+      price_font_size_scale: price_font_size_scale,
+      background_color: background_color,
+      alignment: alignment,
+      id: card_id,
+      image_sizes: image_sizes,
+      fetchpriority: fetchpriority,
+      loading: loading,
+      default_price: default_price,
+      placeholder_name: placeholder_name,
+      show_price: show_price
+    %}
+  {% endfor %}
+{% endcapture %}
+
+<div class="related-products-grid--inner">
+  <div class="related-products-grid__content">
+    {% if products_source == 'product_list' %}
+      <div class="related-products-grid__content-grid">
+        {% if upsell_product_list != blank %}
+          {% for rec_product in upsell_product_list %}
+            {%- assign card_id = section.id | append: '-' | append: rec_product.id -%}
+            {% if section.index <= 3 and forloop.index == 1 %}
+              {%- assign fetchpriority = 'high' -%}
+              {%- assign image_sizes = '' -%}
+            {% endif %}
+
+            {% render 'product-card_v2',
+              product: rec_product,
+              selected_variant: rec_product.selected_or_first_available_variant,
+              display_type: display_type,
+              drop_shadow: drop_shadow,
+              card_background_color: card_background_color,
+              image_background_color: image_background_color,
+              name_color: name_color,
+              name_tag: name_tag,
+              name_font_size_scale: name_font_size_scale,
+              show_price: show_price,
+              price_color: price_color,
+              price_font_size_scale: price_font_size_scale,
+              alignment: alignment,
+              id: card_id,
+              fetchpriority: fetchpriority,
+              image_sizes: image_sizes
+            %}
+          {% endfor %}
+        {% else %}
+          {{ placeholder_products }}
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if products_source == 'related_products' or products_source == 'complementary_products' %}
+      {%- if products_source == 'related_products' -%}
+        {%- assign rec_type = 'related' -%}
+      {%- elsif products_source == 'complementary_products' -%}
+        {%- assign rec_type = 'complementary' -%}
+      {%- endif -%}
+      <product-recommendations
+        data-section-id="{{ section.id }}"
+        class="product-recommendations"
+        data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit=12&intent={{rec_type}}"
+      >
+        <div class="related-products-grid__content-grid">
+          {%- if recommendations.performed? and recommendations.products_count > 0 -%}
+            {%- for rec_product in recommendations.products -%}
+              {%- assign card_id = section.id | append: '-' | append: rec_product.id -%}
+              {% if section.index <= 3 and forloop.index == 1 %}
+                {%- assign fetchpriority = 'high' -%}
+                {%- assign image_sizes = '' -%}
+              {% endif %}
+
+              {% render 'product-card_v2',
+                product: rec_product,
+                selected_variant: rec_product.selected_or_first_available_variant,
+                display_type: display_type,
+                drop_shadow: drop_shadow,
+                card_background_color: card_background_color,
+                image_background_color: image_background_color,
+                name_color: name_color,
+                name_tag: name_tag,
+                name_font_size_scale: name_font_size_scale,
+                show_price: true,
+                price_color: price_color,
+                price_font_size_scale: price_font_size_scale,
+                alignment: alignment,
+                id: card_id,
+                fetchpriority: fetchpriority,
+                image_sizes: image_sizes
+              %}
+            {%- endfor -%}
+
+          {%- else -%}
+            {{ placeholder_products }}
+          {%- endif -%}
+        </div>
+      </product-recommendations>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Related products grid",
+  "class": "related-products-grid container",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Add a grid of your most popular collections to your page. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+    },
+    {
+      "type": "select",
+      "id": "products_source",
+      "label": "Source",
+      "options": [
+        {
+          "value": "product_list",
+          "label": "Product list"
+        },
+        {
+          "value": "related_products",
+          "label": "Related products"
+        },
+        {
+          "value": "complementary_products",
+          "label": "Complementary products"
+        }
+      ],
+      "default": "product_list"
+    },
+    {
+      "type": "product_list",
+      "id": "upsell_product_list",
+      "label": "Product list",
+      "limit": 20
+    },
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Customize the core styles of your related products section."
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columns",
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns (mobile)",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 1,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Grid gap",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "display_type",
+      "label": "Display type",
+      "options": [
+        {
+          "value": "borderless",
+          "label": "Borderless"
+        },
+        {
+          "value": "card",
+          "label": "Card"
+        }
+      ],
+      "default": "borderless"
+    },
+    {
+      "type": "header",
+      "content": "Cards",
+      "info": "Customize the core styles of your collection cards."
+    },
+    {
+      "type": "checkbox",
+      "id": "drop_shadow",
+      "label": "Drop shadow",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "card_background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "color",
+      "id": "image_background_color",
+      "label": "Image background color"
+    },
+    {
+      "type": "text_alignment",
+      "id": "alignment",
+      "label": "Text alignment",
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Names",
+      "info": "Customize the look and feel of the collection names within the cards."
+    },
+    {
+      "type": "color",
+      "id": "name_color",
+      "label": "Color"
+    },
+    {
+      "type": "select",
+      "id": "name_tag",
+      "label": "Tag",
+      "options": [
+        {
+          "value": "h1",
+          "label": "H1"
+        },
+        {
+          "value": "h2",
+          "label": "H2"
+        },
+        {
+          "value": "h3",
+          "label": "H3"
+        },
+        {
+          "value": "h4",
+          "label": "H4"
+        },
+        {
+          "value": "h5",
+          "label": "H5"
+        },
+        {
+          "value": "h6",
+          "label": "H6"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "range",
+      "id": "name_font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Prices",
+      "info": "Show an item count informing the user on how many products are in each collection."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show prices",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Color"
+    },
+    {
+      "type": "range",
+      "id": "price_font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Personalize the background of your section to match your brand. "
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth_background",
+      "label": "Fullwidth background",
+      "default": false
+    },
+    {
+    "type": "header",
+    "content": "Section padding",
+    "info": "Add spacing above and below inside your new section."
+  },
+  {
+    "type": "range",
+    "id": "top_padding",
+    "min": 0,
+    "max": 100,
+    "step": 1,
+    "unit": "px",
+    "label": "Top padding",
+    "default": 15
+  },
+  {
+    "type": "range",
+    "id": "bottom_padding",
+    "min": 0,
+    "max": 100,
+    "step": 1,
+    "unit": "px",
+    "label": "Bottom padding",
+    "default": 15
+  },
+  {
+    "type": "range",
+    "id": "side_padding",
+    "min": 10,
+    "max": 60,
+    "step": 1,
+    "unit": "px",
+    "label": "Side padding",
+    "default": 24
+  },
+    {
+      "type": "header",
+      "content": "Section margin",
+      "info": "Add spacing above and below your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top margin",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "bottom_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom margin",
+      "default": 40
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "Related products grid",
+      "settings": {
+      "background_color": "",
+      "fullwidth_background": false,
+      "products_source": "related_products",
+      "upsell_product_list": [
+
+      ],
+      "columns": 4,
+      "columns_mobile": "1",
+      "grid_gap": 16,
+      "display_type": "borderless",
+      "drop_shadow": false,
+      "card_background_color": "",
+      "image_background_color": "",
+      "alignment": "center",
+      "name_color": "",
+      "name_tag": "h2",
+      "name_font_size_scale": 100,
+      "show_price": true,
+      "price_color": "",
+      "price_font_size_scale": 100,
+      "top_padding": 15,
+      "bottom_padding": 15,
+      "side_padding": 24,
+      "top_margin": 40,
+      "bottom_margin": 40
+    }
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,530 @@
+{% liquid
+  assign background_color = section.settings.background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign column_gap = section.settings.column_gap
+  assign top_padding = section.settings.top_padding
+  assign bottom_padding = section.settings.bottom_padding
+  assign top_padding_mobile = section.settings.top_padding | divided_by: 2
+  assign bottom_padding_mobile = section.settings.bottom_padding | divided_by: 2
+
+  assign background_color = section.settings.background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign side_padding = section.settings.side_padding
+
+  assign top_margin = section.settings.top_margin
+  assign bottom_margin = section.settings.bottom_margin
+  assign top_margin_mobile = section.settings.top_margin | divided_by: 2
+  assign bottom_margin_mobile = section.settings.bottom_margin | divided_by: 2
+
+  assign grid_size = section.blocks.size
+
+  assign animation_speed = section.settings.animation_speed
+  assign trigger_on = section.settings.trigger_on
+  assign font_size_scale = section.settings.font_size_scale
+  assign content_alignment = section.settings.content_alignment
+
+  assign blockSize = 0
+  for block in section.blocks
+    if block.settings.scale_from != blank and block.settings.scale_to != blank
+      assign blockSize = blockSize | plus: 1
+    endif
+  endfor
+%}
+
+{% stylesheet %}
+  .scaling-numbers__content {
+    display: grid;
+  }
+
+  .scaling-numbers__number {
+    padding: 43px 0;
+  }
+
+  .scaling-numbers__number--inner {
+    margin-bottom: 14px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .scaling-numbers__number__value, .scaling-numbers__number__unit {
+    font-style: normal;
+    line-height: 1;
+  }
+
+  .scaling-numbers__number__label {
+    font-style: normal;
+    line-height: 1;
+    display: block;
+    width: 100%;
+  }
+
+  @media only screen and (min-width: 768px) {
+    .scaling-numbers__content {
+      flex-direction: row;
+    }
+  }
+{% endstylesheet %}
+
+{%- if section.blocks.size > 0 -%}
+  {% style %}
+    #shopify-section-{{ section.id }} {
+      margin-top: {{top_margin_mobile}}px;
+      margin-bottom: {{bottom_margin_mobile}}px;
+    }
+
+    {% if background_color.alpha != null and background_color.alpha != 0.0 %}
+      {% if fullwidth_background %}
+        #shopify-section-{{ section.id }} {
+          background-color: {{background_color}};
+          max-width: 100%;
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: 0;
+          padding-right: 0;
+        }
+
+        #shopify-section-{{ section.id }} .scaling-numbers--inner {
+          max-width: {{ settings.page_width }}px;
+          margin: 0 auto;
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+      {% else %}
+        #shopify-section-{{ section.id }}{
+          background-color: {{background_color}};
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: {{side_padding}}px;
+          padding-right: {{side_padding}}px;
+          box-sizing: border-box;
+        }
+      {% endif %}
+    {% endif %}
+    #shopify-section-{{section.id}}  .scaling-numbers__content {
+      grid-template-columns: 1fr;
+      gap: {{column_gap}}px;
+    }
+
+    #shopify-section-{{section.id}} .scaling-numbers__number {
+      {%- case content_alignment -%}
+        {%- when "left" -%}
+          text-align: left;
+        {%- when "center" -%}
+          text-align: center;
+        {%- when "right" -%}
+          text-align: right;
+      {%- endcase -%}
+    }
+
+    #shopify-section-{{section.id}} .scaling-numbers__number--inner {
+      {%- case content_alignment -%}
+        {%- when "left" -%}
+          justify-content: flex-start;
+        {%- when "center" -%}
+          justify-content: center;
+        {%- when "right" -%}
+          justify-content: flex-end;
+      {%- endcase -%}
+    }
+
+    #shopify-section-{{section.id}} .scaling-numbers__number__value, .scaling-numbers__number__unit  {
+      color: {{settings.heading_color}};
+      font-family: {{ settings.heading_font.family }}, {{ settings.heading_font.fallback_families }};
+      font-weight: {{ settings.heading_font.weight }};
+      font-size: {{46 | times: font_size_scale |  divided_by: 100.0 | round}}px;
+    }
+
+    #shopify-section-{{section.id}} .scaling-numbers__number__label {
+      font-family: {{ settings.paragraph_font.family }}, {{ settings.paragraph_font.fallback_families }};
+      font-weight: {{ settings.paragraph_font.weight }};
+      color: {{ settings.paragraph_color }};
+      font-size: {{16 | times: font_size_scale |  divided_by: 100.0 | round}}px;
+    }
+
+    @media only screen and (min-width: 768px) {
+      #shopify-section-{{section.id}}  .scaling-numbers__content {
+        grid-template-columns: repeat({{grid_size}}, minmax(0, 1fr));
+      }
+
+      #shopify-section-{{section.id}} {
+        margin-top: {{top_margin}}px;
+        margin-bottom: {{bottom_margin}}px;
+      }
+
+      #shopify-section-{{section.id}} .scaling-numbers__content {
+        flex-wrap: wrap;
+      }
+    }
+  {% endstyle %}
+
+  <div class="scaling-numbers--inner {% if fullwidth_background %}container{% endif %}">
+    <div class="scaling-numbers__content">
+      {%- for block in section.blocks -%}
+        {%- if block.settings.scale_from != blank and block.settings.scale_to != blank -%}
+          {% style %}
+            #scaling-numbers-block-{{block.id}} .scaling-numbers__number__value {
+              animation: countUp {{animation_speed}}s ease-out;
+            }
+
+            @keyframes countUp {
+              from {
+                content: "{{block.settings.scale_from}}";
+              }
+              to {
+                content: "{{block.settings.scale_to}}";
+              }
+            }
+          {% endstyle %}
+
+          <scale-number
+            class="scaling-numbers__number"
+            data-scale-from="{{block.settings.scale_from}}"
+            data-scale-to="{{block.settings.scale_to}}"
+            data-animation-speed="{{animation_speed}}"
+            data-trigger-in-view="{% if trigger_on == 'scroll_in_view' %}true{% endif %}"
+            id="scaling-numbers-block-{{block.id}}"
+          >
+            <div class="scaling-numbers__number--inner">
+              {%- if block.settings.pre_unit != blank -%}
+                <span class="scaling-numbers__number__unit">{{ block.settings.pre_unit | slice: 0, 3 }}</span>
+              {%- endif -%}
+              <span class="scaling-numbers__number__value" data-value-container>{{ block.settings.scale_from }}</span>
+              {%- if block.settings.post_unit != blank -%}
+                <span class="scaling-numbers__number__unit">{{ block.settings.post_unit | slice: 0, 3 }}</span>
+              {%- endif -%}
+            </div>
+            {%- if block.settings.label != blank -%}
+              <span class="scaling-numbers__number__label">{{ block.settings.label }}</span>
+            {%- endif -%}
+          </scale-number>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% javascript %}
+  class ScaleNumber extends HTMLElement {
+    constructor() {
+      super();
+      this.valueContainer = this.querySelector('[data-value-container]')
+      this.scaleFromValue = +this.dataset.scaleFrom
+      this.scaleToValue = +this.dataset.scaleTo
+      this.animationSpeed = +this.dataset.animationSpeed
+      this.isTriggerInView = this.dataset.triggerInView
+    }
+
+    runAnimation() {
+      const isFloatFunction = (n) => {
+        return Number(n) === n && n % 1 !== 0;
+      }
+      let counterElement = this.valueContainer
+      let startValue = this.scaleFromValue;
+      let endValue = this.scaleToValue;
+      let duration = this.animationSpeed * 1000;
+      let range = endValue - startValue;
+      let step = Math.ceil(duration / range);
+      let startTime = null;
+      const isFloat = isFloatFunction(this.scaleToValue)
+      function animateCounter(timestamp) {
+        if (!startTime) startTime = timestamp;
+        let progress = timestamp - startTime;
+        let currentValue = startValue + (progress / duration) * range;
+
+        if (progress < duration && currentValue <= endValue) {
+          counterElement.textContent = isFloat ? currentValue.toFixed(1) : currentValue.toFixed();
+          requestAnimationFrame(animateCounter);
+        } else {
+          counterElement.textContent = isFloat ? endValue.toFixed(1) : endValue.toFixed(0);
+        }
+      }
+      this.classList.add('loaded')
+      requestAnimationFrame(animateCounter);
+    }
+
+    runObserver() {
+      const options = {
+          root: null,
+          rootMargin: '0px 0px',
+          threshold: 0,
+      };
+
+      const callback = (entries) => {
+          entries.forEach((entry) => {
+              if (entry.isIntersecting && !this.classList.contains('loaded')) {
+                this.runAnimation();
+              }
+          });
+      };
+
+      const observer = new IntersectionObserver(callback, options);
+
+      observer.observe(this);
+    }
+
+    initScale() {
+      if (this.isTriggerInView === "true") {
+        this.runObserver();
+      } else {
+        this.runAnimation();
+      }
+    }
+
+    connectedCallback() {
+      document.addEventListener("DOMContentLoaded", ()=>{
+        this.initScale();
+      })
+    }
+  }
+
+  if (customElements.get('scale-number') === undefined) {
+    customElements.define("scale-number", ScaleNumber);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Scaling metrics",
+  "class": "scaling-numbers container",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "This section displays your best metrics with a scaling numbers animation. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+    },
+    {
+      "type": "range",
+      "id": "animation_speed",
+      "min": 0.5,
+      "max": 10,
+      "step": 0.5,
+      "unit": "sec",
+      "label": "Animation speed",
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "trigger_on",
+      "label": "Trigger on",
+      "options": [
+        {
+          "value": "page_load",
+          "label": "Page load"
+        },
+        {
+          "value": "scroll_in_view",
+          "label": "Scroll in view"
+        }
+      ],
+      "default": "scroll_in_view"
+    },
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Customize the sizing and spacing of your section."
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Column gap",
+      "default": 30
+    },
+    {
+        "type": "range",
+        "id": "font_size_scale",
+        "min": 75,
+        "max": 125,
+        "step": 1,
+        "unit": "%",
+        "label": "Font size scale",
+        "default": 100
+    },
+    {
+      "type": "text_alignment",
+      "id": "content_alignment",
+      "label": "Content alignment",
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Customize the background of your section."
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth_background",
+      "label": "Fullwidth background",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Section padding",
+      "info": "Add spacing above and below inside your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "bottom_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Section margin",
+      "info": "Add spacing above and below your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top margin",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "bottom_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom margin",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Metric",
+      "type": "metric",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "This block represents one metric within your scaling metrics section. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+        },
+        {
+          "type": "number",
+          "id": "scale_from",
+          "label": "Scale from",
+          "default": 0
+        },
+        {
+          "type": "number",
+          "id": "scale_to",
+          "label": "Scale to",
+          "default": 20
+        },
+        {
+          "type": "text",
+          "id": "pre_unit",
+          "label": "Pre Unit"
+        },
+        {
+          "type": "text",
+          "id": "post_unit",
+          "label": "Post Unit"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Customers"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 5,
+  "presets": [
+    {
+      "name": "Scaling metrics",
+      "settings": {
+        "background_color": "",
+        "fullwidth_background": false,
+        "animation_speed": 1.5,
+        "trigger_on": "scroll_in_view",
+        "column_gap": 30,
+        "font_size_scale": 100,
+        "content_alignment": "center",
+        "top_padding": 0,
+        "bottom_padding": 0,
+        "top_margin": 40,
+        "bottom_margin": 40
+      },
+      "blocks": [
+        {
+          "type": "metric",
+          "settings": {
+            "scale_from": 0,
+            "scale_to": 300,
+            "pre_unit": "",
+            "post_unit": "K+",
+            "label": "Happy Pets"
+          }
+        },
+        {
+          "type": "metric",
+          "settings": {
+            "scale_from": 0,
+            "scale_to": 56,
+            "pre_unit": "",
+            "post_unit": "",
+            "label": "Locations"
+          }
+        },
+        {
+          "type": "metric",
+          "settings": {
+            "scale_from": 0,
+            "scale_to": 100,
+            "pre_unit": "$",
+            "post_unit": "K",
+            "label": "Donated to Charity"
+          }
+        },
+        {
+          "type": "metric",
+          "settings": {
+            "scale_from": 0,
+            "scale_to": 8,
+            "pre_unit": "",
+            "post_unit": "",
+            "label": "Countries"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

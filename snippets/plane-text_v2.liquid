@@ -1,0 +1,102 @@
+{% liquid
+    assign default_color = default_color | default: settings.inactive_color
+    assign text = text | default: block.settings.text
+    assign font_size_scale = font_size_scale | default: block.settings.font_size_scale | default: 100
+    assign color = color | default: block.settings.color
+    assign max_width = max_width | default: block.settings.max_width
+    assign visible_on_desktop = visible_on_desktop | default: block.settings.visible_on_desktop
+    assign visible_on_mobile = visible_on_mobile | default: block.settings.visible_on_mobile
+    assign block_id = block_id | default: block.id
+
+    assign desktop_line_height_percents = desktop_line_height_percents | default: 160
+    assign mobile_line_height_percents = mobile_line_height_percents | default: 160
+
+    assign default_font_size_mobile = default_font_size_mobile | default: 16
+    assign default_font_size_desktop = default_font_size_desktop | default: 16
+    
+    assign global_setting_font_size_scale = settings.paragraph_font_size_scale | default: 100
+    assign global_setting_line_height_scale = settings.paragraph_line_spacing_scale | default: 100
+
+    assign font_size = default_font_size_mobile | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round
+    assign font_size_desktop = default_font_size_desktop | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round
+
+    assign line_height = font_size | times: desktop_line_height_percents | divided_by: 100.0 | round | times: global_setting_line_height_scale | divided_by: 100.0 | round
+    assign line_height_desktop = font_size_desktop | times: mobile_line_height_percents | divided_by: 100.0 | round | times: global_setting_line_height_scale | divided_by: 100.0 | round
+
+    assign content_alignment_mobile = content_alignment_mobile 
+    assign content_alignment = content_alignment 
+%}
+
+    
+{%- if text != blank -%}
+  <span
+    class="block__plane-text inherit-inner-content block-{{block_id}}"
+    aria-label="{{'accessibility.general.description' | t}}"
+  >
+  {% style %}
+    .block__plane-text.block-{{block_id}} {
+        font-family: {{ settings.paragraph_font.family }}, {{ settings.paragraph_font.fallback_families }};
+        color: {% if color.alpha and color.alpha != 0.0 %}{{color}}{% elsif default_color.alpha and default_color.alpha != 0.0 %}{{default_color}}{% else %}{{settings.paragraph_color}}{% endif %};
+        font-size: {{font_size}}px;
+        line-height: {{line_height}}px;
+        font-weight: {{ settings.paragraph_font.weight }};
+        {%- case content_alignment_mobile -%}
+            {%- when "center" -%}
+                text-align: center;
+            {%- when "left" -%}
+                text-align: left;
+            {%- when "right" -%}
+                text-align: right;
+        {%- endcase -%}
+    }
+    {% if max_width != blank %}
+        .block__plane-text.block-{{block_id}} {
+            max-width: {{max_width}}px;
+            width: 100%;
+        }
+    {% endif %}
+    {% if visible_on_mobile %}
+        .block__plane-text.block-{{block_id}} {
+            display: inline;
+        }
+    {% else %}
+        .block__plane-text.block-{{block_id}} {
+            display: none;
+        }
+    {% endif %}
+
+    @media only screen and (min-width: 768px) {
+        .block__plane-text.block-{{block_id}} {
+            font-size: {{font_size_desktop}}px;
+            line-height: {{line_height_desktop}}px;
+            {%- case content_alignment -%}
+                {%- when "center" -%}
+                    text-align: center;
+                {%- when "left" -%}
+                    text-align: left;
+                {%- when "right" -%}
+                    text-align: right;
+            {%- endcase -%}
+        }
+
+        {% if max_width != blank %}
+            .block__plane-text.block-{{block_id}} {
+                max-width: {{max_width}}px;
+                width: 100%;
+            }
+        {% endif %}
+
+        {% if visible_on_desktop %}
+            .block__plane-text.block-{{block_id}} {
+                display: inline;
+            }
+        {% else %}
+            .block__plane-text.block-{{block_id}} {
+                display: none;
+            }
+        {% endif %}
+    }
+  {% endstyle %}
+    {{ text }}
+  </span>
+{%- endif -%}

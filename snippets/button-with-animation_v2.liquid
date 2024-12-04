@@ -1,0 +1,60 @@
+{% liquid
+    assign text = text
+    assign link = link
+    assign type = type
+    assign animation = animation
+    assign classes = classes
+    assign id = id
+    assign aria_label = aria_label
+    assign data_attributes = data_attributes
+    assign element_type = element_type | default: "button"
+
+    assign class = class
+
+    assign text_color = text_color
+    assign background_color = background_color
+    assign border_color = border_color
+    assign border_width = border_width
+    assign border_radius = border_radius
+    assign button_id = button_id
+
+    assign top_padding = top_padding
+    assign bottom_padding = bottom_padding
+
+    assign default_font_size_mobile = default_font_size_mobile | default: 16
+    assign default_font_size_desktop = default_font_size_desktop | default: 16
+
+    assign icon_name = icon_name
+    assign icon_color = icon_color
+%}
+
+{% render 'button-animation-styles_v2', 
+    type: type,
+    animation: animation, 
+    text_color: text_color,
+    background_color: background_color,
+    border_color: border_color,
+    border_width: border_width,
+    border_radius: border_radius,
+    top_padding: top_padding,
+    bottom_padding: bottom_padding,
+    default_font_size_mobile: default_font_size_mobile,
+    default_font_size_desktop: default_font_size_desktop,
+    button_id: button_id
+%}
+
+{%- if text != blank and link != blank -%}
+    <a type="{{element_type}}" href="{{link}}" class="button-{{button_id}} {{class}}" id="{{button_id}}" aria-label="{{aria_label}}" {{data_attributes}}>
+        {% if icon_name != null and icon_name != blank %}
+            <span class="button-with-animation-icon">{% render 'icon_v2', icon: icon_name, color: icon_color %}</span>
+        {% endif %}
+        <span class="button-with-animation-text">{{text}}</span>
+    </a>
+{%- elsif text != blank -%}
+    <button type="{{element_type}}" class="button-{{button_id}} {{class}}" id="{{button_id}}" aria-label="{{aria_label}}" {{data_attributes}}>
+        {% if icon_name != null and icon_name != blank %}
+            <span class="button-with-animation-icon">{% render 'icon_v2', icon: icon_name, color: icon_color %}</span>
+        {% endif %}
+        <span class="button-with-animation-text">{{text}}</span>
+    </button>
+{%- endif -%}

@@ -1,0 +1,475 @@
+{% liquid
+  assign grid_gap = section.settings.grid_gap
+  assign columns = section.settings.columns
+  assign display_title = section.settings.display_title
+  assign title_tag = section.settings.title_tag
+  assign title_color = section.settings.title_color
+  assign title_font_size_scale = section.settings.title_font_size_scale
+  assign display_date = section.settings.display_date
+  assign date_color = section.settings.date_color
+  assign date_font_size_scale = section.settings.date_font_size_scale
+  assign display_author = section.settings.display_author
+  assign author_color = section.settings.author_color
+  assign author_font_size_scale = section.settings.author_font_size_scale
+  assign top_margin = section.settings.top_margin
+  assign bottom_margin = section.settings.bottom_margin
+
+  assign grid_rows = 0
+  assign float_columns = columns | times: 1.0
+
+  assign background_color = section.settings.background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign top_padding = section.settings.top_padding
+  assign bottom_padding = section.settings.bottom_padding
+  assign side_padding = section.settings.side_padding
+%}
+
+{%- for block in section.blocks -%}
+  {%- if columns > 2 -%}
+    {%- assign size = block.settings.width | times: block.settings.height -%}
+    {%- assign grid_rows = grid_rows | plus: size -%}
+  {%- else -%}
+    {%- assign grid_rows = grid_rows | plus: block.settings.height -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- if columns > 2 -%}
+  {%- assign grid_rows = grid_rows | divided_by: float_columns | round -%}
+{%- else -%}
+  {%- assign grid_rows = grid_rows -%}
+{%- endif -%}
+
+{% stylesheet %}
+  .featured-articles__content {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-flow: dense;
+  }
+
+  /* Card styles */
+
+  .article-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .article-card__media {
+    display: flex;
+    height: -webkit-fill-available;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .article-card__media img {
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .article-card__author-date {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .article-card__author-date .block__paragraph[style*="display:block;"] {
+    display: contents;
+  }
+{% endstylesheet %}
+
+{% if section.blocks.size > 0 %}
+  {% style %}
+    #shopify-section-{{section.id}} {
+        margin: {{ top_margin | divided_by: 2 }}px auto {{ bottom_margin | divided_by: 2 }}px;
+    }
+
+    {% if background_color.alpha != null and background_color.alpha != 0.0 %}  
+      {% if fullwidth_background %}
+        #shopify-section-{{ section.id }} {
+          background-color: {{background_color}};
+          max-width: 100%;
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: 0;
+          padding-right: 0;
+        }
+
+        #shopify-section-{{ section.id }} .featured-articles--inner {
+          max-width: {{ settings.page_width }}px;
+          margin: 0 auto;
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+      {% else %}
+        #shopify-section-{{ section.id }}{
+          background-color: {{background_color}};
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: {{side_padding}}px;
+          padding-right: {{side_padding}}px;
+          box-sizing: border-box;
+        }
+      {% endif %}
+    {% endif %}
+
+    #shopify-section-{{section.id}} .featured-articles__content {
+        grid-gap: {{ grid_gap }}px;
+    }
+
+    @media only screen and (min-width: 769px) {
+        #shopify-section-{{ section.id }} .featured-articles__content {
+            {% if columns > 1 %}
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            {% endif %}
+            grid-template-rows: repeat(auto-fill, minmax(250px, max-content));
+        }
+    }
+
+    @media only screen and (min-width: 1050px) {
+        #shopify-section-{{section.id}} {
+          margin: {{ top_margin }}px auto {{ bottom_margin }}px
+        }
+
+        #shopify-section-{{ section.id }} .featured-articles__content {
+            grid-template-columns: repeat({{ columns }}, minmax(0, 1fr));
+            grid-template-rows: repeat(auto-fill, minmax(220px, max-content));
+        }
+    }
+  {% endstyle %}
+
+  <div class="featured-articles--inner">
+    <div class="featured-articles__content">
+      {%- for block in section.blocks -%}
+        {% render 'article-card_v2',
+          block: block,
+          grid_gap: grid_gap,
+          card_index: forloop.index,
+          columns: columns,
+          display_title: display_title,
+          title_tag: title_tag,
+          title_color: title_color,
+          title_font_size_scale: title_font_size_scale,
+          display_date: display_date,
+          date_color: date_color,
+          date_font_size_scale: date_font_size_scale,
+          display_author: display_author,
+          author_color: author_color,
+          author_font_size_scale: author_font_size_scale
+        %}
+      {%- endfor -%}
+    </div>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Featured articles",
+  "class": "featured-articles container",
+  "max_blocks": 20,
+  "settings": [
+      {
+        "type": "paragraph",
+        "content": "Add a grid of handpicked featured articles and amend its layout and style to your liking. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+    },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Personalize the background of your section to match your brand. "
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth_background",
+      "label": "Fullwidth background",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Grid gap",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columns",
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Titles",
+      "info": "Amend your article's titles to your liking."
+    },
+    {
+      "type": "checkbox",
+      "id": "display_title",
+      "label": "Display titles",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "title_tag",
+      "label": "Tag",
+      "options": [
+        {
+          "value": "h1",
+          "label": "H1"
+        },
+        {
+          "value": "h2",
+          "label": "H2"
+        },
+        {
+          "value": "h3",
+          "label": "H3"
+        },
+        {
+          "value": "h4",
+          "label": "H4"
+        },
+        {
+          "value": "h5",
+          "label": "H5"
+        },
+        {
+          "value": "h6",
+          "label": "H6"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Dates",
+      "info": "Amend your article's date text to your liking."
+    },
+    {
+      "type": "checkbox",
+      "id": "display_date",
+      "label": "Display dates",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "date_color",
+      "label": "Color"
+    },
+    {
+      "type": "range",
+      "id": "date_font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Authors",
+      "info": "Amend your article's author text to your liking."
+    },
+    {
+      "type": "checkbox",
+      "id": "display_author",
+      "label": "Display authors",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "author_color",
+      "label": "Color"
+    },
+    {
+      "type": "range",
+      "id": "author_font_size_scale",
+      "min": 75,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Font size scale",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Section padding",
+      "info": "Add spacing above and below inside your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "bottom_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Section margin",
+      "info": "Add spacing above and below your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top margin",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "bottom_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom margin",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Article",
+      "type": "article",
+      "settings": [
+        {
+            "type": "paragraph",
+            "content": "Add a handpicked article to your featured article section and amend it’s placement within the grid. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+        },
+        {
+          "type": "article",
+          "id": "article",
+          "label": "Article"
+        },
+        {
+          "type": "header",
+          "content": "Override",
+          "info": "Refine certain (or all) elements of the article with this override functionality."
+        },
+        {
+          "type": "image_picker",
+          "id": "image_with_text_image",
+          "label": "Image Override"
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_title_override",
+          "label": "Enable title override",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_date_override",
+          "label": "Enable date override",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_author_override",
+          "label": "Enable author override",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "title_override",
+          "label": "Title override"
+        },
+        {
+          "type": "text",
+          "id": "date_override",
+          "label": "Date override"
+        },
+        {
+          "type": "text",
+          "id": "author_override",
+          "label": "Author override"
+        },
+        {
+          "type": "header",
+          "content": "Layout",
+          "info": "Customize the layout and positioning of the card within the grid and the content within the card."
+        },
+        {
+          "type": "range",
+          "id": "width",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "unit": "col",
+          "label": "Width",
+          "default": 1
+        },
+        {
+          "type": "range",
+          "id": "height",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "unit": "row",
+          "label": "Height",
+          "default": 1
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured articles"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,16 @@
+<label class='checkbox-wrapper{% if is_dark %} dark{% endif %} {{ class }}'>
+  <input
+    type='checkbox'
+    class='checkbox'
+    {% if required %}
+      required
+    {% endif %}
+    {% if disabled %}
+      disabled
+    {% endif %}
+  >
+  <div class='checkbox-icon'>
+    {%- render 'icon_v2', icon: 'checkbox' -%}
+  </div>
+  <span class='checkbox-label'>{{- label -}}</span>
+</label>

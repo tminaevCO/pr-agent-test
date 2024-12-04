@@ -1,0 +1,258 @@
+{% liquid
+  assign article = article | default: block.settings.article
+
+  assign image_with_text_image = block.settings.image_with_text_image | default: article.image
+
+  assign enable_title_override = block.settings.enable_title_override
+  assign enable_date_override = block.settings.enable_date_override
+  assign enable_author_override = block.settings.enable_author_override
+  assign title_override = block.settings.title_override
+  assign date_override = block.settings.date_override
+  assign author_override = block.settings.author_override
+
+  assign width = width | default: block.settings.width
+  assign height = height | default: block.settings.height
+
+  assign columns = columns
+
+  assign block_id = block_id | default: block.id
+
+  assign display_title = display_title
+  assign title_tag = title_tag
+  assign title_color = title_color
+  assign title_font_size_scale = title_font_size_scale
+
+  assign display_date = display_date
+  assign date_color = date_color
+  assign date_font_size_scale = date_font_size_scale
+  assign date_block_id = block_id | prepend: 'date--'
+
+  assign display_author = display_author
+  assign author_color = author_color
+  assign author_font_size_scale = author_font_size_scale
+  assign author_block_id = block_id | prepend: 'author--'
+
+  assign date_and_author_order = date_and_author_order | default: 'date_first'
+
+  assign display_excerpt = display_excerpt
+  assign excerpt_color = excerpt_color
+  assign excerpt_font_size_scale = excerpt_font_size_scale
+  assign excerpt_block_id = block_id | prepend: 'excerpt--'
+
+  assign title = article.title
+  assign date = article.created_at | date: '%b %d, %Y'
+  assign author = article.author
+  assign excerpt = article.excerpt
+
+  assign text_alignment = text_alignment
+
+  assign image_sizes = image_sizes
+  assign divider_color = divider_color
+  if divider_color.alpha == null or divider_color.alpha == 0.0
+    assign divider_color = author_color
+  endif
+
+  if enable_title_override and title_override != blank
+    assign title = title_override
+  endif
+
+  if enable_date_override and date_override != blank
+    assign date = date_override
+  endif
+
+  if enable_author_override and author_override != blank
+    assign author = author_override
+  endif
+
+  if date != blank and display_date and author != blank and display_author
+    if date_and_author_order == 'author_first'
+      assign date = date | prepend: '<span class="divider">|</span> '
+    else
+      assign author = author | prepend: '<span class="divider">|</span> '
+    endif
+  endif
+%}
+
+{% if article != null %}
+  <a href="{{ article.url }}" class="blog-article-card" id="block--{{ block_id }}">
+    {% style %}
+      #block--{{ block_id }} {
+				display: grid;
+				grid-template-columns: 1fr;
+				grid-template-rows: auto 1fr;
+      }
+
+      #block--{{ block_id }} .blog-article-card__media {
+				position: relative;
+				padding-bottom: 77.71%;
+				border-radius: {{settings.border_radius}}px;
+				overflow: hidden;
+				height: 0;
+      }
+
+      #block--{{ block_id }} .blog-article-card__media img,
+      #block--{{ block_id }} .blog-article-card__media svg {
+				position: absolute;
+				top: 0;
+				left: 0;
+				object-fit: cover;
+				width: 100%;
+				height: 100%;
+				background-color:
+      }
+
+      #block--{{ block_id }} .blog-article-card__content {
+				display: flex;
+				flex-direction: column;
+      }
+
+      #block--{{ block_id }} .blog-article-card__content .block__title {
+        margin-top: 12px;
+      }
+
+      #block--{{ block_id }} .blog-article-card__content .block__paragraph {
+        margin-top: 8px;
+      }
+
+      #block--{{ block_id }} .blog-article-card__author-date {
+				{%- case text_alignment -%}
+					{%- when "center" -%}
+						margin-left: auto;
+						margin-right: auto;
+						text-align: center;
+					{%- when "left" -%}
+						margin-left: 0;
+						margin-right: 0;
+						text-align: left;
+					{%- when "right" -%}
+						margin-left: auto;
+						margin-right: 0;
+						text-align: right;
+				{%- endcase -%}
+				margin-top: 8px;
+      }
+
+      #block--{{ block_id }} .blog-article-card__author-date span.divider {
+        color: {{divider_color}};
+      }
+
+      @media only screen and (min-width: 769px) {
+          #block--{{ block_id }} .blog-article-card__content .block__title {
+            margin-top: 14px;
+          }
+
+          #block--{{ block_id }} .blog-article-card__content .block__paragraph {
+            margin-top: 8px;
+          }
+
+          #block--{{ block_id }} .blog-article-card__author-date {
+            margin-top: 8px;
+          }
+      }
+    {% endstyle %}
+
+    <div class="blog-article-card__media">
+      {% if image_with_text_image != blank %}
+        {% render 'responsive-image-dynamic_v2',
+          image: image_with_text_image,
+          sizes: image_sizes,
+          fetchpriority: fetchpriority
+        %}
+      {%- else -%}
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'svg-placeholder' }}
+      {% endif %}
+    </div>
+
+    <div class="blog-article-card__content">
+      {% if display_title %}
+        {% render 'title_v2',
+          block: block,
+          text: title,
+          font_size_scale: title_font_size_scale,
+          color: title_color,
+          tag: title_tag,
+          visible_on_desktop: true,
+          visible_on_mobile: true,
+          block_id: block_id,
+          default_font_size_desktop: 18,
+          default_font_size_mobile: 18,
+          default_color: settings.heading_color,
+          content_alignment: text_alignment,
+          content_alignment_mobile: text_alignment
+        %}
+      {% endif %}
+
+      {% if excerpt != blank and display_excerpt == true %}
+        {% render 'paragraph_v2',
+          text: excerpt,
+          color: excerpt_color,
+          default_color: settings.paragraph_color,
+          font_size_scale: excerpt_font_size_scale,
+          block_id: excerpt_block_id,
+          visible_on_desktop: true,
+          visible_on_mobile: true,
+          content_alignment: text_alignment,
+          content_alignment_mobile: text_alignment
+        %}
+      {% endif %}
+
+      <div class="blog-article-card__author-date">
+        {% if date_and_author_order == 'author_first' %}
+          {% render 'plane-text_v2',
+            text: author,
+            font_size_scale: author_font_size_scale,
+            color: author_color,
+            visible_on_desktop: display_author,
+            visible_on_mobile: display_author,
+            block_id: author_block_id,
+            default_font_size_desktop: 15,
+            block_id: block_id,
+            default_color: settings.inactive_color,
+            content_alignment: text_alignment,
+            content_alignment_mobile: text_alignment
+          %}
+
+          {% render 'plane-text_v2',
+            text: date,
+            font_size_scale: date_font_size_scale,
+            color: date_color,
+            visible_on_desktop: display_date,
+            visible_on_mobile: display_date,
+            block_id: date_block_id,
+            default_font_size_desktop: 15,
+            default_color: settings.inactive_color,
+            content_alignment: text_alignment,
+            content_alignment_mobile: text_alignment
+          %}
+        {% else %}
+          {% render 'plane-text_v2',
+            text: date,
+            font_size_scale: date_font_size_scale,
+            color: date_color,
+            visible_on_desktop: display_date,
+            visible_on_mobile: display_date,
+            block_id: date_block_id,
+            default_font_size_desktop: 15,
+            default_color: settings.inactive_color,
+            content_alignment: text_alignment,
+            content_alignment_mobile: text_alignment
+          %}
+
+          {% render 'plane-text_v2',
+            text: author,
+            font_size_scale: author_font_size_scale,
+            color: author_color,
+            visible_on_desktop: display_author,
+            visible_on_mobile: display_author,
+            block_id: author_block_id,
+            default_font_size_desktop: 15,
+            block_id: block_id,
+            default_color: settings.inactive_color,
+            content_alignment: text_alignment,
+            content_alignment_mobile: text_alignment
+          %}
+        {% endif %}
+      </div>
+    </div>
+  </a>
+{% endif %}

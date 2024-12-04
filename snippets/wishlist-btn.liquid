@@ -1,0 +1,11 @@
+{%- if settings.enable_wishlist -%}
+  <wishlist-btn
+    data-product-id="{{ product.id }}"
+    data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+    class="absolute z-10 top-2 right-2 lg:right-0 lg:top-0 block md:opacity-0 group-hover:opacity-100 transition-all"
+  >
+    <button>
+      {%- render 'icon_v2', icon: 'wishlist', class: 'w-32 h-32 lg:w-20 lg:h-20' -%}
+    </button>
+  </wishlist-btn>
+{%- endif -%}

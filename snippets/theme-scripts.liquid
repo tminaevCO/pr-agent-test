@@ -1,0 +1,87 @@
+{% liquid
+  assign layout_content = layout_content
+%}
+
+{{ 'shopify_common.js' | shopify_asset_url | script_tag }}
+
+<script>
+  window.shopUrl = '{{ request.origin }}';
+  window.routes = {
+    cart_add_url: '{{ routes.cart_add_url }}',
+    cart_change_url: '{{ routes.cart_change_url }}',
+    cart_update_url: '{{ routes.cart_update_url }}',
+    cart_url: '{{ routes.cart_url }}',
+    predictive_search_url: '{{ routes.predictive_search_url }}',
+  };
+  window.variantStrings = {
+    addToCart: `{{ 'product.form.add_to_cart' | t }}`,
+    soldOut: `{{ 'product.form.sold_out' | t }}`,
+    unavailable: `{{ 'product.form.unavailable' | t }}`,
+    unavailable_with_option: `{{ 'product.form.value_unavailable' | t: option_value: '[value]' }}`,
+  };
+</script>
+
+{% comment %} footer.liquid {% endcomment %}
+{%- if layout_content contains 'section-footer' -%}
+  {{- 'footer.min.js' | asset_url | script_tag -}}
+{%- endif -%}
+
+{% comment %} header.liquid {% endcomment %}
+{%- if layout_content contains 'section-header' -%}
+  {{- 'header.min.js' | asset_url | script_tag -}}
+{%- endif -%}
+
+{% comment %} Swiper connection {% endcomment %}
+{%- if layout_content contains 'swiper' -%}
+  {{- 'swiper-bundle.min.js' | asset_url | script_tag -}}
+{%- endif -%}
+
+{% comment %} search-input-component.liquid {% endcomment %}
+{%- if layout_content contains 'search-input-component' -%}
+  {{ 'search-input-component.min.js' | asset_url | script_tag }}
+{%- endif -%}
+
+{% comment %} benefits.liquid {% endcomment %}
+{%- if layout_content contains 'benefits-section' -%}
+  {{ 'benefits.min.js' | asset_url | script_tag }}
+{%- endif -%}
+
+{% comment %} our-products.liquid {% endcomment %}
+{%- if layout_content contains 'our-products-section' -%}
+  {{ 'our-products-section.min.js' | asset_url | script_tag }}
+{%- endif -%}
+
+{% comment %} video-reviews-carousel.liquid {% endcomment %}
+{%- if layout_content contains 'video-reviews-carousel' -%}
+  {{ 'video-reviews-carousel.min.js' | asset_url | script_tag }}
+{%- endif -%}
+
+{% comment %} quick-view-btn.liquid {% endcomment %}
+{%- if layout_content contains 'quick-view-btn' -%}
+  {{- 'quick-view-btn.min.js' | asset_url | script_tag -}}
+{%- endif -%}
+
+{% comment %} wishlist-btn.liquid {% endcomment %}
+{%- if layout_content contains 'wishlist-btn' -%}
+  {{- 'wishlist-btn.min.js' | asset_url | script_tag -}}
+{%- endif -%}
+
+{% comment %} section-products-slider.liquid {% endcomment %}
+{%- if layout_content contains 'products-slider' -%}
+  {{- 'products-slider.min.js' | asset_url | script_tag -}}
+{%- endif -%}
+
+{% comment %} drawer-mega-menu.liquid {% endcomment %}
+{%- if layout_content contains 'mega-menu' -%}
+  {{- 'drawer-mega-menu.min.js' | asset_url | script_tag -}}
+{%- endif -%}
+
+{% comment %} currency-selector.liquid {% endcomment %}
+{%- if layout_content contains 'localization-form' -%}
+  {{ 'localization-form.min.js' | asset_url | script_tag }}
+{%- endif -%}
+
+{% comment %} market-selector.liquid {% endcomment %}
+{%- if layout_content contains 'market-selector-widget' -%}
+  {{ 'market-selector.min.js' | asset_url | script_tag }}
+{%- endif -%}

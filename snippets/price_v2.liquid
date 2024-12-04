@@ -1,0 +1,218 @@
+{%- liquid
+    assign price_color = price_color
+
+    if price_color.alpha == null or price_color.alpha == 0.0
+        assign price_color = settings.heading_color
+    endif
+
+    assign price_font_size_scale = price_font_size_scale | default: 100
+
+    if use_variant
+        assign target = product.selected_or_first_available_variant
+    else
+        assign target = product
+    endif
+
+    assign alignment = alignment 
+    assign alignment_mobile = alignment_mobile 
+
+    assign compare_at_price = target.compare_at_price
+
+    assign price = target.price | default: default_price
+
+    assign price_min = product.price_min | default: default_price
+    assign price_max = product.price_max
+
+    assign currency_code_enable = settings.currency_code_enable
+    assign currency_format = settings.currency_format
+    assign range_type = settings.range_type
+
+    assign money_price = price | money
+
+    assign money_price_min = price_min | money
+    assign money_price_max = price_max | money
+    assign money_compare_at_price = compare_at_price | money
+
+    if currency_code_enable
+        assign money_price = price | money_with_currency
+        assign money_price_min = price_min | money_with_currency
+        assign money_price_max = price_max | money_with_currency
+        assign money_compare_at_price = compare_at_price | money_with_currency
+    endif
+
+    case currency_format
+        when "amount_with_comma_separator"
+            assign money_price = money_price | replace: ",", "." | replace_last: ".", ","
+            assign money_price_min = money_price_min | replace: ",", "." | replace_last: ".", ","
+            assign money_price_max = money_price_max | replace: ",", "." | replace_last: ".", ","
+            assign money_compare_at_price = money_compare_at_price | replace: ",", "." | replace_last: ".", ","
+        when "amount_with_apostrophe_separator"
+            assign money_price = money_price | replace: ",", "'"
+            assign money_price_min = money_price_min | replace: ",", "'" 
+            assign money_price_max = money_price_max | replace: ",", "'"
+            assign money_compare_at_price = money_compare_at_price | replace: ",", "'"
+        when "amount_with_space_separator"
+            assign money_price = money_price | replace: ",", " " | replace_last: ".", ","
+            assign money_price_min = money_price_min | replace: ",", " " | replace_last: ".", ","
+            assign money_price_max = money_price_max | replace: ",", " " | replace_last: ".", ","
+            assign money_compare_at_price = money_compare_at_price | replace: ",", " " | replace_last: ".", ","
+        when "amount_with_period_and_space_separator"
+            assign money_price = money_price | replace: ",", " "
+            assign money_price_min = money_price_min | replace: ",", " "
+            assign money_price_max = money_price_max | replace: ",", " "
+            assign money_compare_at_price = money_compare_at_price | replace: ",", " "
+    endcase
+
+    assign font_size_desktop = font_size_desktop | default: 16
+    assign font_size_mobile = font_size_mobile | default: 16
+-%}
+
+<div class="price" id="{{section.id}}-{{target.id}}" data-product-price>
+    {% style %}
+        #{{section.id}}-{{target.id}} .price__min-compare--label, 
+        #{{section.id}}-{{target.id}} .price__min--label, 
+        #{{section.id}}-{{target.id}} .price__range--label {
+            position: absolute !important;
+            overflow: hidden;
+            width: 1px;
+            padding: 0;
+            border: 0;
+            clip: rect(0 0 0 0);
+            word-wrap: normal !important;
+            margin: 0;
+            height: 1em;
+            text-align: {{alignment}};
+        }
+
+        #{{section.id}}-{{target.id}} .price__min-compare--min,
+        #{{section.id}}-{{target.id}} .price__min--min,
+        #{{section.id}}-{{target.id}} .price__range--min,
+        #{{section.id}}-{{target.id}} .price__range--max {
+            color: {{price_color}};
+            font-size: {{font_size_desktop | times: settings.paragraph_font_size_scale | divided_by: 100.0 | round | times: price_font_size_scale | divided_by: 100.0 | round }}px;
+            line-height: {{font_size_desktop | times: settings.paragraph_font_size_scale | divided_by: 100.0 | round | times: price_font_size_scale | divided_by: 100.0 | round | times: 150 | divided_by: 100.0 | round | times: settings.paragraph_line_spacing_scale | divided_by: 100.0 | round }}px;
+            font-family: {{ settings.paragraph_font.family }}, {{ settings.paragraph_font.fallback_families }};
+            font-weight: {{ settings.paragraph_font.weight }};
+            text-align: {{alignment}};
+        }
+
+        #{{section.id}}-{{target.id}} .price__min--min {
+            width: 100%;
+            display: block;
+        }
+
+        #{{section.id}}-{{target.id}} .price__min-compare--compare {
+            text-align: {{alignment}};
+        }
+        
+        #{{section.id}}-{{target.id}} .price__min-compare--compare s {
+            color: #77808E;
+            {% if template == 'product' %}  
+                font-size: {{font_size_desktop | minus: 4 | times: settings.paragraph_font_size_scale | divided_by: 100.0 | round | times: price_font_size_scale | divided_by: 100.0 | round }}px;
+            line-height: {{font_size_desktop | minus: 4 | times: settings.paragraph_font_size_scale | divided_by: 100.0 | round | times: price_font_size_scale | divided_by: 100.0 | round | times: 150 | divided_by: 100.0 | round | times: settings.paragraph_line_spacing_scale | divided_by: 100.0 | round }}px;
+            {% else %}
+                font-size: {{font_size_desktop | times: settings.paragraph_font_size_scale | divided_by: 100.0 | round | times: price_font_size_scale | divided_by: 100.0 | round }}px;
+                line-height: {{font_size_desktop | times: settings.paragraph_font_size_scale | divided_by: 100.0 | round | times: price_font_size_scale | divided_by: 100.0 | round | times: 150 | divided_by: 100.0 | round | times: settings.paragraph_line_spacing_scale | divided_by: 100.0 | round }}px;
+            {% endif %}
+            
+            font-family: {{ settings.paragraph_font.family }}, {{ settings.paragraph_font.fallback_families }};
+            font-weight: {{ settings.paragraph_font.weight }};
+            text-align: {{alignment}};
+        }
+
+        #{{section.id}}-{{target.id}} .price__range, 
+        #{{section.id}}-{{target.id}} .price__min-compare {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            {%- case alignment -%}
+                {%- when 'left' -%}
+                    justify-content: flex-start;
+                {%- when 'center' -%}
+                    justify-content: center;
+                {%- when 'right' -%}
+                    justify-content: flex-end;
+            {%- endcase -%}
+        }
+
+        @media only screen and (max-width: 769px) {
+            #{{section.id}}-{{target.id}} .price__min-compare--min,
+            #{{section.id}}-{{target.id}} .price__min--min,
+            #{{section.id}}-{{target.id}} .price__range--min,
+            #{{section.id}}-{{target.id}} .price__range--max,
+            #{{section.id}}-{{target.id}} .price__min-compare--compare s {  
+                font-size: {{font_size_mobile | times: settings.paragraph_font_size_scale | divided_by: 100.0 | round | times: price_font_size_scale | divided_by: 100.0 | round }}px;
+                line-height: {{font_size_mobile | times: settings.paragraph_font_size_scale | divided_by: 100.0 | round | times: price_font_size_scale | divided_by: 100.0 | round | times: 150 | divided_by: 100.0 | round | times: settings.paragraph_line_spacing_scale | divided_by: 100.0 | round }}px;
+                text-align: {{alignment_mobile}};
+            }
+
+            #{{section.id}}-{{target.id}} .price__min-compare--compare s {
+                font-size: {{font_size_mobile | minus: 4 | times: settings.paragraph_font_size_scale | divided_by: 100.0 | round | times: price_font_size_scale | divided_by: 100.0 | round }}px;
+                line-height: {{font_size_mobile | minus: 4 | times: settings.paragraph_font_size_scale | divided_by: 100.0 | round | times: price_font_size_scale | divided_by: 100.0 | round | times: 150 | divided_by: 100.0 | round | times: settings.paragraph_line_spacing_scale | divided_by: 100.0 | round }}px;
+            }
+
+            #{{section.id}}-{{target.id}} .price__range, .price__min-compare {
+                {%- case alignment_mobile -%}
+                    {%- when 'left' -%}
+                        justify-content: flex-start;
+                    {%- when 'center' -%}
+                        justify-content: center;
+                    {%- when 'right' -%}
+                        justify-content: flex-end;
+                {%- endcase -%}
+            }
+        }
+    {% endstyle %}
+    
+    <div class="price__container">
+        {% if range_type == 'display_min' %}
+            {%- if compare_at_price -%}
+                <div class="price__min-compare">
+                    <span class="price__min-compare--label">{{ 'products.product.price.sale_price' | t }}</span>
+                    {% if use_variant %}
+                        <span class="price__min-compare--min">{{money_price}}</span>
+                    {% else %}
+                        <span class="price__min-compare--min">{{money_price_min}}</span>
+                    {% endif %}
+                    
+                    <span class="price__min-compare--compare"><s>{{money_compare_at_price}}</s></span>
+                </div>
+            {%- else -%}
+                <div class="price__min">
+                    {%- assign money_price_min = 'products.product.price.from_price_html' | t: price: money_price_min -%}
+                    {% if use_variant %}
+                        {%- assign money_price_min = money_price -%}
+                    {% endif %}
+                    <span class="price__min--label">{{ 'products.product.price.regular_price' | t }}</span>
+                    <span class="price__min--min">{{money_price_min}}</span>
+                </div>
+            {%- endif -%}
+        {%- else -%}
+            <div class="price__range">
+                <span class="price__range--label">{{'products.product.price.range_price' | t: min_price: money_price_min, max_price: money_price_max}}</span>
+                <span class="price__range--min">{{money_price_min}}{% if money_price_min !=  money_price_max %} - {% endif %}</span>
+
+                {% if money_price_min !=  money_price_max %}
+                    <span class="price__range--max">{{money_price_max}}</span>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    {% if target.taxable %}
+        {%- assign tax_text = 'products.product.price.taxes_included' | t -%}
+        {% render 'plane-text_v2', 
+            text: tax_text,
+            color: tax_color,
+            font_size_scale: tax_font_size_scale,
+            visible_on_desktop: true,
+            visible_on_mobile: true,
+            block_id: block.id,
+            default_font_size_desktop: 15,
+            default_font_size_mobile: 15,
+            default_color: settings.inactive_color
+        %}
+    {% endif %}
+</div>

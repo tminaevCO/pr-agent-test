@@ -1,0 +1,1561 @@
+{% liquid
+  assign content_alignment = section.settings.content_alignment
+  assign content_position = section.settings.content_position
+  assign background_image = section.settings.background_image
+  assign mobile_background_image = section.settings.mobile_background_image
+  assign show_arrow = section.settings.show_arrow
+  assign border_radius = settings.border_radius
+  assign arrow_color = section.settings.arrow_color | default: settings.secondary_text_color
+  assign scroll_target = section.settings.scroll_target
+  assign top_margin = section.settings.top_margin
+  assign bottom_margin = section.settings.bottom_margin
+
+  assign top_margin_mobile = section.settings.top_margin | divided_by: 2
+  assign bottom_margin_mobile = section.settings.bottom_margin | divided_by: 2
+
+  assign background_color = section.settings.background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign top_padding = section.settings.top_padding
+  assign bottom_padding = section.settings.bottom_padding
+  assign side_padding = section.settings.side_padding
+
+  assign desktop_min_height = section.settings.desktop_min_height
+  assign mobile_height = section.settings.mobile_height
+%}
+
+{% stylesheet %}
+  .jumbotron .jumbotron--inner {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    padding: 0 32px;
+  }
+
+  .jumbotron .jumbotron__content {
+    position: relative;
+    z-index: 2;
+    width: max-content;
+    height: auto;
+    display: block;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .jumbotron__content .block__title {
+    letter-spacing: -1px;
+  }
+
+  div.jumbotron__content div.block__button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  div.jumbotron__content div.block__button a[type='button'] {
+    flex: 0 0 auto;
+    max-width: 154px;
+  }
+
+  .jumbotron__content .block__buttons {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 16px;
+  }
+
+  .jumbotron__content .block__buttons a[type='button'] {
+    flex: 0 0 auto;
+  }
+
+  .jumbotron .block__counter {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .jumbotron__scroll-icon {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 32px;
+    z-index: 2;
+    cursor: pointer;
+  }
+
+  .jumbotron__scroll-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  @media only screen and (max-width: 530px) {
+    .jumbotron .jumbotron--inner {
+      padding: 0 16px;
+    }
+  }
+{% endstylesheet %}
+
+{% style %}
+  {% if background_color.alpha != null and background_color.alpha != 0.0 %}
+      {% if fullwidth_background %}
+        #shopify-section-{{ section.id }} {
+          background-color: {{background_color}};
+          max-width: 100%;
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: 0;
+          padding-right: 0;
+        }
+
+        #shopify-section-{{ section.id }} .jumbotron--inner {
+          max-width: {{ settings.page_width }}px;
+          margin: 0 auto;
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+      {% else %}
+        #shopify-section-{{ section.id }}{
+          background-color: {{background_color}};
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: {{side_padding}}px;
+          padding-right: {{side_padding}}px;
+          box-sizing: border-box;
+        }
+      {% endif %}
+    {% endif %}
+
+    #shopify-section-{{ section.id }} .jumbotron--inner {
+      min-height: {{mobile_height}}px;
+    }
+
+    #shopify-section-{{ section.id }} .jumbotron--inner .block__buttons {
+      flex-wrap: wrap;
+    }
+
+    #shopify-section-{{section.id}} .svg-placeholder {
+        background-color: {{settings.image_background_color}};
+        stroke: {{settings.icon_color}};
+        fill: {{settings.icon_color}};
+    }
+
+    #shopify-section-{{section.id}} {
+        margin: {{top_margin_mobile}}px auto {{bottom_margin_mobile}}px;
+        border-radius: {{border_radius}}px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    #shopify-section-{{section.id}} .jumbotron-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%
+    }
+
+    #shopify-section-{{section.id}} .jumbotron-background img,
+    #shopify-section-{{section.id}} .jumbotron-background svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        background-color: {{settings.image_background_color}};
+    }
+
+    .jumbotron-{{section.id}}.jumbotron--inner .jumbotron__content {
+        position: relative;
+        height: auto;
+        display: block;
+        padding: 80px 16px 100px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    {%- case content_position -%}
+        {%- when "left" -%}
+            .jumbotron-{{section.id}}.jumbotron--inner {
+                justify-content: flex-start;
+            }
+        {%- when "center" -%}
+            .jumbotron-{{section.id}}.jumbotron--inner {
+                justify-content: center;
+            }
+        {%- when "right" -%}
+            .jumbotron-{{section.id}}.jumbotron--inner {
+                justify-content: flex-end;
+            }
+    {%- endcase -%}
+
+    {% case content_alignment %}
+        {% when 'left' %}
+            .jumbotron-{{section.id}}.jumbotron--inner{
+                text-align: left;
+            }
+
+            .jumbotron-{{section.id}} .jumbotron__content{
+                text-align: left;
+                align-items: flex-start;
+            }
+
+            .jumbotron-{{section.id}} .block__button {
+                justify-content: flex-start;
+            }
+
+            .jumbotron-{{section.id}} .block__buttons {
+                justify-content: flex-start;
+            }
+
+            .jumbotron-{{section.id}} .block__counter {
+                justify-content: flex-start;
+                margin-left: 0;
+                margin-right: auto;
+            }
+
+            div.jumbotron-{{section.id}} div.block__button a[type="button"],
+            div.jumbotron-{{section.id}} div.block__buttons a[type="button"] {
+                max-width: 194px;
+                width: max-content;
+                min-width: 164px;
+            }
+
+        {% when 'center' %}
+            .jumbotron-{{section.id}}.jumbotron--inner{
+                text-aclign: center;
+            }
+
+            .jumbotron-{{section.id}} .jumbotron__content{
+                text-align: center;
+                align-items: center;
+            }
+
+            .jumbotron-{{section.id}} .block__button {
+                justify-content: center;
+            }
+
+            div.jumbotron-{{section.id}} div.block__button a[type="button"],
+            div.jumbotron-{{section.id}} div.block__buttons a[type="button"] {
+                max-width: 328px;
+            }
+
+            .jumbotron-{{section.id}} .block__buttons {
+                justify-content: center;
+            }
+
+            .jumbotron-{{section.id}} .block__counter {
+                justify-content: center;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        {% when 'right' %}
+            .jumbotron-{{section.id}} .jumbotron__content{
+                text-align: right;
+                align-items: flex-end;
+            }
+
+            .jumbotron-{{section.id}} .block__button {
+                justify-content: flex-end;
+            }
+
+            .jumbotron-{{section.id}} .block__buttons {
+                justify-content: flex-end;
+            }
+
+            .jumbotron-{{section.id}} .block__counter {
+                justify-content: flex-end;
+                margin-left: auto;
+                margin-right: 0;
+            }
+
+            div.jumbotron-{{section.id}} div.block__button a[type="button"],
+            div.jumbotron-{{section.id}} div.block__buttons a[type="button"] {
+                max-width: 194px;
+                width: max-content;
+                min-width: 164px;
+            }
+    {% endcase %}
+
+    @media only screen and (min-width: 768px) {
+      #shopify-section-{{ section.id }} .jumbotron--inner {
+        min-height: {{desktop_min_height}}px;
+      }
+
+      #shopify-section-{{ section.id }} .jumbotron--inner .block__buttons {
+        flex-wrap: nowrap;
+      }
+        #shopify-section-{{section.id}} {
+            margin: {{top_margin}}px auto {{bottom_margin}}px
+        }
+
+        .jumbotron-{{section.id}}.jumbotron--inner .jumbotron__content {
+            width: max-content;
+            padding: {% if settings.page_width > 1200 %}150px 0px{% else %}120px 0px{% endif %};
+        }
+
+        {% case content_alignment %}
+            {% when 'left' %}
+                .jumbotron-{{section.id}}.jumbotron--inner{
+                    text-align: left;
+                }
+
+                .jumbotron-{{section.id}} .jumbotron__content{
+                    text-align: left;
+                    align-items: flex-start;
+                }
+
+                .jumbotron-{{section.id}} .block__button {
+                    justify-content: flex-start;
+                }
+
+                .jumbotron-{{section.id}} .block__buttons {
+                    justify-content: flex-start;
+                }
+
+                .jumbotron-{{section.id}} .block__counter {
+                    justify-content: flex-start;
+                    margin-left: 0;
+                    margin-right: auto;
+                }
+
+                div.jumbotron-{{section.id}} div.block__button a[type="button"],
+                div.jumbotron-{{section.id}} div.block__buttons a[type="button"] {
+                    max-width: 194px;
+                    width: max-content;
+                    min-width: 154px;
+                }
+
+            {% when 'center' %}
+
+                .jumbotron-{{section.id}} .jumbotron__content{
+                    text-align: center;
+                    align-items: center;
+                }
+
+                .jumbotron-{{section.id}} .block__button {
+                    justify-content: center;
+                }
+
+                div.jumbotron-{{section.id}} div.block__button a[type="button"],
+                div.jumbotron-{{section.id}} div.block__buttons a[type="button"] {
+                    max-width: 194px;
+                    width: max-content;
+                    min-width: 154px;
+                }
+
+                .jumbotron-{{section.id}} .block__buttons {
+                    justify-content: center;
+                }
+
+                .jumbotron-{{section.id}} .block__counter {
+                    justify-content: center;
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+
+            {% when 'right' %}
+
+                .jumbotron-{{section.id}} .jumbotron__content {
+                    text-align: right;
+                    align-items: flex-end;
+                }
+                .jumbotron-{{section.id}} .block__button {
+                    justify-content: flex-end;
+                }
+
+                .jumbotron-{{section.id}} .block__buttons {
+                    justify-content: flex-end;
+                }
+
+                .jumbotron-{{section.id}} .block__counter {
+                    justify-content: flex-end;
+                    margin-left: auto;
+                    margin-right: 0;
+                }
+
+                div.jumbotron-{{section.id}} div.block__button a[type="button"],
+                div.jumbotron-{{section.id}} div.block__buttons a[type="button"] {
+                    max-width: 194px;
+                    width: max-content;
+                    min-width: 154px;
+                }
+        {% endcase %}
+    }
+{% endstyle %}
+
+<div class="jumbotron--inner jumbotron-{{section.id}}">
+  <div class="jumbotron__content">
+    {% for block in section.blocks %}
+      {%- case block.type -%}
+        {%- when 'title' -%}
+          {% liquid
+            assign top_margin = block.settings.top_margin
+            assign bottom_margin = block.settings.bottom_margin
+          %}
+
+          {% render 'title_v2',
+            block: block,
+            default_color: settings.secondary_text_color,
+            margin_top: top_margin,
+            margin_bottom: bottom_margin,
+            default_font_size_mobile: 32,
+            default_font_size_desktop: 36,
+            visible_on_desktop: true,
+            visible_on_mobile: true
+          %}
+        {%- when 'paragraph' -%}
+          {% liquid
+            assign top_margin = block.settings.top_margin
+            assign bottom_margin = block.settings.bottom_margin
+          %}
+
+          {% render 'paragraph_v2',
+            block: block,
+            default_color: settings.secondary_text_color,
+            margin_top: top_margin,
+            margin_bottom: bottom_margin,
+            visible_on_desktop: true,
+            visible_on_mobile: true
+          %}
+
+        {%- when 'button' -%}
+          {% liquid
+            assign top_margin = block.settings.top_margin
+            assign bottom_margin = block.settings.bottom_margin
+          %}
+
+          {% render 'button_v2',
+            block: block,
+            tag: 'desktop',
+            visible_on_desktop: true,
+            visible_on_mobile: true,
+            top_padding: top_margin,
+            bottom_padding: bottom_margin
+          %}
+        {%- when 'buttons' -%}
+          {% liquid
+            assign top_margin = block.settings.top_margin
+            assign bottom_margin = block.settings.bottom_margin
+          %}
+          {% render 'buttons_v2',
+            block: block,
+            tag: 'desktop',
+            visible_on_desktop: true,
+            visible_on_mobile: true,
+            top_padding: top_margin,
+            bottom_padding: bottom_margin
+          %}
+        {%- when 'countdown' -%}
+          {% render 'countdown_v2', block: block %}
+      {%- endcase -%}
+    {% endfor %}
+  </div>
+
+  {% if show_arrow %}
+    <div type="button" data-target="{{scroll_target}}" class="jumbotron__scroll-icon">
+      {% render 'icon_v2', icon: 'arrow-down', color: arrow_color %}
+    </div>
+  {% endif %}
+
+  <div class="jumbotron-background">
+    {% if mobile_background_image != blank and background_image != blank %}
+      {% render 'responsive-image-dynamic_v2', image: background_image, image_mobile: mobile_background_image %}
+    {% elsif background_image != blank %}
+      {% render 'responsive-image-dynamic_v2', image: background_image %}
+    {% else %}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'svg-placeholder' }}
+    {% endif %}
+  </div>
+</div>
+
+{% javascript %}
+  class DateCounter extends HTMLElement {
+    constructor() {
+      super();
+      this.days = this.querySelector('#Days');
+      this.hours = this.querySelector('#Hours');
+      this.minutes = this.querySelector('#Mins');
+      this.seconds = this.querySelector('#Secs');
+
+      this.timezone = this.dataset.timezone;
+      this.yearsValue = this.dataset.years;
+      this.monthsValue = this.dataset.months - 1;
+      this.daysValue = this.days.dataset.value;
+      this.hoursValue = this.hours.dataset.value;
+      this.minutesValue = this.minutes.dataset.value;
+
+      this.timerDate = new Date(
+        this.yearsValue,
+        this.monthsValue,
+        this.daysValue,
+        this.hoursValue,
+        this.minutesValue,
+        0
+      );
+
+      this.isHideOnComplete = this.dataset.hideOnCompletion;
+    }
+
+    setDateValue(target, value) {
+      target.textContent = value >= 10 ? value : `0${value}`;
+    }
+
+    initCounter() {
+      const currentDate = new Date();
+      const [sign, hoursStr] = this.timezone.split(' ');
+      const hours = parseInt(hoursStr, 10);
+      const offsetMilliseconds = hours * 60 * 60 * 1000 * (sign === '+' ? 1 : -1);
+      const nowDate = new Date(currentDate.getTime() + offsetMilliseconds);
+      const futureDate = new Date(this.timerDate.getTime() + offsetMilliseconds);
+      const difference = futureDate - nowDate;
+      if (difference > 0) {
+        this.classList.remove('hide');
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+        this.setDateValue(this.days, days);
+        this.setDateValue(this.hours, hours);
+        this.setDateValue(this.minutes, minutes);
+        this.setDateValue(this.seconds, seconds);
+      } else {
+        this.classList.remove('hide');
+        this.setDateValue(this.days, 0);
+        this.setDateValue(this.hours, 0);
+        this.setDateValue(this.minutes, 0);
+        this.setDateValue(this.seconds, 0);
+        this.classList.remove('hide');
+        if (this.isHideOnComplete === 'true') {
+          this.classList.add('hide');
+        }
+        clearInterval(this.interval);
+      }
+    }
+
+    connectedCallback() {
+      this.interval = setInterval(() => this.initCounter(), 1000);
+    }
+  }
+
+  if (customElements.get('date-counter') === undefined) {
+    customElements.define('date-counter', DateCounter);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const scrollIcons = document.querySelectorAll('.jumbotron__scroll-icon');
+    if (scrollIcons.length) {
+      scrollIcons.forEach((scrollIcon) => {
+        scrollIcon.addEventListener('click', (e) => {
+          e.preventDefault();
+          let target = e.target.closest('section').nextElementSibling;
+          if (e.currentTarget.dataset.target.length) {
+            target = document.querySelector(`${e.currentTarget.dataset.target}`);
+          }
+          if (target) {
+            const Ycoords = target.getBoundingClientRect().top + window.pageYOffset - 74;
+            window.scrollTo({
+              top: Ycoords,
+              behavior: 'smooth',
+            });
+          }
+        });
+      });
+    }
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Jumbotron",
+  "tag": "section",
+  "class": "jumbotron container",
+  "enabled_on": {
+    "templates": ["*"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "A jumbotron section perfect for the top of your page, or to split the page up into segments. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_background_image",
+      "label": "Mobile Background image"
+    },
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Amend the position and alignment of your block content."
+    },
+    {
+        "type": "range",
+        "id": "desktop_min_height",
+        "min": 400,
+        "max": 900,
+        "step": 10,
+        "unit": "px",
+        "label": "Desktop min height",
+        "default": 400
+      },
+      {
+        "type": "range",
+        "id": "mobile_height",
+        "min": 400,
+        "max": 900,
+        "step": 10,
+        "unit": "px",
+        "label": "Mobile min height",
+        "default": 400
+      },
+    {
+      "type": "text_alignment",
+      "id": "content_alignment",
+      "label": "Content alignment",
+      "default": "left"
+  },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Content position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Scroll arrow",
+      "info": "Add a scroll down arrow to your jumbotron which navigates the user to the next section by default, or any section of your choosing."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrow",
+      "label": "Display",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "scroll_target",
+      "label": "Target (CSS identifier)"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color",
+      "label": "Arrow color"
+    },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Personalize the background of your section to match your brand. "
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth_background",
+      "label": "Fullwidth background",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Section padding",
+      "info": "Add spacing above and below inside your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "bottom_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Section margin",
+      "info": "Add spacing above and below your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top margin",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "bottom_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom margin",
+      "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "name": "t:blocks.title.info.title",
+      "type": "title",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "t:blocks.title.info.description"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "t:blocks.title.attribute_names.text",
+          "default": "The most loved pet supplies store"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "t:blocks.title.attribute_names.color"
+        },
+        {
+          "type": "select",
+          "id": "tag",
+          "label": "t:blocks.title.attribute_names.tag",
+          "options": [
+            {
+              "value": "h1",
+              "label": "t:blocks.title.attribute_names.tag_options.h1"
+            },
+            {
+              "value": "h2",
+              "label": "t:blocks.title.attribute_names.tag_options.h2"
+            },
+            {
+              "value": "h3",
+              "label": "t:blocks.title.attribute_names.tag_options.h3"
+            },
+            {
+              "value": "h4",
+              "label": "t:blocks.title.attribute_names.tag_options.h4"
+            },
+            {
+              "value": "h5",
+              "label": "t:blocks.title.attribute_names.tag_options.h5"
+            },
+            {
+              "value": "h6",
+              "label": "t:blocks.title.attribute_names.tag_options.h6"
+            }
+          ],
+          "default": "h2"
+        },
+        {
+          "type": "range",
+          "id": "font_size_scale",
+          "min": 75,
+          "max": 125,
+          "step": 1,
+          "unit": "%",
+          "label": "t:blocks.title.attribute_names.font_size_scale",
+          "default": 100
+        },
+        {
+          "type": "range",
+          "id": "max_width",
+          "min": 300,
+          "max": 1500,
+          "step": 12,
+          "unit": "px",
+          "label": "Max width",
+          "default": 1500
+        },
+        {
+          "type": "header",
+          "content": "Block margin",
+          "info": "Add spacing above and below your block."
+        },
+        {
+          "type": "range",
+          "id": "top_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Top margin",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "bottom_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Bottom margin",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "t:blocks.paragraph.info.title",
+      "type": "paragraph",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "t:blocks.paragraph.info.description"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "t:blocks.paragraph.attribute_names.text",
+          "default": "<p>Where quality meets affection</p>"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "t:blocks.paragraph.attribute_names.color"
+        },
+        {
+          "type": "range",
+          "id": "font_size_scale",
+          "min": 75,
+          "max": 125,
+          "step": 1,
+          "unit": "%",
+          "label": "t:blocks.paragraph.attribute_names.font_size_scale",
+          "default": 100
+        },
+        {
+          "type": "range",
+          "id": "max_width",
+          "min": 300,
+          "max": 1500,
+          "step": 12,
+          "unit": "px",
+          "label": "Max width",
+          "default": 1500
+        },
+        {
+          "type": "header",
+          "content": "Block margin",
+          "info": "Add spacing above and below your block."
+        },
+        {
+          "type": "range",
+          "id": "top_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Top margin",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "bottom_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Bottom margin",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "t:blocks.button.info.title",
+      "type": "button",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "t:blocks.button.info.description"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "t:blocks.button.attribute_names.text",
+          "default": "Primary button"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:blocks.button.attribute_names.link"
+        },
+        {
+          "type": "select",
+          "id": "type",
+          "label": "t:blocks.button.attribute_names.type",
+          "options": [
+            {
+              "value": "primary",
+              "label": "t:blocks.button.attribute_names.type_options.primary"
+            },
+            {
+              "value": "secondary",
+              "label": "t:blocks.button.attribute_names.type_options.secondary"
+            },
+            {
+              "value": "override",
+              "label": "t:blocks.button.attribute_names.type_options.override"
+            }
+          ],
+          "default": "primary"
+        },
+        {
+          "type": "header",
+          "content": "t:blocks.button.info.override_title",
+          "info": "t:blocks.button.info.override_description"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "t:blocks.button.attribute_names.text_color"
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "t:blocks.button.attribute_names.background_color"
+        },
+        {
+          "type": "color",
+          "id": "border_color",
+          "label": "t:blocks.button.attribute_names.border_color"
+        },
+        {
+          "type": "range",
+          "id": "border_width",
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "unit": "px",
+          "label": "t:blocks.button.attribute_names.border_width",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "border_radius",
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "label": "t:blocks.button.attribute_names.border_radius",
+          "default": 6
+        },
+        {
+          "type": "select",
+          "id": "animation",
+          "label": "t:blocks.button.attribute_names.animation",
+          "options": [
+            {
+              "value": "grow",
+              "label": "t:blocks.button.attribute_names.animation_options.grow"
+            },
+            {
+              "value": "shrink",
+              "label": "t:blocks.button.attribute_names.animation_options.shrink"
+            },
+            {
+              "value": "lighten",
+              "label": "t:blocks.button.attribute_names.animation_options.lighten"
+            },
+            {
+              "value": "darken",
+              "label": "t:blocks.button.attribute_names.animation_options.darken"
+            }
+          ],
+          "default": "shrink"
+        },
+        {
+          "type": "header",
+          "content": "Block margin",
+          "info": "Add spacing above and below your block."
+        },
+        {
+          "type": "range",
+          "id": "top_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Top margin",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "bottom_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Bottom margin",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "t:blocks.buttons.info.title",
+      "type": "buttons",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "t:blocks.buttons.info.description"
+        },
+        {
+          "type": "header",
+          "content": "t:blocks.buttons.info.primary_button_title",
+          "info": "t:blocks.buttons.info.primary_button_description"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "primary_text",
+          "label": "t:blocks.buttons.attribute_names.primary_text",
+          "default": "Primary button"
+        },
+        {
+          "type": "url",
+          "id": "primary_link",
+          "label": "t:blocks.buttons.attribute_names.primary_link"
+        },
+        {
+          "type": "select",
+          "id": "primary_type",
+          "label": "t:blocks.buttons.attribute_names.primary_type",
+          "options": [
+            {
+              "value": "primary",
+              "label": "t:blocks.buttons.attribute_names.primary_type_options.primary"
+            },
+            {
+              "value": "secondary",
+              "label": "t:blocks.buttons.attribute_names.primary_type_options.secondary"
+            },
+            {
+              "value": "override",
+              "label": "t:blocks.buttons.attribute_names.primary_type_options.override"
+            }
+          ],
+          "default": "primary"
+        },
+        {
+          "type": "header",
+          "content": "t:blocks.buttons.info.primary_override_title",
+          "info": "t:blocks.buttons.info.primary_override_description"
+        },
+        {
+          "type": "color",
+          "id": "primary_text_color",
+          "label": "t:blocks.buttons.attribute_names.primary_text_color"
+        },
+        {
+          "type": "color",
+          "id": "primary_background_color",
+          "label": "t:blocks.buttons.attribute_names.primary_background_color"
+        },
+        {
+          "type": "color",
+          "id": "primary_border_color",
+          "label": "t:blocks.buttons.attribute_names.primary_border_color"
+        },
+        {
+          "type": "range",
+          "id": "primary_border_width",
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "unit": "px",
+          "label": "t:blocks.buttons.attribute_names.primary_border_width",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "primary_button_border_radius",
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "label": "t:blocks.buttons.attribute_names.primary_button_border_radius",
+          "default": 6
+        },
+        {
+          "type": "select",
+          "id": "primary_button_animation",
+          "label": "t:blocks.buttons.attribute_names.primary_button_animation",
+          "options": [
+            {
+              "value": "grow",
+              "label": "t:blocks.buttons.attribute_names.primary_button_animation_options.grow"
+            },
+            {
+              "value": "shrink",
+              "label": "t:blocks.buttons.attribute_names.primary_button_animation_options.shrink"
+            },
+            {
+              "value": "lighten",
+              "label": "t:blocks.buttons.attribute_names.primary_button_animation_options.lighten"
+            },
+            {
+              "value": "darken",
+              "label": "t:blocks.buttons.attribute_names.primary_button_animation_options.darken"
+            }
+          ],
+          "default": "shrink"
+        },
+        {
+          "type": "header",
+          "content": "t:blocks.buttons.info.secondary_button_title",
+          "info": "t:blocks.buttons.info.secondary_button_description"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "secondary_text",
+          "label": "t:blocks.buttons.attribute_names.secondary_text",
+          "default": "Secondary button"
+        },
+        {
+          "type": "url",
+          "id": "secondary_link",
+          "label": "t:blocks.buttons.attribute_names.secondary_link"
+        },
+        {
+          "type": "select",
+          "id": "secondary_type",
+          "label": "t:blocks.buttons.attribute_names.secondary_type",
+          "options": [
+            {
+              "value": "primary",
+              "label": "t:blocks.buttons.attribute_names.secondary_type_options.primary"
+            },
+            {
+              "value": "secondary",
+              "label": "t:blocks.buttons.attribute_names.secondary_type_options.secondary"
+            },
+            {
+              "value": "override",
+              "label": "t:blocks.buttons.attribute_names.secondary_type_options.override"
+            }
+          ],
+          "default": "secondary"
+        },
+        {
+          "type": "header",
+          "content": "t:blocks.buttons.info.secondary_override_title",
+          "info": "t:blocks.buttons.info.secondary_override_description"
+        },
+        {
+          "type": "color",
+          "id": "secondary_text_color",
+          "label": "t:blocks.buttons.attribute_names.secondary_text_color"
+        },
+        {
+          "type": "color",
+          "id": "secondary_background_color",
+          "label": "t:blocks.buttons.attribute_names.secondary_background_color"
+        },
+        {
+          "type": "color",
+          "id": "secondary_border_color",
+          "label": "t:blocks.buttons.attribute_names.secondary_border_color"
+        },
+        {
+          "type": "range",
+          "id": "secondary_border_width",
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "unit": "px",
+          "label": "t:blocks.buttons.attribute_names.secondary_border_width",
+          "default": 1
+        },
+        {
+          "type": "range",
+          "id": "secondary_button_border_radius",
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "label": "t:blocks.buttons.attribute_names.secondary_button_border_radius",
+          "default": 6
+        },
+        {
+          "type": "select",
+          "id": "secondary_buttons_animation",
+          "label": "t:blocks.buttons.attribute_names.secondary_buttons_animation",
+          "options": [
+            {
+              "value": "grow",
+              "label": "t:blocks.buttons.attribute_names.secondary_buttons_animation_options.grow"
+            },
+            {
+              "value": "shrink",
+              "label": "t:blocks.buttons.attribute_names.secondary_buttons_animation_options.shrink"
+            },
+            {
+              "value": "lighten",
+              "label": "t:blocks.buttons.attribute_names.secondary_buttons_animation_options.lighten"
+            },
+            {
+              "value": "darken",
+              "label": "t:blocks.buttons.attribute_names.secondary_buttons_animation_options.darken"
+            }
+          ],
+          "default": "shrink"
+        },
+        {
+          "type": "header",
+          "content": "Block margin",
+          "info": "Add spacing above and below your block."
+        },
+        {
+          "type": "range",
+          "id": "top_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Top margin",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "bottom_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Bottom margin",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "Countdown",
+      "type": "countdown",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Add a countdown block to your section counting down the big moment, whatever that moment may be! [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Background color"
+        },
+        {
+          "type": "color",
+          "id": "numbers_color",
+          "label": "Numbers color"
+        },
+        {
+          "type": "color",
+          "id": "labels_color",
+          "label": "Labels color"
+        },
+        {
+          "type": "select",
+          "id": "timezones",
+          "label": "Timezones",
+          "options": [
+            { "value": "UTC -12", "label": "UTC -12" },
+            { "value": "UTC -11", "label": "UTC -11" },
+            { "value": "UTC -10", "label": "UTC -10" },
+            { "value": "UTC -9", "label": "UTC -9" },
+            { "value": "UTC -8", "label": "UTC -8" },
+            { "value": "UTC -7", "label": "UTC -7" },
+            { "value": "UTC -6", "label": "UTC -6" },
+            { "value": "UTC -5", "label": "UTC -5" },
+            { "value": "UTC -4", "label": "UTC -4" },
+            { "value": "UTC -3", "label": "UTC -3" },
+            { "value": "UTC -2", "label": "UTC -2" },
+            { "value": "UTC -1", "label": "UTC -1" },
+            { "value": "UTC 0", "label": "UTC 0" },
+            { "value": "UTC +1", "label": "UTC +1" },
+            { "value": "UTC +2", "label": "UTC +2" },
+            { "value": "UTC +3", "label": "UTC +3" },
+            { "value": "UTC +4", "label": "UTC +4" },
+            { "value": "UTC +5", "label": "UTC +5" },
+            { "value": "UTC +6", "label": "UTC +6" },
+            { "value": "UTC +7", "label": "UTC +7" },
+            { "value": "UTC +8", "label": "UTC +8" },
+            { "value": "UTC +9", "label": "UTC +9" },
+            { "value": "UTC +10", "label": "UTC +10" },
+            { "value": "UTC +11", "label": "UTC +11" },
+            { "value": "UTC +12", "label": "UTC +12" },
+            { "value": "UTC +13", "label": "UTC +13" },
+            { "value": "UTC +14", "label": "UTC +14" }
+          ],
+          "default": "UTC 0"
+        },
+        {
+          "type": "select",
+          "id": "year",
+          "label": "Year",
+          "options": [
+            {
+              "value": "2024",
+              "label": "2024"
+            },
+            {
+              "value": "2025",
+              "label": "2025"
+            },
+            {
+              "value": "2026",
+              "label": "2026"
+            },
+            {
+              "value": "2027",
+              "label": "2027"
+            },
+            {
+              "value": "2028",
+              "label": "2028"
+            },
+            {
+              "value": "2029",
+              "label": "2029"
+            },
+            {
+              "value": "2030",
+              "label": "2030"
+            },
+            {
+              "value": "2031",
+              "label": "2031"
+            },
+            {
+              "value": "2032",
+              "label": "2032"
+            },
+            {
+              "value": "2033",
+              "label": "2033"
+            },
+            {
+              "value": "2034",
+              "label": "2034"
+            }
+          ],
+          "default": "2025"
+        },
+        {
+          "type": "select",
+          "id": "month",
+          "label": "Month",
+          "options": [
+            {
+              "value": "1",
+              "label": "January"
+            },
+            {
+              "value": "2",
+              "label": "February"
+            },
+            {
+              "value": "3",
+              "label": "March"
+            },
+            {
+              "value": "4",
+              "label": "April"
+            },
+            {
+              "value": "5",
+              "label": "May"
+            },
+            {
+              "value": "6",
+              "label": "June"
+            },
+            {
+              "value": "7",
+              "label": "July"
+            },
+            {
+              "value": "8",
+              "label": "August"
+            },
+            {
+              "value": "9",
+              "label": "September"
+            },
+            {
+              "value": "10",
+              "label": "October"
+            },
+            {
+              "value": "11",
+              "label": "November"
+            },
+            {
+              "value": "12",
+              "label": "December"
+            }
+          ],
+          "default": "1"
+        },
+        {
+          "type": "range",
+          "id": "day",
+          "min": 1,
+          "max": 31,
+          "step": 1,
+          "label": "Day",
+          "default": 1
+        },
+        {
+          "type": "range",
+          "id": "hour",
+          "min": 1,
+          "max": 23,
+          "step": 1,
+          "label": "Hour",
+          "default": 1
+        },
+        {
+          "type": "range",
+          "id": "min",
+          "min": 1,
+          "max": 59,
+          "step": 1,
+          "label": "Min",
+          "default": 1
+        },
+        {
+          "type": "checkbox",
+          "id": "hide_on_completion",
+          "label": "Hide on completion",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Block margin",
+          "info": "Add spacing above and below your block."
+        },
+        {
+          "type": "range",
+          "id": "top_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Top margin",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "bottom_margin",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "label": "Bottom margin",
+          "default": 0
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Jumbotron",
+      "settings": {
+        "desktop_min_height": 400,
+        "mobile_height": 400,
+        "content_alignment": "center",
+        "content_position": "center",
+        "show_arrow": true,
+        "scroll_target": "",
+        "arrow_color": "",
+        "background_color": "",
+        "fullwidth_background": false,
+        "top_padding": 15,
+        "bottom_padding": 15,
+        "side_padding": 24,
+        "top_margin": 40,
+        "bottom_margin": 40
+      },
+      "blocks": [
+        {
+          "type": "title",
+          "settings": {
+            "text": "The most loved pet supplies store",
+            "color": "",
+            "tag": "h2",
+            "font_size_scale": 100,
+            "max_width": 600,
+            "top_margin": 0,
+            "bottom_margin": 20
+          }
+        },
+        {
+          "type": "buttons",
+          "settings": {
+            "primary_text": "Primary button",
+            "primary_link": "",
+            "primary_type": "secondary",
+            "primary_text_color": "",
+            "primary_background_color": "",
+            "primary_border_color": "",
+            "primary_border_width": 0,
+            "primary_button_border_radius": 6,
+            "primary_button_animation": "shrink",
+            "secondary_text": "Secondary button",
+            "secondary_link": "",
+            "secondary_type": "secondary",
+            "secondary_text_color": "",
+            "secondary_background_color": "",
+            "secondary_border_color": "",
+            "secondary_border_width": 1,
+            "secondary_button_border_radius": 6,
+            "secondary_buttons_animation": "shrink",
+            "top_margin": 0,
+            "bottom_margin": 20
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

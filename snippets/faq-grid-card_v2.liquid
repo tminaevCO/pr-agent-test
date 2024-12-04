@@ -1,0 +1,115 @@
+{% liquid
+    assign title = title 
+    assign question_tag = question_tag | default: "h4"
+    assign content = content
+    assign icon = icon
+    assign icon_color = icon_color
+    assign custom_icon = custom_icon
+    assign width = width
+    assign id = id
+    assign show_icons = show_icons
+    
+    if icon_color == blank or icon_color.alpha == 0.0
+        assign icon_color = settings.icon_color
+    endif
+
+    assign question_font_size_scale = question_font_size_scale | default: 100
+    assign answer_font_size_scale = answer_font_size_scale | default: 100
+
+    assign default_font_size_mobile = default_font_size_mobile | default: 18
+    assign default_font_size_desktop = default_font_size_desktop | default: 18
+
+    assign global_setting_font_size_scale = settings.heading_font_size_scale | default: 100
+    assign global_setting_line_height_scale = settings.heading_line_spacing_scale | default: 100
+
+    assign question_font_size_desktop = default_font_size_desktop | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: question_font_size_scale | divided_by: 100.0 | round
+    assign question_font_size_mobile = default_font_size_mobile | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: question_font_size_scale | divided_by: 100.0 | round
+    assign question_line_height_desktop = question_font_size_desktop | times: 150 |  divided_by: 100.0 | round | times: global_setting_line_height_scale |  divided_by: 100.0 | round 
+    assign question_line_height_mobile = question_font_size_mobile | times: 150 |  divided_by: 100.0 | round | times: global_setting_line_height_scale |  divided_by: 100.0 | round 
+    assign answer_font_size_desktop = 16 | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: answer_font_size_scale | divided_by: 100.0 | round
+    assign answer_font_size_mobile = 16 | times: global_setting_font_size_scale | divided_by: 100.0 | round | times: answer_font_size_scale | divided_by: 100.0 | round
+    assign answer_line_height_desktop = answer_font_size_desktop | times: 160 |  divided_by: 100.0 | round | times: global_setting_line_height_scale |  divided_by: 100.0 | round 
+    assign answer_line_height_mobile = answer_font_size_mobile | times: 160 |  divided_by: 100.0 | round | times: global_setting_line_height_scale |  divided_by: 100.0 | round 
+%}
+
+{% style %}
+    #faq-grid-card-{{id}} {
+        display: block;
+    }
+
+    #faq-grid-card-{{id}} .heading {
+        display: flex;
+        flex-direction: row;
+        align-items: normal;
+        margin-bottom: 12px;
+    }
+    
+    #faq-grid-card-{{id}} .heading .heading__title {
+        margin: 0;
+        font-size: {{question_font_size_mobile}}px;
+        line-height: {{question_line_height_mobile}}px;
+    }
+
+    #faq-grid-card-{{id}} .heading .heading__icon {
+        width: {{width}}px;
+        height: {{width}}px;
+        margin-right: 8px;
+        flex: 0 0 auto;
+    }
+
+    #faq-grid-card-{{id}} .heading .heading__icon svg,
+    #faq-grid-card-{{id}} .heading .heading__icon img {
+        width: 100%;
+        height: 100%;
+        vertical-align: middle;
+    }
+    
+    #faq-grid-card-{{id}} .content {
+        font-size: {{answer_font_size_mobile}}px;
+        line-height: {{answer_line_height_mobile}}px;
+        padding-left: calc({{width}}px + 8px);
+    }
+
+    @media only screen and (min-width: 769px) {
+        #faq-grid-card-{{id}} .heading {
+            margin-bottom: 14px;
+        }
+
+        #faq-grid-card-{{id}} .heading .heading__title {
+            font-size: {{question_font_size_desktop}}px;
+            line-height: {{question_line_height_desktop}}px;
+        }
+        
+
+        #faq-grid-card-{{id}} .content {
+            font-size: {{answer_font_size_desktop}}px;
+            line-height: {{answer_line_height_desktop}}px;
+        }
+    }
+{% endstyle %}
+
+<div class="faq-grid-card" id="faq-grid-card-{{id}}">
+    <div class="heading">
+        {%- if show_icons -%}
+            <span class="heading__icon">
+                {%- if icon != blank or custom_icon != blank -%}
+                    {%- if custom_icon != blank -%}
+                        {% render 'responsive-image-dynamic_v2', image: custom_icon, width: 24, height: 24, crop: 'center' %}
+                    {%- else -%}
+                        
+                        {%- if icon == 'plus/minus' -%}
+                            {% render 'icon_v2', icon: "plus", color: icon_color %}
+                        {%- else -%}
+                            {% render 'icon_v2', icon: icon, color: icon_color %}
+                        {%- endif -%}
+                    {%- endif -%}
+                {%- endif -%}
+            </span>
+        {%- endif -%}
+        
+        <{{question_tag}} class="heading__title inherit-inner-content"> {{title}} </{{question_tag}}>
+    </div>
+    <div class="content inherit-inner-content">
+        {{content}}
+    </div>
+</div>

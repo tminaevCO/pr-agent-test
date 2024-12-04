@@ -1,0 +1,223 @@
+{%- assign s = section.settings -%}
+
+<section-header>
+  <header>
+    <div class="container">
+      <div class="flex flex-wrap items-center justify-between lg:flex-nowrap lg:grid lg:grid-cols-[1fr_2.5fr_1fr] lg:gap-70">
+        <div class="order-1 py-16">
+          {%- if s.logo != blank -%}
+            <a
+              href="{{- routes.root -}}"
+              class="block w-fit"
+            >
+              {%- render 'responsive-image-dynamic_v2',
+                image: s.logo,
+                alt_text: s.logo.alt,
+                sizes: '64px',
+                class: 'w-52 lg:w-64'
+              -%}
+            </a>
+          {%- endif -%}
+        </div>
+        <div class="flex w-full h-full order-4 lg:order-2">
+          {%- if s.show_search -%}
+            <form
+              action="{{- routes.search_url -}}"
+              method="get"
+              class="items rounded-8 border-1 border-orange-100 mt-16 lg:mt-0 lg:mb-20 overflow-hidden hidden"
+            >
+              <input
+                type="search"
+                name="q"
+                placeholder="{{- 'header.search' | t -}}"
+                class="appearance-none border-none outline-none py-12 px-16 text-black-200 body-3 w-full"
+              >
+              <button
+                type="submit"
+                class="m-2 button button--primary button--icon"
+              >
+                {%- render 'icon_v2', icon: 'search' -%}
+              </button>
+            </form>
+          {%- endif -%}
+          {%- if s.navigation != blank -%}
+            <nav class="hidden my-auto lg:flex items-center justify-center">
+              {%- for link in s.navigation.links -%}
+                {%- liquid
+                  assign handle_link = link.title | handleize
+                  assign is_mega_menu = false
+                  for block in section.blocks
+                    assign handle_block_title = block.settings.trigger_link_title | handleize
+                    assign top_title = block.settings.top_title
+                    assign brands_title = block.settings.brands_title
+                    assign models_title = block.settings.models_title
+                    assign mega_links = block.settings.links
+                    if handle_block_title == handle_link and brands_title != blank and models_title != blank and mega_links != blank and top_title != blank
+                      assign is_mega_menu = true
+                    endif
+                  endfor
+                -%}
+                {%- if is_mega_menu -%}
+                  <button
+                    type="button"
+                    onclick="
+                      document.dispatchEvent(new CustomEvent('openMegaMenu', {
+                        detail: { parent: '{{ handle_link }}' }
+                      }))
+                    "
+                    class="flex items-center text-14 leading-20 font-semibold text-grey-300 uppercase mx-16"
+                  >
+                    {%- render 'icon_v2', icon: 'menu' -%}
+                    <span class="ml-8">{{- link.title -}}</span>
+                  </button>
+                {%- else -%}
+                  <a
+                    href="{{- link.url -}}"
+                    class="text-14 leading-20 font-semibold text-grey-300 uppercase mx-16"
+                  >
+                    {{- link.title -}}
+                  </a>
+                {%- endif -%}
+              {%- endfor -%}
+            </nav>
+          {%- endif -%}
+        </div>
+        <div class="order-3 flex items-center justify-end">
+          {%- if customer != blank -%}
+            <a
+              href="{{- routes.account_url -}}"
+              class="mx-12 lg:mx-16"
+            >
+              {%- render 'icon_v2', icon: 'customer' -%}
+            </a>
+          {%- else -%}
+            <a
+              href="{{- routes.account_login_url -}}"
+              class="flex items-center mx-12 lg:mx-16"
+            >
+              {%- render 'icon_v2', icon: 'customer' -%}
+              <span class="body-3 text-grey-300 ml-8 hidden lg:block">{{- 'header.login' | t -}}</span>
+            </a>
+          {%- endif -%}
+          <button
+            type="button"
+            class="mx-12 lg:mx-16"
+          >
+            {%- render 'icon_v2', icon: 'wishlist' -%}
+          </button>
+          <a
+            href="{{- routes.cart_url -}}"
+            class="flex items-center mx-12 lg:ml-16 lg:mr-0"
+          >
+            {%- render 'icon_v2', icon: 'cart' -%}
+            <span class="body-3 text-grey-300 ml-8">{{- cart.item_count -}}</span>
+          </a>
+          <div class="lg:hidden">
+            {%- render 'icon_v2', icon: 'menu' -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+</section-header>
+
+{%- if section.blocks.size > 0 -%}
+  {%- for link in s.navigation.links -%}
+    {%- liquid
+      assign handle_link = link.title | handleize
+      assign is_mega_menu = false
+      for block in section.blocks
+        assign handle_block_title = block.settings.trigger_link_title | handleize
+        assign top_title = block.settings.top_title
+        assign brands_title = block.settings.brands_title
+        assign models_title = block.settings.models_title
+        assign mega_links = block.settings.links
+        if handle_block_title == handle_link and brands_title != blank and models_title != blank and mega_links != blank and top_title != blank
+          assign is_mega_menu = true
+        endif
+      endfor
+    -%}
+    {%- if is_mega_menu -%}
+      {%- render 'drawer-mega-menu',
+        menu: mega_links,
+        top_title: top_title,
+        brands_title: brands_title,
+        models_title: models_title,
+        parent_title: handle_block_title
+      -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Header",
+  "tag": "section",
+  "class": "bg-white sticky top-0 left-0 w-full z-50",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "link_list",
+      "id": "navigation",
+      "label": "Navigation"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show Search",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "mega-menu",
+      "name": "Mega menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "trigger_link_title",
+          "label": "Trigger link title",
+          "default": "Shop",
+          "info": "Case non-sensitive"
+        },
+        {
+          "type": "link_list",
+          "id": "links",
+          "label": "Links"
+        },
+        {
+          "type": "text",
+          "id": "top_title",
+          "label": "Top title",
+          "default": "Our products"
+        },
+        {
+          "type": "text",
+          "id": "brands_title",
+          "label": "Brands title",
+          "default": "Brands"
+        },
+        {
+          "type": "text",
+          "id": "models_title",
+          "label": "Models title",
+          "default": "Models"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Header",
+      "category": "Header"
+    }
+  ],
+  "enabled_on": {
+    "groups": ["header"]
+  }
+}
+{% endschema %}

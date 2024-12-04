@@ -1,0 +1,289 @@
+{%- liquid
+  assign padding_top = section.settings.padding_top
+  assign padding_bottom = section.settings.padding_bottom
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+  assign margin_top = section.settings.margin_top
+  assign margin_bottom = section.settings.margin_bottom
+  assign margin_top_mobile = section.settings.margin_top_mobile
+  assign margin_bottom_mobile = section.settings.margin_bottom_mobile
+  assign title_color = section.settings.title_color
+  assign text_color = section.settings.text_color
+  assign image_desktop = section.settings.image_desktop
+  assign image_mobile = section.settings.image_mobile | default: image_desktop
+  assign title = section.settings.title
+  assign button_link = section.settings.button_link
+  assign button_text = section.settings.button_text
+  assign button_style = section.settings.button_style
+-%}
+
+{%- if image_desktop != blank and section.blocks.size > 0 -%}
+  <benefits-section>
+    <style>
+      :root #shopify-section-{{section.id}} {
+        --padding-top: {{- padding_top -}}px;
+        --padding-bottom: {{- padding_bottom -}}px;
+        --padding-top-mobile: {{- padding_top_mobile -}}px;
+        --padding-bottom-mobile: {{- padding_bottom_mobile -}}px;
+        --margin-top: {{- margin_top -}}px;
+        --margin-bottom: {{- margin_bottom -}}px;
+        --margin-top-mobile: {{- margin_top_mobile -}}px;
+        --margin-bottom-mobile: {{- margin_bottom_mobile -}}px;
+        --title-color: {{- title_color -}};
+        --text-color: {{- text_color -}};
+      }
+    </style>
+
+    <div class="relative global-spacing">
+      {%- render 'responsive-image-dynamic_v2',
+        image: image_desktop,
+        image_mobile: image_mobile,
+        alt_text: image_desktop.alt,
+        class: 'absolute top-0 left-0 w-full h-full object-cover'
+      -%}
+
+      <div class="container">
+        <div class="grid gap-40 lg:grid-cols-[1.5fr_1fr] relative z-10">
+          <div>
+            {%- if title != blank -%}
+              <div class="text-center lg:text-left custom-title-color">{{- title -}}</div>
+            {%- endif -%}
+
+            {%- if button_link != blank and button_text != blank -%}
+              <a
+                href="{{- button_link -}}"
+                class="button button--{{ button_style }} mt-40 !hidden lg:!block"
+              >
+                {{- button_text -}}
+              </a>
+            {%- endif -%}
+          </div>
+          <div class="lg:max-h-[675px] lg:overflow-auto hide-scrollbar js-benefit-items">
+            {%- for block in section.blocks -%}
+              {%- if block.settings.icon != blank and block.settings.title != blank -%}
+                <div
+                  class="flex items-start flex-col lg:flex-row py-40 px-16 lg:px-0 lg:py-56 border-white border-t-1 border-b-1"
+                  {{ block.shopify_attributes }}
+                >
+                  {%- render 'responsive-image-dynamic_v2',
+                    image: block.settings.icon,
+                    class: 'mb-40 lg:mb-0 lg:mr-64 object-contain w-40 h-40 lg:w-56 lg:h-56'
+                  -%}
+
+                  <div>
+                    <h4 class="custom-title-color uppercase">{{- block.settings.title -}}</h4>
+
+                    {%- if block.settings.text != blank -%}
+                      <p class="mt-24 body-2 custom-text-color">{{- block.settings.text -}}</p>
+                    {%- endif -%}
+                  </div>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+          {%- if button_link != blank and button_text != blank -%}
+            <a
+              href="{{- button_link -}}"
+              class="button button--{{ button_style }} button--w-full lg:hidden"
+            >
+              {{- button_text -}}
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  </benefits-section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Benefits",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Text"
+    },
+    {
+      "type": "richtext",
+      "id": "title",
+      "label": "Title",
+      "default": "<h2>EVERY DETAIL ELEVATES<br />YOUR LISTENING<br/>EXPERIENCE</h2>"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#FFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#C2C1C0"
+    },
+    {
+      "type": "header",
+      "content": "Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_desktop",
+      "label": "Desktop image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Mobile image"
+    },
+    {
+      "type": "header",
+      "content": "Button settings"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "SHOP NOW"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "default": "primary",
+      "options": [
+        {
+          "label": "Primary",
+          "value": "primary"
+        },
+        {
+          "label": "Secondary",
+          "value": "secondary"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Outer Spaces"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "(Desktop) Margin top",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "(Desktop) Margin bottom",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "(Mobile) Margin top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "(Mobile) Margin bottom",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Inner Spaces"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "(Desktop) Padding top",
+      "default": 160
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "(Desktop) Padding bottom",
+      "default": 160
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "(Mobile) Padding top",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "(Mobile) Padding bottom",
+      "default": 120
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icon"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Benefits"
+    }
+  ]
+}
+{% endschema %}

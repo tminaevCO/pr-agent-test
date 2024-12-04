@@ -1,0 +1,20 @@
+{
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "printWidth": 120,
+  "singleAttributePerLine": true,
+  "trailingComma": "all",
+  "tabWidth": 2,
+  "semi": true,
+  "singleQuote": false,
+  "useTabs": false,
+  "plugins": ["@shopify/prettier-plugin-liquid", "prettier-plugin-tailwindcss"],
+  "pluginSearchDirs": false,
+  "liquid": {
+    "indentSchema": true,
+    "normalizeSpacing": true,
+    "hyphenateFilters": true,
+    "preserveComment": true,
+    "ignoreClassAttribute": true
+  }
+}

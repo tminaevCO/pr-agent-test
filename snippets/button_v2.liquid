@@ -1,0 +1,97 @@
+{% liquid
+  assign text = text | default: block.settings.text
+  assign link = link | default: block.settings.link
+  assign type = type | default: block.settings.type
+
+  assign text_color = text_color | default: block.settings.text_color
+  assign background_color = background_color | default: block.settings.background_color
+  assign border_color = border_color | default: block.settings.border_color
+  assign border_width = border_width | default: block.settings.border_width
+  assign border_radius = border_radius | default: block.settings.border_radius
+  assign animation = animation | default: block.settings.animation
+
+  assign top_padding = top_padding | default: block.settings.top_padding | default: 0
+  assign bottom_padding = bottom_padding | default: block.settings.bottom_padding | default: 0
+
+  assign visible_on_desktop = visible_on_desktop | default: block.settings.visible_on_desktop
+  assign visible_on_mobile = visible_on_mobile | default: block.settings.visible_on_mobile
+
+  assign block_id = block_id | default: block.id
+  assign class = class
+  assign default_font_size_mobile = default_font_size_mobile | default: 16
+  assign default_font_size_desktop = default_font_size_desktop | default: 16
+
+  assign element_type = element_type
+
+  assign data_attributes = data_attributes
+
+  assign icon_name = icon_name
+
+  case type
+    when 'primary'
+      assign text_color = settings.primary_button_text_color
+    when 'secondary'
+      assign text_color = settings.secondary_button_text_color | default: settings.paragraph_color
+    when 'override'
+      assign text_color = text_color | default: block.settings.text_color
+  endcase
+
+  assign icon_color = icon_color | default: text_color
+  if icon_color.alpha == null or icon_color.alpha == 0.0
+    assign icon_color = settings.icon_color
+  endif
+%}
+
+{%- if text != blank -%}
+  {% style %}
+    .block__button {
+        /*max-width: 194px;*/
+        width: 100%;
+        margin: {{top_padding}}px 0 {{bottom_padding}}px;
+    }
+
+    {% if visible_on_mobile %}
+        .block-{{block_id}} {
+            display: flex;
+        }
+    {% else %}
+        .block-{{block_id}} {
+            display: none;
+        }
+    {% endif %}
+
+    @media only screen and (min-width: 768px) {
+        {% if visible_on_desktop %}
+            .block-{{block_id}} {
+              display: block;
+            }
+        {% else %}
+            .block-{{block_id}} {
+                display: none;
+            }
+        {% endif %}
+    }
+  {% endstyle %}
+
+  <div class="block__button block-{{block_id}}">
+    {% render 'button-with-animation_v2',
+      text: text,
+      link: link,
+      type: type,
+      animation: animation,
+      text_color: text_color,
+      background_color: background_color,
+      border_color: border_color,
+      border_width: border_width,
+      border_radius: border_radius,
+      top_padding: top_padding,
+      bottom_padding: bottom_padding,
+      class: class,
+      data_attributes: data_attributes,
+      element_type: element_type,
+      button_id: block_id,
+      icon_name: icon_name,
+      icon_color: icon_color
+    %}
+  </div>
+{%- endif -%}

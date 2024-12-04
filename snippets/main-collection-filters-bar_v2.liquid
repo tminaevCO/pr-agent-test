@@ -1,0 +1,188 @@
+{% liquid
+    assign form_id = form_id
+    assign active_filters_size = 0
+    assign layout = layout
+    assign type = type
+    assign filter_text_color = filter_text_color
+    assign filter_background_color = filter_background_color
+    assign filter_border_color = filter_border_color
+    assign filter_border_width = filter_border_width
+    assign filter_border_radius = filter_border_radius
+    assign filter_animation = filter_animation
+%}
+
+<style>
+    #filters-bar-{{form_id}} {
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        flex-direction: column;
+    }
+    #filters-bar-{{form_id}}.empty .list_products-filters-bar__reset,
+    #filters-bar-{{form_id}}.empty .list_products-filters-bar__filters {
+        display: none;
+    }
+
+    #filters-bar-{{form_id}} .list_products-filters-bar__reset {
+        display: block;
+        color: #005898;
+        font-size: 14px;
+        line-height: 19.6px;
+        text-decoration: underline;
+    }
+    
+    #filters-bar-{{form_id}} .list_products-filters-bar__filters {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 24px;
+    }
+    #filters-bar-{{form_id}} .list_products-filters-bar__filters a.list_products-filters-bar__filters__item {
+        display: block;
+        padding: 12px 16px;
+        background-color: #F5F7F9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 1000px;
+
+    }
+    #filters-bar-{{form_id}} .list_products-filters-bar__filters span {
+        color: #003D69;
+        font-size: 16px;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+    }
+    #filters-bar-{{form_id}} .list_products-filters-bar__filters svg {
+        margin-left: 8px;
+    }
+    /* Mobile */
+    #filters-bar-{{form_id}} .list_products-filters-bar__reset {
+        display: block;
+    }
+    #filters-bar-{{form_id}} .list_products-filters-bar__filters {
+        display: flex;
+    }
+    #filters-bar-{{form_id}}.list_products-filters-bar .block__button,
+    #filters-bar-{{form_id}}.list_products-filters-bar .block__button button,
+    #filters-bar-{{form_id}}.list_products-filters-bar .block__button a {
+        max-width: 100%;
+    }
+    #filters-bar-{{form_id}} .product-counts {
+        display: none;
+    }
+    @media screen and (min-width: 769px) {
+        {% if layout == "fullwidth" %}
+            #filters-bar-{{form_id}} {
+                display: grid;
+                grid-template-columns: auto 1fr;
+                grid-row-gap: 20px;
+                grid-column-gap: 16px;
+                align-items: center;
+            }
+            #filters-bar-{{form_id}} .product-counts {
+                display: block;
+                grid-column: 2;
+                grid-row: 1;
+            }
+            #filters-bar-{{form_id}}.list_products-filters-bar .block__button,
+            #filters-bar-{{form_id}}.list_products-filters-bar .block__button button,
+            #filters-bar-{{form_id}}.list_products-filters-bar .block__button a {
+                max-width: 154px;
+            }
+            #filters-bar-{{form_id}} .list_products-filters-bar__filters {
+                grid-column: 1;
+                grid-row: 2;
+                margin-top: 0px;
+            }
+            
+
+            #filters-bar-{{form_id}} .list_products-filters-bar__reset.combine-view {
+                margin-top: 0;
+                text-align: left;
+                display: block;
+            }
+            #filters-bar-{{form_id}} .list_products-filters-bar__reset.default-view {
+                display: none;
+            }
+            #filters-bar-{{form_id}} .product-counts {
+                text-align: right;
+            }
+        {% else %}
+            #filters-bar-{{form_id}} {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+                flex-direction: row;
+            }
+            #filters-bar-{{form_id}} .list_products-filters-bar__reset {
+                margin-left: 16px;
+                margin-top: 0;
+            }
+            #filters-bar-{{form_id}} .list_products-filters-bar__filters {
+                margin-top: 0px;
+            }
+            #filters-bar-{{form_id}}.empty {
+                display: none;
+            }
+            #filters-bar-{{form_id}}.list_products-filters-bar .block__button {
+                display: none;
+            }
+        {% endif %}
+    }
+
+</style>
+
+{% for filter in collection.filters %}
+    {%- assign active_filters_size = active_filters_size | plus: filter.active_values.size -%}
+
+    {% if filter.min_value.value != nil or filter.max_value.value != nil  %}
+        {%- assign active_filters_size = active_filters_size | plus: 1 -%}
+    {% endif %}
+{% endfor %}
+
+
+<div class="list_products-filters-bar {% if active_filters_size == 0 %}empty{% endif %}"  id="filters-bar-{{form_id}}">
+    {%- assign filter_button_id = form_id | append: '-filter-button' -%}
+    {%- assign filter_button_text = 'collection_filters.buttons.filters_button' | t -%}
+    {% render 'button_v2', 
+        text: filter_button_text,
+        type: type,
+        text_color: filter_text_color,
+        background_color: filter_background_color,
+        border_color: filter_border_color,
+        border_width: filter_border_width,
+        border_radius: filter_border_radius,
+        animation: filter_animation,
+        visible_on_desktop: true,
+        visible_on_mobile: true,
+        block_id: filter_button_id,
+        icon_name: 'filter-button-icon',
+        data_attributes: "data-open-filters-sidebar"
+    %}
+    <span class="product-counts">{{'collection_filters.products_count' | t: count: collection.products_count}}</span>
+
+    <div class="list_products-filters-bar__filters">
+        {%- for filter in collection.filters -%}
+            {%- if filter.type == "price_range" -%}
+                {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+                    <a href="{{ filter.url_to_remove }}" data-reset-filters class="list_products-filters-bar__filters__item">
+                        {%- assign min_value = filter.min_value.value | default: 0 -%}
+                        {%- assign max_value = filter.max_value.value | default: filter.range_max -%}
+                        <span>{{ min_value | money }} - {{ max_value | money }} {% render 'icon' icon: 'remove-filter-cross', color: settings.icon_color %}</span>
+                    </a>
+                {%- endif -%}
+            {%- else -%}
+                {%- for filter_value in filter.active_values -%}
+                    <a href="{{ filter_value.url_to_remove }}" data-reset-filters class="list_products-filters-bar__filters__item">
+                        <span>{{ filter_value.label }} {% render 'icon' icon: 'remove-filter-cross', color: settings.icon_color %}</span>
+                    </a>
+                {%- endfor -%}
+            {%- endif -%}
+        {%- endfor -%}
+        <a href="{{ collection.url }}{%- if collection.sort_by.size > 0 -%}?sort_by={{ collection.sort_by }}{%- endif -%} " class="list_products-filters-bar__reset combine-view" data-reset-filters>{{'collection_filters.buttons.clear_filters' | t}}</a>
+    </div>
+</div>

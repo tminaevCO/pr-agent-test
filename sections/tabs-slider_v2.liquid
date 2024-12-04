@@ -1,0 +1,451 @@
+{% liquid
+	assign section_title = section.settings.section_title
+	assign title_alignment = section.settings.title_alignment
+	assign title_uppercase = section.settings.title_uppercase
+	assign tabs_title_uppercase = section.settings.tabs_title_uppercase
+	assign title_color = section.settings.title_color
+	assign title_font_size_scale = section.settings.title_font_size_scale
+
+	assign show_navigations = section.settings.show_navigations
+	assign show_navigations = section.settings.show_navigations
+	assign desktop_slider_position = section.settings.desktop_slider_position
+	assign mobile_slider_position = section.settings.mobile_slider_position
+
+	assign tabs_background_color = section.settings.tabs_background_color
+	if tabs_background_color.alpha == null or tabs_background_color.alpha == 0.0
+		assign tabs_background_color = "#58656F"
+	endif
+	assign tabs_title_color = section.settings.tabs_title_color
+	if tabs_title_color.alpha == null or tabs_title_color.alpha == 0.0
+		assign tabs_title_color = "#fff"
+	endif
+	assign tabs_title_underline = section.settings.tabs_title_underline
+	assign tabs_title_font_size_scale = section.settings.tabs_title_font_size_scale
+	assign hotspots_text_font_size_scale = section.settings.hotspots_text_font_size_scale
+	assign top_margin = section.settings.top_margin
+	assign bottom_margin = section.settings.bottom_margin
+
+	assign slides =  section.blocks | where: "type", 'slide'
+%}
+
+<style>
+	:root #shopify-section-{{section.id}} {
+		--title-alignment: {{title_alignment}};
+		--title-uppercase: {% if title_uppercase %}uppercase{% else %}none{% endif %};
+		--title-color: {{title_color}};
+		--title-font-size-desktop: {{40 | times: title_font_size_scale | divided_by: 100.0 | round}}px;
+		--title-font-size-mobile: {{28 | times: title_font_size_scale | divided_by: 100.0 | round}}px;
+		--tabs_background_color: {{tabs_background_color}};
+		--tabs-title-color: {{tabs_title_color}};
+		--tabs-title-underline: {% if tabs_title_underline %}underline{% else %}none{% endif %};
+		--tabs-title-uppercase: {% if tabs_title_uppercase %}uppercase{% else %}none{% endif %};
+		--tabs-title-font-size-desktop: {{40 | times: tabs_title_font_size_scale | divided_by: 100.0 | round}}px;
+		--tabs-title-font-size-mobile: {{23 | times: tabs_title_font_size_scale | divided_by: 100.0 | round}}px;
+		--hotspots-text-font-size-desktop: {{16 | times: hotspots_text_font_size_scale | divided_by: 100.0 | round}}px;
+		--hotspots-text-font-size-mobile: {{13 | times: hotspots_text_font_size_scale | divided_by: 100.0 | round}}px;
+		--margin-top: {{top_margin}}px;
+		--margin-botton: {{bottom_margin}}px;
+		
+		--desktop-slider-colunn: {% if desktop_slider_position == 'left' %}1{% else %}2{% endif %};
+		--desktop-tabs-colunn: {% if desktop_slider_position == 'left' %}2{% else %}1{% endif %};
+		--mobile-slider-row: {% if mobile_slider_position == 'top' %}1{% else %}2{% endif %};
+		--mobile-tabs-row: {% if mobile_slider_position == 'top' %}2{% else %}1{% endif %};
+		--mobile-arrows-position: {% if mobile_slider_position == 'top' %}30%{% else %}70%{% endif %};
+	}
+</style>
+
+{% if section_title != blank %}
+	<h2 class="tabs-slider-section__title">{{section_title}}</h2>
+{% endif %}
+
+<tabs-slider>
+	<div class="swiper tabs-slider__slider" data-slider>
+		<div class="swiper-wrapper">
+			{%- for slide in slides -%}
+				<div class="swiper-slide" id="slide-{{slide.id}}">
+					<div class="tabs-slider__slide-image">
+						{%- if slide.settings.image != blank -%}
+							{%- if section.index <= 3 and forloop.first -%}
+								{%- assign fetchpriority = "high" -%}
+								{%- assign loading = "eager" -%}
+							{%- else -%}
+								{%- assign fetchpriority = "auto" -%}
+								{%- assign loading = "lazy" -%}
+							{%- endif -%}
+							{%- assign half_page_container = settings.page_width |  divided_by: 2 -%}
+							{%- assign image_sizes = "(max-width: 768px) 100vw, (min-width: PAGE_CONTAINERpx) HALF_PAGE_CONTAINERpx, 50vw" | replace: "HALF_PAGE_CONTAINER", half_page_container | replace: "PAGE_CONTAINER", settings.page_width  -%}
+
+							{{ slide.settings.image | image_url: width: slide.settings.image.width
+								| image_tag: widths: "320, 480, 576, 768, 992, 1024, 1220, 1440, 1680, 1920, 2000, 2180",
+									alt: slide.settings.image.alt,
+									aria-label: "Tabs slider image",
+									fetchpriority: fetchpriority,
+									loading: loading,
+									sizes: image_sizes 
+							}}
+						{%- else -%}
+							{{ 'image' | placeholder_svg_tag: 'svg-placeholder' }}
+						{%- endif -%}
+					</div>
+
+					{%- assign show_slide_points = false -%}
+					{%- for block in section.blocks -%}
+						{% if block.type == "slide" %}
+							{% if block == slide %}
+								{%- assign show_slide_points = true -%}
+							{%- else -%}
+								{%- assign show_slide_points = false -%}
+							{% endif %}
+						{%- endif -%}
+
+						{% if show_slide_points and block.type == "hotspot" %}
+							{% if block.settings.hotspot_text != blank %}
+								{% liquid
+									assign hotspot_text = block.settings.hotspot_text
+									assign hotspot_alignment = block.settings.hotspot_alignment
+									
+									assign hotspots_color = block.settings.hotspots_color
+									if hotspots_color.alpha == null or hotspots_color.alpha == 0.0
+										assign hotspots_color = "#fff"
+									endif
+
+									assign vertical_position = block.settings.vertical_position
+									assign horizontal_position = block.settings.horizontal_position
+									assign vertical_offset = 50
+									assign horizontal_offset = 50
+
+									if vertical_position == 0
+										assign vertical_offset = 0
+									elsif vertical_position == 100
+										assign vertical_offset = -100
+									endif
+
+									if horizontal_position == 0
+										assign horizontal_offset = 0
+									elsif horizontal_position == 100
+										assign horizontal_offset = -100
+									endif
+								%}
+
+								<div class="tabs-slider__slide-image__hotspot" id="slide-hotspot-{{block.id}}" data-slide-image-hotspot>
+									<style>
+										:root #slide-hotspot-{{block.id}} {
+											--hotspot-alignment: {{hotspot_alignment}};
+											--hotspots-color: {{hotspots_color}};
+											--vertical-position: {{vertical_position}}%;
+											--horizontal-position: {{horizontal_position}}%;
+											--vertical-offset: {{vertical_offset}}%;
+											--horizontal-offset: {{horizontal_offset}}%;
+										}
+									</style>
+
+									<span class="tabs-slider__slide-image__hotspot-circle"></span>
+									<div class="tabs-slider__slide-image__hotspot-text inherit-inner-content" data-slide-image-hotspot-text>
+										{{hotspot_text | truncate: 300}}
+									</div>
+								</div>
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+				</div>
+			{%- endfor -%}
+		</div>
+	</div>
+	
+	<div class="tabs-slider__tabs">
+		<ul class="tabs-slider__tabs-list">
+			{%- for slide in slides -%}
+				{%- if slide.settings.tab_title -%}
+					<li class="tabs-slider__tabs__tab {% if forloop.first %}active{% endif %}" data-slider-tab>{{slide.settings.tab_title}}</li>
+				{%- endif -%}
+			{%- endfor -%}
+		</ul>
+	</div>
+	
+	{%- if show_navigations -%}
+		<div class="swiper-button-prev" data-swiper-button-prev>
+			{% comment %} {% render 'icon-left-arrow' %} {% endcomment %}
+		</div>
+		<div class="swiper-button-next" data-swiper-button-next>
+			{% comment %} {% render 'icon-right-arrow' %} {% endcomment %}
+		</div>
+	{%- endif -%}
+</tabs-slider>
+
+{% schema %}
+	{
+		"name": "Tabs Slider",
+		"class": "tabs-slider-section page-width",
+		"tag": "section",
+		"settings": [
+			{
+				"type": "header",
+				"content": "Section title"
+			},
+			{
+				"type": "inline_richtext",
+				"id": "section_title",
+				"label": "Title"
+			},
+			{
+				"type": "text_alignment",
+				"id": "title_alignment",
+				"label": "Title alignment",
+				"default": "center"
+			},
+			{
+				"type": "checkbox",
+				"id": "title_uppercase",
+				"label": "Title uppercase",
+				"default": true
+			},
+			{
+				"type": "color",
+				"id": "title_color",
+				"label": "Title color",
+				"default": "#000"
+			},
+			{
+				"type": "range",
+				"id": "title_font_size_scale",
+				"min": 75,
+				"max": 125,
+				"step": 1,
+				"unit": "%",
+				"label": "Title font size scale",
+				"default": 100
+			},
+			{
+				"type": "header",
+				"content": "Slider"
+			},
+			{
+				"type": "checkbox",
+				"id": "show_navigations",
+				"label": "Show navigation arrows",
+				"default": true
+			},
+			{
+				"type": "select",
+				"id": "desktop_slider_position",
+				"label": "Desktop slider position",
+				"options": [
+					{
+						"value": "left",
+						"label": "Left"
+					},
+					{
+						"value": "right",
+						"label": "Right"
+					}
+				],
+				"default": "left"
+			},
+			{
+				"type": "select",
+				"id": "mobile_slider_position",
+				"label": "Mobile slider position",
+				"options": [
+					{
+						"value": "top",
+						"label": "Top"
+					},
+					{
+						"value": "bottom",
+						"label": "Bottom"
+					}
+				],
+				"default": "top"
+			},
+			{
+				"type": "header",
+				"content": "Tabs"
+			},
+			{
+				"type": "color",
+				"id": "tabs_background_color",
+				"label": "Tab block bacgkround color",
+				"default": "#58656F"
+			},
+			{
+				"type": "color",
+				"id": "tabs_title_color",
+				"label": "Tab title color",
+				"default": "#FFF"
+			},
+			{
+				"type": "checkbox",
+				"id": "tabs_title_underline",
+				"label": "Tab title uderline",
+				"default": true
+			},
+			{
+				"type": "checkbox",
+				"id": "tabs_title_uppercase",
+				"label": "Tab title uppercase",
+				"default": true
+			},
+			{
+				"type": "range",
+				"id": "tabs_title_font_size_scale",
+				"min": 75,
+				"max": 125,
+				"step": 1,
+				"unit": "%",
+				"label": "Tab title font size scale",
+				"default": 100
+			},
+			{
+				"type": "header",
+				"content": "Hotspots"
+			},
+			{
+				"type": "range",
+				"id": "hotspots_text_font_size_scale",
+				"min": 75,
+				"max": 125,
+				"step": 1,
+				"unit": "%",
+				"label": "Hotspots text font size scale",
+				"default": 100
+			},
+			{
+				"type": "header",
+				"content": "Section margin",
+				"info": "Add spacing above and below your new section."
+			},
+			{
+				"type": "range",
+				"id": "top_margin",
+				"min": 0,
+				"max": 100,
+				"step": 1,
+				"unit": "px",
+				"label": "Top margin",
+				"default": 0
+			},
+			{
+				"type": "range",
+				"id": "bottom_margin",
+				"min": 0,
+				"max": 100,
+				"step": 1,
+				"unit": "px",
+				"label": "Bottom margin",
+				"default": 0
+			}
+		],
+		"blocks": [
+			{
+				"name": "Slide",
+				"type": "slide",
+				"limit": 4,
+				"settings": [
+					{
+						"type": "header",
+						"content": "Image"
+					},
+					{
+						"type": "image_picker",
+						"id": "image",
+						"label": "Image"
+					},
+					{
+						"type": "header",
+						"content": "Tab title"
+					},
+					{
+						"type": "text",
+						"id": "tab_title",
+						"label": "Tab Title",
+						"default": "Default Title"
+					}
+				]
+			},
+			{
+				"name": "Hotspot",
+				"type": "hotspot",
+				"settings": [
+					{
+						"type": "richtext",
+						"id": "hotspot_text",
+						"label": "Text",
+						"info": "Maximum 300 characters"
+					},
+					{
+						"type": "text_alignment",
+						"id": "hotspot_alignment",
+						"label": "Hotspot alignment",
+						"default": "left"
+					},
+					{
+						"type": "color",
+						"id": "hotspots_color",
+						"label": "Hotspots color",
+						"default": "#fff"
+					},
+					{
+						"type": "range",
+						"id": "vertical_position",
+						"min": 0,
+						"max": 100,
+						"step": 1,
+						"unit": "%",
+						"label": "Vertical position",
+						"default": 50
+					},
+					{
+						"type": "range",
+						"id": "horizontal_position",
+						"min": 0,
+						"max": 100,
+						"step": 1,
+						"unit": "%",
+						"label": "Horizontal position",
+						"default": 50
+					}
+				]
+			}
+		],
+		"presets": [
+			{
+				"name": "Tabs Slider",
+				"settings": {
+					"section_title": "no bullshit inside"
+				},
+				"blocks": [
+					{
+						"type": "slide",
+						"settings": {
+							"tab_title": "niacinamide"
+						}
+					},
+					{
+						"type": "hotspot",
+						"settings": {
+							"hotspot_text": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et </p>"
+						}
+					},
+					{
+						"type": "slide",
+						"settings": {
+							"tab_title": "peptides"
+						}
+					},
+					{
+						"type": "slide",
+						"settings": {
+							"tab_title": "hialuronic acid"
+						}
+					},
+					{
+						"type": "slide",
+						"settings": {
+							"tab_title": "Marula oil"
+						}
+					}
+				]
+			}
+		]
+	}
+{% endschema %}

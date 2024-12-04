@@ -1,0 +1,160 @@
+{% liquid
+    assign product = product
+    assign selected_variant = selected_variant | default: product.selected_or_first_available_variant
+    assign product_form_id = product_form_id | default: 'product_form_id-' | append: section.id
+    assign display_type = display_type | default: 'card'
+    assign drop_shadow = drop_shadow | default: false
+    assign show_title = show_title
+    assign name_color = name_color
+    assign name_tag = name_tag | default: "h4"
+    assign name_font_size_scale = name_font_size_scale
+
+    assign show_price = show_price
+    assign price_color = price_color
+    assign price_font_size_scale = price_font_size_scale
+
+    assign show_button = show_button
+    assign button_action = button_action
+    assign link = link
+    assign text = text
+    assign type = type  
+    assign text_color = text_color
+    assign background_color = background_color
+    assign border_color = border_color
+    assign border_width = border_width
+    assign border_radius = border_radius
+    assign animation = animation
+    assign alignment = alignment
+
+    assign id = id
+    assign fetchpriority = fetchpriority
+    assign loading = loading
+    assign image_sizes = image_sizes
+
+    assign badge_limit = badge_limit
+
+    assign default_price = default_price | default: 9990
+    assign placeholder_name = placeholder_name | default: "product-1"
+%}
+
+
+<product-card class="product-card {{class}}" id="product-card-{{id}}" data-variant-id="{{selected_variant.id}}">
+    {% style %}
+        #product-card-{{id}} {
+            {% if display_type == 'card' %}
+                {% if drop_shadow %}box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.10){% endif %};
+            {% endif %}
+            border-radius: {{settings.border_radius}}px;
+            overflow: hidden;
+            display: block;
+            height: 100%;
+        }
+        
+        #product-card-{{id}} .product-card__image {
+            width: 100%;
+            padding-bottom: 100%;
+            position: relative;
+        }
+
+        #product-card-{{id}} .product-card__image img,
+        #product-card-{{id}} .product-card__image svg {
+            background-color: {% if image_background_color.alpha and image_background_color.alpha != 0.0 %}{{image_background_color}}{% else %}{{settings.image_background_color}}{% endif %};
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #product-card-{{id}} .product-card__image .svg-placeholder {
+            background-color: {% if image_background_color.alpha and image_background_color.alpha != 0.0 %}{{image_background_color}}{% else %}{{settings.image_background_color}}{% endif %};
+            stroke: {{settings.icon_color}};
+            fill: {{settings.icon_color}};
+        }
+
+        #product-card-{{id}} .product-card__image .product-badges {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 2;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        #product-card-{{id}} .product-card__wrapper {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #product-card-{{id}} .product-card__content {
+            display: flex;
+            flex-direction: column;
+            {% if display_type == 'card' %}
+                background-color: {{card_background_color}};
+                padding: 16px 20px 16px;
+            {% else %}
+                padding: 16px 0px 0px;
+            {% endif %}
+            flex: 1 0 auto;
+        }
+
+        #product-card-{{id}} .product-card__button {
+            margin-top: auto;
+        }
+
+        #product-card-{{id}} form button[type="submit"],
+        #product-card-{{id}} form a[type="submit"] {
+            max-width: 100%;
+            width: 100%;
+        }
+
+    {% endstyle %}
+    
+    <a href="{{selected_variant.url}}" class="product-card__wrapper">
+        <div class="product-card__image">
+            {% if selected_variant.featured_image != null %}
+                {% render 'responsive-image-dynamic_v2', image: selected_variant.featured_image, fetchpriority: fetchpriority, loading: loading, sizes: image_sizes %}
+            {%- elsif product.featured_product != null -%}
+                {% render 'responsive-image-dynamic_v2', image: product.featured_image, fetchpriority: fetchpriority, loading: loading, sizes: image_sizes %}
+            {%- elsif product.media.first -%}
+                {% render 'responsive-image-dynamic_v2', image: product.media.first, fetchpriority: fetchpriority, loading: loading, sizes: image_sizes %}
+            {% else %}
+                {{ placeholder_name | placeholder_svg_tag: "svg-placeholder" }}
+            {% endif %}
+
+            {% render 'product-badges_v2', product: product, limit: badge_limit %}
+        </div>
+
+        <div class="product-card__content">
+            {% if show_title == null or show_title == true  %}
+                <div class="product-card__title"> 
+                    {%- assign title_id = section.id |  append: '-title-' | append: product.id -%}
+                    {%- assign prodcut_title = product.title | default: "Product name" -%}
+                    {% render 'title_v2',
+                        text: prodcut_title, 
+                        color: name_color, 
+                        default_color: settings.heading_color, 
+                        tag: name_tag, 
+                        font_size_scale: name_font_size_scale, 
+                        block_id: title_id,
+                        visible_on_desktop: true, 
+                        visible_on_mobile: true,
+                        default_font_size_desktop: 18,
+                        default_font_size_mobile: 16,
+                        margin_bottom: 6,
+                        content_alignment_mobile: alignment,
+                        content_alignment: alignment
+                    %}
+                </div>
+            {% endif %}
+            
+            {% if show_price %}
+                {% render 'price_v2', product: product, alignment: alignment, price_color: price_color, price_font_size_scale: price_font_size_scale, default_price: default_price %}
+            {% endif %}
+        </div>
+    </a>
+</product-card>

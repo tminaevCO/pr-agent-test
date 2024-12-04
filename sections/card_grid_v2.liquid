@@ -1,0 +1,911 @@
+{% liquid
+  assign grid_gap = section.settings.grid_gap
+  assign top_margin = section.settings.top_margin
+  assign bottom_margin = section.settings.bottom_margin
+  assign top_margin_mobile = section.settings.top_margin
+  assign bottom_margin_mobile = section.settings.bottom_margin
+  assign grid_rows = 0
+  assign columns = section.settings.columns
+  assign float_columns = columns | times: 1.0
+
+  assign background_color = section.settings.background_color
+  assign fullwidth_background = section.settings.fullwidth_background
+  assign top_padding = section.settings.top_padding
+  assign bottom_padding = section.settings.bottom_padding
+  assign side_padding = section.settings.side_padding
+%}
+
+{%- for block in section.blocks -%}
+  {%- if block.settings.desktop_image != blank
+    or block.settings.mobile_image != blank
+    or block.settings.text != blank
+    or block.settings.paragraph_text != blank
+    or block.settings.primary_text != blank
+    and block.settings.primary_link != blank
+    or block.settings.secondary_text != blank
+    and block.settings.secondary_link != blank
+  -%}
+    {%- if columns > 2 -%}
+      {%- assign size = block.settings.width | times: block.settings.height -%}
+      {%- assign grid_rows = grid_rows | plus: size -%}
+    {%- else -%}
+      {%- assign grid_rows = grid_rows | plus: block.settings.height -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- if columns > 2 -%}
+  {%- assign grid_rows = grid_rows | divided_by: float_columns | round -%}
+{%- else -%}
+  {%- assign grid_rows = grid_rows -%}
+{%- endif -%}
+
+{% stylesheet %}
+  .card-grid__content {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-flow: dense;
+  }
+{% endstylesheet %}
+
+{%- if section.blocks.size > 0 -%}
+  {% style %}
+    #shopify-section-{{section.id}} {
+        margin-top: {{top_margin_mobile}}px;
+        margin-bottom: {{bottom_margin_mobile}}px;
+    }
+
+    {% if background_color.alpha != null and background_color.alpha != 0.0 %}
+      {% if fullwidth_background %}
+        #shopify-section-{{ section.id }} {
+          background-color: {{background_color}};
+          max-width: 100%;
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: 0;
+          padding-right: 0;
+        }
+
+        #shopify-section-{{ section.id }} .card-grid--inner {
+          max-width: {{ settings.page_width }}px;
+          margin: 0 auto;
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+      {% else %}
+        #shopify-section-{{ section.id }}{
+          background-color: {{background_color}};
+          padding-top: {{top_padding}}px;
+          padding-bottom: {{bottom_padding}}px;
+          padding-left: {{side_padding}}px;
+          padding-right: {{side_padding}}px;
+          box-sizing: border-box;
+        }
+      {% endif %}
+    {% endif %}
+
+    #shopify-section-{{section.id}} .svg-placeholder {
+        background-color: {{settings.image_background_color}};
+        stroke: {{settings.icon_color}};
+        fill: {{settings.icon_color}};
+    }
+
+    #shopify-section-{{section.id}} .card-grid__content {
+        grid-gap: {{grid_gap}}px;
+    }
+
+    @media only screen and (min-width: 769px) {
+        #shopify-section-{{section.id}} .card-grid__content {
+            {% if columns > 1 %}
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            {% endif %}
+            grid-template-rows: repeat(auto-fill, minmax(200px, max-content));
+            grid-auto-rows: 200px;
+        }
+    }
+
+    @media only screen and (min-width: 1050px) {
+        #shopify-section-{{section.id}} {
+            margin-top: {{top_margin}}px;
+            margin-bottom: {{bottom_margin}}px;
+        }
+
+        #shopify-section-{{section.id}} .card-grid__content {
+            grid-template-columns: repeat({{columns}}, minmax(0, 1fr));
+            grid-template-rows: repeat(auto-fill, minmax(180px, max-content));
+            grid-auto-rows: 200px;
+        }
+    }
+  {% endstyle %}
+
+  <div class="card-grid--inner">
+    <div class="card-grid__content">
+      {%- for block in section.blocks -%}
+        {% render 'card-grid_v2', block: block, grid_gap: grid_gap, card_index: forloop.index, columns: columns %}
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Card grid",
+  "class": "card-grid container",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "A card grid section to display multiple sets of information and callouts. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Grid gap",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "col",
+      "label": "Columns",
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Customize the background of your section."
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth_background",
+      "label": "Fullwidth background",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Section padding",
+      "info": "Add spacing inside of your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "bottom_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Section margin",
+      "info": "Add spacing above and below your new section."
+    },
+    {
+      "type": "range",
+      "id": "top_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Top margin",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "bottom_margin",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Bottom margin",
+      "default": 0
+    }
+  ],
+  "max_blocks": 20,
+  "blocks": [
+    {
+      "name": "Card",
+      "type": "card",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "This block represents one card in your grid, which will automatically reposition depending on how many cards you add and their size. [See Tutorial](https:\/\/help.shopify.com\/manual\/customers\/manage-customers)"
+        },
+        {
+          "type": "image_picker",
+          "id": "desktop_image",
+          "label": "Desktop background image"
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "Mobile background image"
+        },
+        {
+          "type": "header",
+          "content": "Layout",
+          "info": "Customize the layout and positioning of the card within the grid and the content within the card."
+        },
+        {
+          "type": "range",
+          "id": "width",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "unit": "col",
+          "label": "Width",
+          "default": 1
+        },
+        {
+          "type": "range",
+          "id": "height",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "unit": "row",
+          "label": "Height",
+          "default": 1
+        },
+        {
+            "type": "text_alignment",
+            "id": "content_alignment",
+            "label": "Content alignment",
+            "default": "left"
+         },
+        {
+          "type": "select",
+          "id": "horizontal_content_position",
+          "label": "Horizontal content position",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "select",
+          "id": "vertical_content_position",
+          "label": "Vertical content position",
+          "options": [
+            {
+              "value": "top",
+              "label": "Top"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "bottom",
+              "label": "Bottom"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "range",
+          "id": "content_max_width",
+          "min": 300,
+          "max": 1500,
+          "step": 12,
+          "unit": "px",
+          "label": "Content max width",
+          "default": 1500
+        },
+        {
+          "type": "header",
+          "content": "Title",
+          "info": "Edit the title of your card and overwrite the default styles if required."
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Color"
+        },
+        {
+          "type": "select",
+          "id": "tag",
+          "label": "Tag",
+          "options": [
+            {
+              "value": "h1",
+              "label": "H1"
+            },
+            {
+              "value": "h2",
+              "label": "H2"
+            },
+            {
+              "value": "h3",
+              "label": "H3"
+            },
+            {
+              "value": "h4",
+              "label": "H4"
+            },
+            {
+              "value": "h5",
+              "label": "H5"
+            },
+            {
+              "value": "h6",
+              "label": "H6"
+            }
+          ],
+          "default": "h2"
+        },
+        {
+          "type": "range",
+          "id": "font_size_scale",
+          "min": 75,
+          "max": 125,
+          "step": 1,
+          "unit": "%",
+          "label": "Font size scale",
+          "default": 100
+        },
+        {
+          "type": "header",
+          "content": "Title visibility"
+        },
+        {
+          "type": "checkbox",
+          "id": "visible_on_desktop",
+          "label": "Visible on desktop",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "visible_on_mobile",
+          "label": "Visible on mobile",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Paragraph",
+          "info": "Edit the paragraph of your card and overwrite the default styles if required."
+        },
+        {
+          "type": "richtext",
+          "id": "paragraph_text",
+          "label": "Text"
+        },
+        {
+          "type": "color",
+          "id": "paragraph_color",
+          "label": "Color"
+        },
+        {
+          "type": "range",
+          "id": "paragraph_font_size_scale",
+          "min": 75,
+          "max": 125,
+          "step": 1,
+          "unit": "%",
+          "label": "Font size scale",
+          "default": 100
+        },
+        {
+          "type": "header",
+          "content": "Paragraph visibility"
+        },
+        {
+          "type": "checkbox",
+          "id": "paragraph_visible_on_desktop",
+          "label": "Visible on desktop",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "paragraph_visible_on_mobile",
+          "label": "Visible on mobile",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Primary button",
+          "info": "Your primary button is your preferred action, usually directing a potential customer closer to making a purchase."
+        },
+        {
+          "type": "inline_richtext",
+          "id": "primary_text",
+          "label": "Text"
+        },
+        {
+          "type": "url",
+          "id": "primary_link",
+          "label": "Link"
+        },
+        {
+          "type": "select",
+          "id": "primary_type",
+          "label": "Type",
+          "options": [
+            {
+              "value": "primary",
+              "label": "Primary"
+            },
+            {
+              "value": "secondary",
+              "label": "Secondary"
+            },
+            {
+              "value": "override",
+              "label": "Override"
+            }
+          ],
+          "default": "primary"
+        },
+        {
+          "type": "header",
+          "content": "Primary button override"
+        },
+        {
+          "type": "color",
+          "id": "primary_text_color",
+          "label": "Text color"
+        },
+        {
+          "type": "color",
+          "id": "primary_background_color",
+          "label": "Background color"
+        },
+        {
+          "type": "color",
+          "id": "primary_border_color",
+          "label": "Border color"
+        },
+        {
+          "type": "range",
+          "id": "primary_border_width",
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "unit": "px",
+          "label": "Border width",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "primary_button_border_radius",
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "label": "Border radius",
+          "default": 6
+        },
+        {
+          "type": "select",
+          "id": "primary_button_animation",
+          "label": "Animation",
+          "options": [
+            {
+              "value": "grow",
+              "label": "Grow"
+            },
+            {
+              "value": "shrink",
+              "label": "Shrink"
+            },
+            {
+              "value": "lighten",
+              "label": "Lighten"
+            },
+            {
+              "value": "darken",
+              "label": "Darken"
+            }
+          ],
+          "default": "shrink"
+        },
+        {
+          "type": "header",
+          "content": "Primary button visibility"
+        },
+        {
+          "type": "checkbox",
+          "id": "p_btn_visible_on_desktop",
+          "label": "Visible on desktop",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "p_btn_visible_on_mobile",
+          "label": "Visible on mobile",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Secondary button",
+          "info": "Your secondary button is your alternative action, usually directing a potential customer to more information or a page which provides more context."
+        },
+        {
+          "type": "inline_richtext",
+          "id": "secondary_text",
+          "label": "Text"
+        },
+        {
+          "type": "url",
+          "id": "secondary_link",
+          "label": "Link"
+        },
+        {
+          "type": "select",
+          "id": "secondary_type",
+          "label": "Type",
+          "options": [
+            {
+              "value": "primary",
+              "label": "Primary"
+            },
+            {
+              "value": "secondary",
+              "label": "Secondary"
+            },
+            {
+              "value": "override",
+              "label": "Override"
+            }
+          ],
+          "default": "primary"
+        },
+        {
+          "type": "header",
+          "content": "Secondary button override"
+        },
+        {
+          "type": "color",
+          "id": "secondary_text_color",
+          "label": "Text color"
+        },
+        {
+          "type": "color",
+          "id": "secondary_background_color",
+          "label": "Background color"
+        },
+        {
+          "type": "color",
+          "id": "secondary_border_color",
+          "label": "Border color"
+        },
+        {
+          "type": "range",
+          "id": "secondary_border_width",
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "unit": "px",
+          "label": "Border width",
+          "default": 1
+        },
+        {
+          "type": "range",
+          "id": "secondary_button_border_radius",
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "label": "Border radius",
+          "default": 6
+        },
+        {
+          "type": "select",
+          "id": "secondary_buttons_animation",
+          "label": "Animation",
+          "options": [
+            {
+              "value": "grow",
+              "label": "Grow"
+            },
+            {
+              "value": "shrink",
+              "label": "Shrink"
+            },
+            {
+              "value": "lighten",
+              "label": "Lighten"
+            },
+            {
+              "value": "darken",
+              "label": "Darken"
+            }
+          ],
+          "default": "shrink"
+        },
+        {
+          "type": "header",
+          "content": "Secondary button visibility"
+        },
+        {
+          "type": "checkbox",
+          "id": "s_btn_visible_on_desktop",
+          "label": "Visible on desktop",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "s_btn_visible_on_mobile",
+          "label": "Visible on mobile",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Card grid",
+      "settings": {
+        "grid_gap": 15,
+        "columns": 4,
+        "top_margin": 40,
+        "bottom_margin": 40
+      },
+      "blocks": [
+        {
+          "type": "card",
+          "settings": {
+            "width": 2,
+            "height": 2,
+            "content_alignment": "left",
+            "horizontal_content_position": "left",
+            "vertical_content_position": "center",
+            "text": "",
+            "color": "",
+            "tag": "h2",
+            "font_size_scale": 100,
+            "visible_on_desktop": true,
+            "visible_on_mobile": true,
+            "paragraph_text": "",
+            "paragraph_color": "",
+            "paragraph_font_size_scale": 100,
+            "paragraph_visible_on_desktop": true,
+            "paragraph_visible_on_mobile": true,
+            "primary_text": "",
+            "primary_link": "",
+            "primary_type": "primary",
+            "primary_text_color": "",
+            "primary_background_color": "",
+            "primary_border_color": "",
+            "primary_border_width": 0,
+            "primary_button_border_radius": 6,
+            "primary_button_animation": "shrink",
+            "p_btn_visible_on_desktop": true,
+            "p_btn_visible_on_mobile": true,
+            "secondary_text": "",
+            "secondary_link": "",
+            "secondary_type": "primary",
+            "secondary_text_color": "",
+            "secondary_background_color": "",
+            "secondary_border_color": "",
+            "secondary_border_width": 1,
+            "secondary_button_border_radius": 6,
+            "secondary_buttons_animation": "shrink",
+            "s_btn_visible_on_desktop": true,
+            "s_btn_visible_on_mobile": true
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "width": 1,
+            "height": 1,
+            "content_alignment": "left",
+            "horizontal_content_position": "left",
+            "vertical_content_position": "center",
+            "text": "",
+            "color": "",
+            "tag": "h2",
+            "font_size_scale": 100,
+            "visible_on_desktop": true,
+            "visible_on_mobile": true,
+            "paragraph_text": "",
+            "paragraph_color": "",
+            "paragraph_font_size_scale": 100,
+            "paragraph_visible_on_desktop": true,
+            "paragraph_visible_on_mobile": true,
+            "primary_text": "",
+            "primary_link": "",
+            "primary_type": "primary",
+            "primary_text_color": "",
+            "primary_background_color": "",
+            "primary_border_color": "",
+            "primary_border_width": 0,
+            "primary_button_border_radius": 6,
+            "primary_button_animation": "shrink",
+            "p_btn_visible_on_desktop": true,
+            "p_btn_visible_on_mobile": true,
+            "secondary_text": "",
+            "secondary_link": "",
+            "secondary_type": "primary",
+            "secondary_text_color": "",
+            "secondary_background_color": "",
+            "secondary_border_color": "",
+            "secondary_border_width": 1,
+            "secondary_button_border_radius": 6,
+            "secondary_buttons_animation": "shrink",
+            "s_btn_visible_on_desktop": true,
+            "s_btn_visible_on_mobile": true
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "width": 1,
+            "height": 1,
+            "content_alignment": "left",
+            "horizontal_content_position": "left",
+            "vertical_content_position": "center",
+            "text": "",
+            "color": "",
+            "tag": "h2",
+            "font_size_scale": 100,
+            "visible_on_desktop": true,
+            "visible_on_mobile": true,
+            "paragraph_text": "",
+            "paragraph_color": "",
+            "paragraph_font_size_scale": 100,
+            "paragraph_visible_on_desktop": true,
+            "paragraph_visible_on_mobile": true,
+            "primary_text": "",
+            "primary_link": "",
+            "primary_type": "primary",
+            "primary_text_color": "",
+            "primary_background_color": "",
+            "primary_border_color": "",
+            "primary_border_width": 0,
+            "primary_button_border_radius": 6,
+            "primary_button_animation": "shrink",
+            "p_btn_visible_on_desktop": true,
+            "p_btn_visible_on_mobile": true,
+            "secondary_text": "",
+            "secondary_link": "",
+            "secondary_type": "primary",
+            "secondary_text_color": "",
+            "secondary_background_color": "",
+            "secondary_border_color": "",
+            "secondary_border_width": 1,
+            "secondary_button_border_radius": 6,
+            "secondary_buttons_animation": "shrink",
+            "s_btn_visible_on_desktop": true,
+            "s_btn_visible_on_mobile": true
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "width": 1,
+            "height": 1,
+            "content_alignment": "left",
+            "horizontal_content_position": "left",
+            "vertical_content_position": "center",
+            "text": "",
+            "color": "",
+            "tag": "h2",
+            "font_size_scale": 100,
+            "visible_on_desktop": true,
+            "visible_on_mobile": true,
+            "paragraph_text": "",
+            "paragraph_color": "",
+            "paragraph_font_size_scale": 100,
+            "paragraph_visible_on_desktop": true,
+            "paragraph_visible_on_mobile": true,
+            "primary_text": "",
+            "primary_link": "",
+            "primary_type": "primary",
+            "primary_text_color": "",
+            "primary_background_color": "",
+            "primary_border_color": "",
+            "primary_border_width": 0,
+            "primary_button_border_radius": 6,
+            "primary_button_animation": "shrink",
+            "p_btn_visible_on_desktop": true,
+            "p_btn_visible_on_mobile": true,
+            "secondary_text": "",
+            "secondary_link": "",
+            "secondary_type": "primary",
+            "secondary_text_color": "",
+            "secondary_background_color": "",
+            "secondary_border_color": "",
+            "secondary_border_width": 1,
+            "secondary_button_border_radius": 6,
+            "secondary_buttons_animation": "shrink",
+            "s_btn_visible_on_desktop": true,
+            "s_btn_visible_on_mobile": true
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "width": 1,
+            "height": 1,
+            "content_alignment": "left",
+            "horizontal_content_position": "left",
+            "vertical_content_position": "center",
+            "text": "",
+            "color": "",
+            "tag": "h2",
+            "font_size_scale": 100,
+            "visible_on_desktop": true,
+            "visible_on_mobile": true,
+            "paragraph_text": "",
+            "paragraph_color": "",
+            "paragraph_font_size_scale": 100,
+            "paragraph_visible_on_desktop": true,
+            "paragraph_visible_on_mobile": true,
+            "primary_text": "",
+            "primary_link": "",
+            "primary_type": "primary",
+            "primary_text_color": "",
+            "primary_background_color": "",
+            "primary_border_color": "",
+            "primary_border_width": 0,
+            "primary_button_border_radius": 6,
+            "primary_button_animation": "shrink",
+            "p_btn_visible_on_desktop": true,
+            "p_btn_visible_on_mobile": true,
+            "secondary_text": "",
+            "secondary_link": "",
+            "secondary_type": "primary",
+            "secondary_text_color": "",
+            "secondary_background_color": "",
+            "secondary_border_color": "",
+            "secondary_border_width": 1,
+            "secondary_button_border_radius": 6,
+            "secondary_buttons_animation": "shrink",
+            "s_btn_visible_on_desktop": true,
+            "s_btn_visible_on_mobile": true
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

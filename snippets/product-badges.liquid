@@ -1,0 +1,35 @@
+{% comment %}
+  Usage:
+  {% render 'product-badges', product: product %}
+  Classes optional
+{% endcomment %}
+{% liquid
+  assign date = 'now' | date: '%s' | plus: 0
+  assign period = 21
+  assign week_seconds = period | times: 24 | times: 60 | times: 60
+  assign product_published_at = product.published_at | date: '%s' | plus: 0
+  assign week_published = product_published_at | plus: week_seconds
+
+  assign new_arrival = false
+
+  if week_published > date
+    assign new_arrival = true
+  endif
+
+  assign sale = false
+  if product.compare_at_price > product.price and product.compare_at_price != blank
+    assign sale = true
+  endif
+
+  assign common_badge_class = 'body-3 px-16 py-4 uppercase font-medium border border-black-200 rounded-24'
+%}
+{%- if new_arrival or sale -%}
+  <div class="product-badges flex flex-col {{ classes }}">
+    {% if new_arrival %}
+      <span class="badge {{ common_badge_class }} badge--new">{{ 'products.badges.new' | t }}</span>
+    {% endif %}
+    {% if sale %}
+      <span class="badge {{ common_badge_class }} badge--sale">{{ 'products.badges.sale' | t }}</span>
+    {% endif %}
+  </div>
+{%- endif -%}

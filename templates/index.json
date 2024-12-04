@@ -1,0 +1,434 @@
+{
+  "sections": {
+    "section_example": {
+      "type": "section_example",
+      "disabled": true,
+      "settings": {}
+    },
+    "top_banner_mzCai4": {
+      "type": "top-banner",
+      "blocks": {
+        "feature_QbUEWc": {
+          "type": "feature",
+          "settings": {
+            "feature_icon": "shopify://shop_images/review.svg",
+            "feature_text": "<p>25,000+ Customer</p><p>Reviews Online</p>"
+          }
+        },
+        "feature_h7hk8V": {
+          "type": "feature",
+          "settings": {
+            "feature_icon": "shopify://shop_images/happy.svg",
+            "feature_text": "<p>600,000+ Earpads </p><p>Replaced and Counting...</p>"
+          }
+        },
+        "feature_EC4Uhe": {
+          "type": "feature",
+          "settings": {
+            "feature_icon": "shopify://shop_images/warranty.svg",
+            "feature_text": "<p>365 Days to Fall</p><p>in Love Warranty</p>"
+          }
+        },
+        "feature_xiF96z": {
+          "type": "feature",
+          "settings": {
+            "feature_icon": "shopify://shop_images/timer.svg",
+            "feature_text": "<p>Flawless, Step by Step,</p><p>5 Minute Installation</p>"
+          }
+        }
+      },
+      "block_order": [
+        "feature_QbUEWc",
+        "feature_h7hk8V",
+        "feature_EC4Uhe",
+        "feature_xiF96z"
+      ],
+      "settings": {
+        "background_image": "shopify:\/\/shop_images\/image_77.png",
+        "background_image_mobile": "shopify:\/\/shop_images\/Rectangle_3939.png",
+        "video": "shopify:\/\/files\/videos\/WC.mp4",
+        "video_mobile": "shopify:\/\/files\/videos\/WC_Mobile.mp4",
+        "title": "Premium comfort, perfect sound",
+        "subtitle": "<p>Transform your headphones with premium ear pads that offer unmatched comfort, durability, and style for hours of perfect sound.<\/p>",
+        "show_input": true,
+        "input_placeholder": "Find your product...",
+        "trending_searches_label": "Trending searches",
+        "trending_searches": "earpads,sony,handband,bose,covers",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "padding_top_mobile": 0,
+        "padding_bottom_mobile": 0,
+        "margin_top": 83,
+        "margin_bottom": 20,
+        "margin_top_mobile": 20,
+        "margin_bottom_mobile": 20
+      }
+    },
+    "our_products_WrDpUf": {
+      "type": "our-products",
+      "blocks": {
+        "item_7niRnG": {
+          "type": "item",
+          "settings": {
+            "title": "<p>REPLACEMENT<\/p><p>EARPADS<\/p>",
+            "link": "#",
+            "image_desktop": "shopify:\/\/shop_images\/Replacement_Earpads.png",
+            "image_mobile": "shopify:\/\/shop_images\/Replacement_Earpads_61eb8666-c281-43ab-ad74-f40517647983.png",
+            "title_color": "#ffffff"
+          }
+        },
+        "item_PXRNJ4": {
+          "type": "item",
+          "settings": {
+            "title": "<p>SWEAT<\/p><p>COVERS<\/p>",
+            "link": "#",
+            "image_desktop": "shopify:\/\/shop_images\/BG_Image.png",
+            "image_mobile": "shopify:\/\/shop_images\/Sweat_Covers.png",
+            "title_color": "#0a0300"
+          }
+        },
+        "item_xn8px9": {
+          "type": "item",
+          "settings": {
+            "title": "<p>HEADBANDS<\/p>",
+            "link": "#",
+            "image_desktop": "shopify:\/\/shop_images\/BG_Image_1.png",
+            "image_mobile": "shopify:\/\/shop_images\/Headbands.png",
+            "title_color": "#0a0300"
+          }
+        },
+        "item_dDLFnx": {
+          "type": "item",
+          "settings": {
+            "title": "<p>AIRPODS<\/p><p>EARHOOKS<\/p>",
+            "link": "#",
+            "image_desktop": "shopify:\/\/shop_images\/BG_Image_2.png",
+            "image_mobile": "shopify:\/\/shop_images\/Airpods_Earhooks.png",
+            "title_color": "#0a0300"
+          }
+        },
+        "item_QLbGbL": {
+          "type": "item",
+          "settings": {
+            "title": "<p>AIRPODS<\/p><p>FOAM TIPS<\/p>",
+            "link": "#",
+            "image_desktop": "shopify:\/\/shop_images\/Group_29.png",
+            "image_mobile": "shopify:\/\/shop_images\/Airpods_Foam_Tips.png",
+            "title_color": "#0a0300"
+          }
+        },
+        "item_EHATXg": {
+          "type": "item",
+          "settings": {
+            "title": "<p>SIDE<\/p><p>PLATES<\/p>",
+            "link": "#",
+            "image_desktop": "shopify:\/\/shop_images\/Group_29_1.png",
+            "image_mobile": "shopify:\/\/shop_images\/Side_Plates.png",
+            "title_color": "#0a0300"
+          }
+        }
+      },
+      "block_order": [
+        "item_7niRnG",
+        "item_PXRNJ4",
+        "item_xn8px9",
+        "item_dDLFnx",
+        "item_QLbGbL",
+        "item_EHATXg"
+      ],
+      "settings": {
+        "title": "OUR PRODUCTS",
+        "margin_top": 80,
+        "margin_bottom": 80,
+        "margin_top_mobile": 60,
+        "margin_bottom_mobile": 60
+      }
+    },
+    "benefits_M9xU3T": {
+      "type": "benefits",
+      "blocks": {
+        "item_mBVWim": {
+          "type": "item",
+          "settings": {
+            "title": "Comfort & Thickness",
+            "text": "Soft memory foam provides a snug, pressure-free fit for extended listening sessions.",
+            "icon": "shopify:\/\/shop_images\/happy_70c7da04-033a-4de0-ba9b-58891551896e.png"
+          }
+        },
+        "item_QBYeHi": {
+          "type": "item",
+          "settings": {
+            "title": "Superior Sound Quality",
+            "text": "Improves noise isolation for clearer sound with enhanced bass and crisp highs.",
+            "icon": "shopify:\/\/shop_images\/sound_ea357678-b58d-444c-97f9-4fb9bd52aa38.png"
+          }
+        },
+        "item_qi844q": {
+          "type": "item",
+          "settings": {
+            "title": "Durability",
+            "text": "Made from premium materials, built to withstand daily wear and tear.",
+            "icon": "shopify:\/\/shop_images\/durability.png"
+          }
+        },
+        "item_6DKLD6": {
+          "type": "item",
+          "settings": {
+            "title": "Perfect Compatibility",
+            "text": "Easy to install and perfectly designed for different models.",
+            "icon": "shopify:\/\/shop_images\/compatibility.png"
+          }
+        },
+        "item_cYaze7": {
+          "type": "item",
+          "settings": {
+            "title": "Unique Design and Aesthetics",
+            "text": "Sleek, modern design with color options to refresh your headphones' look.",
+            "icon": "shopify:\/\/shop_images\/Unique.png"
+          }
+        }
+      },
+      "block_order": [
+        "item_mBVWim",
+        "item_QBYeHi",
+        "item_qi844q",
+        "item_6DKLD6",
+        "item_cYaze7"
+      ],
+      "settings": {
+        "title": "<h2>EVERY DETAIL ELEVATES<br\/>YOUR LISTENING<br\/>EXPERIENCE<\/h2>",
+        "title_color": "#ffffff",
+        "text_color": "#c2c1c0",
+        "image_desktop": "shopify:\/\/shop_images\/image_1_f3605327-4c64-4355-93b5-d76dc0e79ed7.png",
+        "image_mobile": "shopify:\/\/shop_images\/image_5807e26d-a16f-4cfc-91dd-4ac28bbdfaf9.png",
+        "button_link": "#",
+        "button_text": "SHOP NOW",
+        "button_style": "primary",
+        "margin_top": 80,
+        "margin_bottom": 80,
+        "margin_top_mobile": 60,
+        "margin_bottom_mobile": 60,
+        "padding_top": 160,
+        "padding_bottom": 160,
+        "padding_top_mobile": 120,
+        "padding_bottom_mobile": 120
+      }
+    },
+    "section_products_slider_amacDi": {
+      "type": "section-products-slider",
+      "blocks": {
+        "products_group_iimWgq": {
+          "type": "products_group",
+          "settings": {
+            "products": [],
+            "collection": "nova-pro-wireless-replacement-earpads",
+            "group_title": "Replacement Earpads"
+          }
+        },
+        "products_group_JgPXVh": {
+          "type": "products_group",
+          "settings": {
+            "products": [],
+            "collection": "sony-wh1000xm3-xm3-sweat-headphone-cover-protectors",
+            "group_title": "Headphone Covers"
+          }
+        },
+        "products_group_DjcBcC": {
+          "type": "products_group",
+          "settings": {
+            "products": [],
+            "collection": "beats-studio-headband-protective-sweat-cover",
+            "group_title": "Headbands"
+          }
+        }
+      },
+      "block_order": [
+        "products_group_iimWgq",
+        "products_group_JgPXVh",
+        "products_group_DjcBcC"
+      ],
+      "settings": {
+        "title": "Bestsellers",
+        "all_group_title": "All",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "padding_top_mobile": 0,
+        "padding_bottom_mobile": 0,
+        "margin_top": 20,
+        "margin_bottom": 82,
+        "margin_top_mobile": 20,
+        "margin_bottom_mobile": 55
+      }
+    },
+    "section_products_slider_fQAaLB": {
+      "type": "section-products-slider",
+      "blocks": {
+        "products_group_KgRA4a": {
+          "type": "products_group",
+          "settings": {
+            "products": [
+              "wc-freeze-a50",
+              "wc-freeze-a40",
+              "astro-a30-replacement-earpads",
+              "wc-freeze-arcits-nova"
+            ],
+            "collection": "nova-pro-wireless-replacement-earpads",
+            "group_title": "Replacement Earpads"
+          }
+        },
+        "products_group_tUDmF3": {
+          "type": "products_group",
+          "settings": {
+            "products": [
+              "bose-quietcomfort-ultra-earpad-sweat-covers-wc-sweatz-qc-ultra-v2",
+              "bose-quiet-comfort-silicone-headband-cover",
+              "bose-quietcomfort-35-45-sweat-earpad-covers",
+              "bose-qc45-replacement-ear-pads",
+              "bose-qc35-replacement-ear-pads-cooling-gel"
+            ],
+            "collection": "sony-wh1000xm3-xm3-sweat-headphone-cover-protectors",
+            "group_title": "Headphone Covers"
+          }
+        },
+        "products_group_zRPDkV": {
+          "type": "products_group",
+          "settings": {
+            "products": [
+              "corsair-hs60-replacement-earpads",
+              "razer-blackshark-v2-pro-earpads",
+              "razer-blackshark-v2-pro-2023-earpads",
+              "playstation-pulse-elite-replacement-earpads",
+              "playstation-pulse-elite-cooling-gel-earpads",
+              "logitech-g933-g935-earpads-cooling-gel",
+              "wc-sweatz-headphone-earpad-cover-black",
+              "epos-h6-pro-replacement-earpads-cooling-gel"
+            ],
+            "collection": "beats-studio-headband-protective-sweat-cover",
+            "group_title": "Headbands"
+          }
+        }
+      },
+      "block_order": [
+        "products_group_KgRA4a",
+        "products_group_tUDmF3",
+        "products_group_zRPDkV"
+      ],
+      "settings": {
+        "title": "New Arrivals",
+        "all_group_title": "All",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "padding_top_mobile": 0,
+        "padding_bottom_mobile": 0,
+        "margin_top": 82,
+        "margin_bottom": 20,
+        "margin_top_mobile": 55,
+        "margin_bottom_mobile": 20
+      }
+    },
+    "video_reviews_carousel_3MnDMx": {
+      "type": "video-reviews-carousel",
+      "blocks": {
+        "video_z8jb4T": {
+          "type": "video",
+          "settings": {
+            "video": "shopify:\/\/files\/videos\/Sea Waves - Sound Effect.mp4"
+          }
+        },
+        "video_QT6HXF": {
+          "type": "video",
+          "settings": {
+            "video": "shopify:\/\/files\/videos\/7565438-hd_1080_1920_25fps.mp4"
+          }
+        },
+        "video_MzdddJ": {
+          "type": "video",
+          "settings": {
+            "video": "shopify:\/\/files\/videos\/Sea Waves - Sound Effect.mp4"
+          }
+        },
+        "video_cY4t4M": {
+          "type": "video",
+          "settings": {
+            "video": "shopify:\/\/files\/videos\/7565438-hd_1080_1920_25fps.mp4"
+          }
+        },
+        "video_6B6KHd": {
+          "type": "video",
+          "settings": {
+            "video": "shopify:\/\/files\/videos\/Sea Waves - Sound Effect.mp4"
+          }
+        },
+        "video_XarCGJ": {
+          "type": "video",
+          "settings": {
+            "video": "shopify:\/\/files\/videos\/7565438-hd_1080_1920_25fps.mp4"
+          }
+        }
+      },
+      "block_order": [
+        "video_z8jb4T",
+        "video_QT6HXF",
+        "video_MzdddJ",
+        "video_cY4t4M",
+        "video_6B6KHd",
+        "video_XarCGJ"
+      ],
+      "settings": {
+        "title": "25,000+ Verified Reviews",
+        "show_stars": true,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "padding_top_mobile": 0,
+        "padding_bottom_mobile": 0,
+        "margin_top": 100,
+        "margin_bottom": 20,
+        "margin_top_mobile": 20,
+        "margin_bottom_mobile": 20
+      }
+    },
+    "1732549786a059ef22": {
+      "type": "apps",
+      "blocks": {
+        "loox_reviews_loox_carousel_section_kGKhdw": {
+          "type": "shopify:\/\/apps\/loox-reviews\/blocks\/loox-carousel-section\/5c3b337f-fd14-4df5-b1d6-80ec13e6e28e",
+          "settings": {
+            "max_width": 1920,
+            "text_color": "#000000",
+            "background_color": "#ffffff",
+            "arrows_color": "#000000",
+            "dots_color": "#000000",
+            "button_color": "#000000",
+            "show_more": true,
+            "only_photos": false,
+            "use_widget_font": true,
+            "product_handle": ""
+          }
+        }
+      },
+      "block_order": [
+        "loox_reviews_loox_carousel_section_kGKhdw"
+      ],
+      "settings": {
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "padding_top_mobile": 0,
+        "padding_bottom_mobile": 0,
+        "margin_top": 80,
+        "margin_bottom": 20,
+        "margin_top_mobile": 80,
+        "margin_bottom_mobile": 20
+      }
+    }
+  },
+  "order": [
+    "section_example",
+    "top_banner_mzCai4",
+    "our_products_WrDpUf",
+    "benefits_M9xU3T",
+    "section_products_slider_amacDi",
+    "section_products_slider_fQAaLB",
+    "video_reviews_carousel_3MnDMx",
+    "1732549786a059ef22"
+  ]
+}

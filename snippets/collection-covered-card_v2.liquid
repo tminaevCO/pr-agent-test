@@ -1,0 +1,199 @@
+{% liquid
+    assign collection = collection
+
+    assign grid_gap = grid_gap  | default: 15
+    assign columns_desktop = columns_desktop | default: 1
+    assign columns_mobile = columns_mobile | default: 1
+
+    assign text_position = text_position | default: 'left'
+
+    assign drop_shadow = drop_shadow | default: false
+
+    assign image_background_color = image_background_color
+    if image_background_color.alpha == null or image_background_color.alpha == 0.0
+        assign image_background_color = settings.image_background_color
+    endif
+
+    assign card_background_color = card_background_color
+    if card_background_color.alpha == null or card_background_color.alpha == 0.0
+        assign card_background_color = settings.card_background_color
+    endif
+
+    assign alignment = alignment
+    assign text_color = text_color
+    if text_color.alpha == null or text_color.alpha == 0.0
+        assign text_color = settings.heading_color
+    endif
+
+    assign font_size_scale = font_size_scale | default: 100
+    assign overlay_color = overlay_color
+    assign opacity = opacity
+
+    if opacity < 100
+        assign alpha = opacity | divided_by: 100.0
+        assign overlay_modified_color = overlay_color | color_modify: 'alpha', alpha
+    else 
+        assign overlay_modified_color = overlay_color | color_modify: 'alpha', 1 
+    endif
+
+    assign show_links = show_links | default: false
+    assign show_link_arrows = show_link_arrows | default: false
+    assign link_color = link_color
+    assign icon_color = link_color
+    if link_color.alpha == null or link_color.alpha == 0.0
+        assign link_color = settings.link_color
+        assign icon_color = settings.icon_color
+    endif
+    assign link_text = link_text
+    assign default_id = 'collection-covered-card' | append: collection.id
+    assign id = id | default: default_id
+%}
+
+<{% if show_links and link_text != blank and text_position == "underneath" %}div{% else %}a href="{{collection.url}}"{% endif %}  class="collection-covered-card" id="{{id}}">
+    {% style %}
+        #{{id}} {
+            display: block;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            height: 100%;
+            border-radius: {{settings.border_radius}}px;
+            {% if drop_shadow %}box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.10);{% endif %}
+            {% if text_position == 'underneath'%}
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                {% if show_links and link_text != blank %}padding-bottom: 28px;{% endif %}
+                box-sizing: border-box;
+            {% else %}
+                aspect-ratio: 0.8;
+            {% endif %}
+        }
+
+        #{{id}} .collection-covered-card__image {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            {% if text_position == "underneath" %}
+              aspect-ratio: 1;
+            {% else %}
+              height: 100%;
+            {% endif  %}
+        }
+
+        #{{id}} .collection-covered-card__image img,
+        #{{id}} .collection-covered-card__image svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%;
+            object-fit: cover;
+            background-color: {{image_background_color}};
+        }
+
+        #{{id}} .svg-placeholder {
+            background-color: {% if image_background_color.alpha and image_background_color.alpha != 0.0 %}{{image_background_color}}{% else %}{{settings.image_background_color}}{% endif %};;
+            stroke: {{settings.icon_color}};
+            fill: {{settings.icon_color}};
+        }
+
+        #{{id}} .collection-covered-card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: {{overlay_modified_color}};
+        }
+
+        #{{id}} .collection-covered-card__title {
+            text-align: {{alignment}};
+            width: 100%;
+            margin: 0;
+            color: {{text_color}};
+            font-size: {{20 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round }}px;
+            line-height: {{20 | times: settings.heading_font_size_scale | divided_by: 100.0 | round | times: font_size_scale | divided_by: 100.0 | round | times: 130 | divided_by: 100.0 | round | times: settings.heading_line_spacing_scale | divided_by: 100.0 | round }}px;
+            font-family: {{ settings.heading_font.family }}, {{ settings.heading_font.fallback_families }};
+            font-weight: {{ settings.heading_font.weight }};
+            box-sizing: border-box;
+            {%- case text_position -%}
+              {%- when "top" -%}
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  z-index: 2;
+                  padding: 28px;
+              {%- when "bottom" -%}
+                  position: absolute;
+                  bottom: 0;
+                  left: 0;
+                  z-index: 2;
+                  padding: 28px;
+              {%- when "underneath" -%}
+                  padding: 24px;
+                  flex: 1 0 auto;
+                  background-color: {{card_background_color}};
+            {%- endcase -%}
+        }
+        
+        {% if columns_mobile == "2" %}
+          @media only screen and (max-width: 400px) {
+            #{{id}} .collection-covered-card__title {
+              padding: 15px;
+            }
+          }
+        {% endif %}
+
+        {% if show_links and link_text != blank and text_position == "underneath" %}
+            #{{id}} .collection-covered-card__link {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 9px;
+                color: {{link_color}};
+                padding: 0 24px 0;
+                width: max-content;
+                max-width: 85%;
+                {% case alignment %}
+                    {% when 'left' %}
+                        justify-content: flex-start;
+                        margin-left: 0;
+                        margin-right: auto;
+                    {% when 'center' %}
+                        justify-content: center;
+                        margin-left: auto;
+                        margin-right: auto;
+                    {% when 'right' %}
+                        justify-content: flex-end;
+                        margin-left: auto;
+                        margin-right: 0;
+                {% endcase %}
+            }
+
+            #{{id}} .collection-covered-card__link svg {
+                flex: 0 0 auto;
+            }
+
+        {% endif %}
+    {% endstyle %}
+
+    <div class="collection-covered-card__image">
+        {% if collection.featured_image %}
+            {%- assign image_sizes = "" -%}
+            {%- assign half_gap = grid_gap |  divided_by: 2 -%}
+            {%- assign mobile_size = 100 | divided_by: columns_mobile |  minus: half_gap | append: 'vw' -%}
+            {%- assign desktop_size = 100 |  divided_by: columns_desktop | minus: half_gap | append: 'vw' -%}
+            {%- assign image_sizes = "(max-width: 769px) MOBILE, DESKTOP" |  replace: "MOBILE", mobile_size |  replace: "DESKTOP", desktop_size -%}
+            {% render 'responsive-image-dynamic_v2', image: collection.featured_image, sizes: image_sizes %}
+        {%- else -%}
+            {{ 'image' | placeholder_svg_tag: "svg-placeholder" }}
+        {% endif %}
+
+        {% if overlay_color.alpha and overlay_color.alpha != 0.0 %}
+            <div class="collection-covered-card-overlay"></div>
+        {% endif %}
+    </div>
+    <p class="collection-covered-card__title">{{collection.title}}</p>
+
+</{% if show_links and link_text != blank and text_position == "underneath" %}div{% else %}a{% endif %}> 

@@ -1,0 +1,11 @@
+{%- if settings.enable_quick_view -%}
+  <quick-view-btn
+    data-product-id="{{ product.id }}"
+    data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+    class="absolute z-10 bottom-4 hidden md:block text-center w-full md:opacity-0 group-hover:opacity-100 transition-all"
+  >
+    <button class="button button--primary m-auto">
+      {{ 'products.quick_view.button_label' | t }}
+    </button>
+  </quick-view-btn>
+{%- endif -%}
