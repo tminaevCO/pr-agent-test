@@ -10,7 +10,7 @@ env:
 
 jobs:
   audit:
-    name: deploy
+    name: audit
     runs-on: ubuntu-latest
     steps:
     - name: Authentication
