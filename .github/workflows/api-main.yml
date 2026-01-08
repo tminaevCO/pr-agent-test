@@ -24,7 +24,7 @@ jobs:
     - name: Install dependencies and audit packages
       run:  |-
         npm install
-        npm audit --severity high
+        npm audit --audit-level=high
 
     - name: Slack notification (success)
       if: success()
