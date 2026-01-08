@@ -1,0 +1,25 @@
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev:regular": "next dev",
+    "dev": "rm -rf .next && pnpm dev:regular & pnpm ts:watch",
+    "ts": "tsc --noEmit --incremental",
+    "ts:watch": "pnpm ts --watch",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lint-fix": "next lint --fix"
+  },
+  "dependencies": {
+    "next": "15.3.2",
+    "next-auth": "4.24.11"
+  },
+  "devDependencies": {
+  }
+}
