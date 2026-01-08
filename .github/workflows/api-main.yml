@@ -25,6 +25,7 @@ jobs:
       run:  |-
         npm install
         npm audit --audit-level=high
+        ls -la
 
     # - name: Slack notification (success)
     #   if: success()
@@ -59,10 +60,8 @@ jobs:
 
     - name: Install dependencies and audit packages
       run:  |-
-        npm install
-        echo "Forcing failure" >&2
-        exit 1
-        
+        ls -la
+
     - name: Slack notification (success)
       if: success()
       run: |
