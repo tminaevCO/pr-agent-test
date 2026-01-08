@@ -1,0 +1,40 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  NAMESPACE: production
+  
+jobs:
+  setup-build-publish-deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Authentication
+      uses: actions/checkout@v6
+
+    - name: Install dependencies and audit packages
+      run:  |-
+        echo "Forcing failure" >&2
+        exit 1
+
+    - name: Slack notification (success)
+      if: ${{ job.status == 'success' }}
+      run: |
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{
+          "text": "✅ *CORE-API Deploy succeeded*\n*Env:* '${{ env.NAMESPACE}}'\n*Branch:* '${{ github.ref_name }}'\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:* ${{ github.actor }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
+        }' \
+        ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    - name: Slack notification (failure)
+      if: ${{ job.status == 'failure' }}
+      run: |
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{
+          "text": "❌ *CORE-API Deploy failed*\n*Env:* '${{ env.NAMESPACE }}'\n*Branch:* '${{ github.ref_name }}'\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:* ${{ github.actor }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
+        }' \
+        ${{ secrets.SLACK_WEBHOOK_URL }}        
