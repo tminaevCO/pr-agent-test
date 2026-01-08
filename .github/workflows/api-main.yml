@@ -9,7 +9,7 @@ env:
   NAMESPACE: production
 
 jobs:
-  setup-build-publish-deploy:
+  audit:
     name: deploy
     runs-on: ubuntu-latest
     steps:
@@ -25,6 +25,41 @@ jobs:
       run:  |-
         npm install
         npm audit --audit-level=high
+
+    # - name: Slack notification (success)
+    #   if: success()
+    #   run: |
+    #     curl -X POST -H 'Content-type: application/json' \
+    #     --data '{
+    #       "text": "✅ *NPM Audit succeeded*\n*Env:* '${{ env.NAMESPACE}}'\n*Branch:* '${{ github.ref_name }}'\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:* ${{ github.actor }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
+    #     }' \
+    #     ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    - name: Slack notification (failure)
+      if: failure()
+      run: |
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{
+          "text": "❌ *Npm audit failed*\n*Env:* '${{ env.NAMESPACE }}'\n*Branch:* '${{ github.ref_name }}'\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:* ${{ github.actor }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
+        }' \
+        ${{ secrets.SLACK_WEBHOOK_URL }}        
+
+  setup-build-publish-deploy:
+    name: deploy
+    needs: [audit]  
+    runs-on: ubuntu-latest
+    steps:
+    - name: Authentication
+      uses: actions/checkout@v6
+
+    - uses: actions/setup-node@v6
+      with:
+        node-version: '22.2.0'
+
+
+    - name: Install dependencies and audit packages
+      run:  |-
+        npm install
 
     - name: Slack notification (success)
       if: success()
@@ -42,4 +77,4 @@ jobs:
         --data '{
           "text": "❌ *CORE-API Deploy failed*\n*Env:* '${{ env.NAMESPACE }}'\n*Branch:* '${{ github.ref_name }}'\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:* ${{ github.actor }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
         }' \
-        ${{ secrets.SLACK_WEBHOOK_URL }}        
+        ${{ secrets.SLACK_WEBHOOK_URL }}              
