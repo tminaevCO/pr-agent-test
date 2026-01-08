@@ -60,7 +60,9 @@ jobs:
     - name: Install dependencies and audit packages
       run:  |-
         npm install
-
+        echo "Forcing failure" >&2
+        exit 1
+        
     - name: Slack notification (success)
       if: success()
       run: |
